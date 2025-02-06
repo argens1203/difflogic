@@ -155,7 +155,7 @@ python experiments/main.py  -eid 526020 -lr 0.001 -bs 100 -t 20 --dataset breast
 ### 🔢 MNIST
 
 ```shell
-python experiments/main.py  -bs 100 -t  10 --dataset mnist20x20 -ni 200_000 -ef 1_000 -k  8_000 -l 6 --compile_model
+   
 python experiments/main.py  -bs 100 -t  30 --dataset mnist      -ni 200_000 -ef 1_000 -k 64_000 -l 6 --compile_model
 # Baselines:
 python experiments/main_baseline.py  -bs 100 --dataset mnist    -ni 200_000 -ef 1_000 -k  128 -l 3
@@ -188,3 +188,9 @@ python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 
 `difflogic` is released under the MIT license. See [LICENSE](LICENSE) for additional details about it. 
 
 Patent pending.
+
+## Commands
+python setup.py install
+mkdir results
+python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k    12_000 -l 4 --compile_model --eid 520001
+python experiments/apply_compiled_net.py
