@@ -516,6 +516,9 @@ if __name__ == "__main__":
                 )
 
                 compiled_model.print()
+                with open("test.out", "w") as dumpf:
+                    raw = compiled_model.get_raw()
+                    dumpf.write("\n".join(raw))
 
                 compiled_model.compile(
                     opt_level=1 if args.num_layers * args.num_neurons < 50_000 else 0,

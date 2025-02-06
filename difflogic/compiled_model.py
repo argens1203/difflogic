@@ -73,15 +73,18 @@ class CompiledLogicNet(torch.nn.Module):
 
             print(self.model)
             first = True
-            for layer in self.model:
-                print(layer)
+            for itr, layer in enumerate(self.model):
+                print(itr, layer)
                 if isinstance(layer, LogicLayer):
                     if first:
                         self.num_inputs = layer.in_dim
                         first = False
                     self.num_out_per_class = layer.out_dim // self.num_classes
-                    print(layer.weights)
-                    input()
+                    print("layer.weights", layer.weights)
+                    print("layer.weights.shape", layer.weights.shape)
+                    print("layer.indices", layer.indices)
+                    print("layer.indices[0].shape", layer.indices[0].shape)
+                    print("layer.indices[1].shape", layer.indices[1].shape)
                     layers.append(
                         (layer.indices[0], layer.indices[1], layer.weights.argmax(1))
                     )
@@ -173,6 +176,87 @@ class CompiledLogicNet(torch.nn.Module):
                     f"\tconst {BITS_TO_DTYPE[self.num_bits]} v{prefix_sums[layer_id] + var_id} = {self.get_gate_code(a, b, gate_op)};"
                 )
         return code
+
+    def get_logic_code(self, var1, var2, gate_op):
+        operation_name = ALL_OPERATIONS[gate_op]
+
+        if operation_name == "zero":
+            res = BITS_TO_ZERO_LITERAL[self.num_bits]
+        elif operation_name == "and":
+            res = f"{var1} & {var2}"
+        elif operation_name == "not_implies":
+            res = f"{var1} & ~{var2}"
+        elif operation_name == "a":
+            res = f"{var1}"
+        elif operation_name == "not_implied_by":
+            res = f"{var2} & ~{var1}"
+        elif operation_name == "b":
+            res = f"{var2}"
+        elif operation_name == "xor":
+            res = f"{var1} ^ {var2}"
+        elif operation_name == "or":
+            res = f"{var1} | {var2}"
+        elif operation_name == "not_or":
+            res = f"~({var1} | {var2})"
+        elif operation_name == "not_xor":
+            res = f"~({var1} ^ {var2})"
+        elif operation_name == "not_b":
+            res = f"~{var2}"
+        elif operation_name == "implied_by":
+            res = f"~{var2} | {var1}"
+        elif operation_name == "not_a":
+            res = f"~{var1}"
+        elif operation_name == "implies":
+            res = f"~{var1} | {var2}"
+        elif operation_name == "not_and":
+            res = f"~({var1} & {var2})"
+        elif operation_name == "one":
+            res = f"~{BITS_TO_ZERO_LITERAL[self.num_bits]}"
+        else:
+            assert False, "Operator {} unknown.".format(operation_name)
+
+        if self.num_bits == 8:
+            res = f"(char) ({res})"
+        elif self.num_bits == 16:
+            res = f"(short) ({res})"
+
+        return res
+
+    def get_layer(self, layer_a, layer_b, layer_op, layer_id, prefix_sums):
+        code = {}
+        for var_id, (gate_a, gate_b, gate_op) in enumerate(
+            zip(layer_a, layer_b, layer_op)
+        ):
+            if self.device == "cpu" and layer_id == len(prefix_sums) - 1:
+                a = f"v{prefix_sums[layer_id - 1] + gate_a}"
+                b = f"v{prefix_sums[layer_id - 1] + gate_b}"
+                code[f"out[{var_id}]"] = f"{self.get_gate_code(a, b, gate_op)}"
+            else:
+                assert not (
+                    self.device == "cpu" and layer_id >= len(prefix_sums) - 1
+                ), (layer_id, len(prefix_sums))
+                if layer_id == 0:
+                    a = f"inp[{gate_a}]"
+                    b = f"inp[{gate_b}]"
+                else:
+                    a = f"v{prefix_sums[layer_id - 1] + gate_a}"
+                    b = f"v{prefix_sums[layer_id - 1] + gate_b}"
+                code[f"v{prefix_sums[layer_id] + var_id}"] = (
+                    f"{self.get_gate_code(a, b, gate_op)}"
+                )
+        return [str(code)]
+
+    def get_raw(self):
+        prefix_sums = [0]
+        cur_count = 0
+        for layer_a, layer_b, layer_op in self.layers[:-1]:
+            cur_count += len(layer_a)
+            prefix_sums.append(cur_count)
+        o = []
+        for layer_id, (layer_a, layer_b, layer_op) in enumerate(self.layers):
+            o.extend(self.get_layer(layer_a, layer_b, layer_op, layer_id, prefix_sums))
+        print("length of list", len(o))
+        return o
 
     def get_c_code(self):
         prefix_sums = [0]
