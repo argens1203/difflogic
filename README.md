@@ -195,3 +195,8 @@ mkdir results
 python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k    12_000 -l 4 --compile_model --eid 520001
 python experiments/apply_compiled_net.py
 python setup.py install && python experiments/main.py -bs 100 -t 100 --dataset cifar-10-3-thresholds -ni 100 -ef 100 -k 12_000 -l 4 --compile_model -eid 520001
+
+-ni number of iterations
+-ef evaluation frequency
+-k number of neurons
+-l number of layers

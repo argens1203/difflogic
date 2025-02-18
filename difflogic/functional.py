@@ -23,6 +23,7 @@ BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 # | 14 | not(A and B)         | 1     | 1     | 1     | 0     |
 # | 15 | 1                    | 1     | 1     | 1     | 1     |
 
+
 def bin_op(a, b, i):
     assert a[0].shape == b[0].shape, (a[0].shape, b[0].shape)
     if a.shape[0] > 1:
@@ -73,10 +74,14 @@ def bin_op_s(a, b, i_s):
 ########################################################################################################################
 
 
-def get_unique_connections(in_dim, out_dim, device='cuda'):
-    assert out_dim * 2 >= in_dim, 'The number of neurons ({}) must not be smaller than half of the number of inputs ' \
-                                  '({}) because otherwise not all inputs could be used or considered.'.format(
-        out_dim, in_dim
+def get_unique_connections(in_dim, out_dim, device="cuda"):
+    print("in_dim", in_dim, "out_dim", out_dim)
+    print("=======================================")
+    assert out_dim * 2 >= in_dim, (
+        "The number of neurons ({}) must not be smaller than half of the number of inputs "
+        "({}) because otherwise not all inputs could be used or considered.".format(
+            out_dim, in_dim
+        )
     )
 
     x = torch.arange(in_dim).long().unsqueeze(0)
@@ -88,6 +93,7 @@ def get_unique_connections(in_dim, out_dim, device='cuda'):
         a = a[..., :m]
         b = b[..., :m]
 
+    print(96, a.shape[-1])
     # If this was not enough, take pairs (1, 2), (3, 4), (5, 6), ...
     if a.shape[-1] < out_dim:
         a_, b_ = x[..., 1::2], x[..., 2::2]
@@ -98,6 +104,7 @@ def get_unique_connections(in_dim, out_dim, device='cuda'):
             a = a[..., :m]
             b = b[..., :m]
 
+    print(107, a.shape[-1])
     # If this was not enough, take pairs with offsets >= 2:
     offset = 2
     while out_dim > a.shape[-1] > offset:
@@ -107,6 +114,7 @@ def get_unique_connections(in_dim, out_dim, device='cuda'):
         offset += 1
         assert a.shape[-1] == b.shape[-1], (a.shape[-1], b.shape[-1])
 
+    print(117, a.shape[-1])
     if a.shape[-1] >= out_dim:
         a = a[..., :out_dim]
         b = b[..., :out_dim]
@@ -139,6 +147,3 @@ class GradFactor(torch.autograd.Function):
 
 
 ########################################################################################################################
-
-
-
