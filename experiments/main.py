@@ -12,7 +12,9 @@ from results_json import ResultsJSON
 
 import mnist_dataset
 import uci_datasets
-from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
+
+# from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
+from difflogic import LogicLayer, GroupSum, CompiledLogicNet
 
 torch.set_num_threads(1)
 
@@ -251,7 +253,11 @@ def get_model(args):
             }
         )
 
-    model = model.to("cuda")
+    model = model.to(
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps" if torch.mps.is_available() else "cpu"
+    )
 
     print(model)
     if args.experiment_id is not None:
@@ -280,7 +286,20 @@ def eval(model, loader, mode):
         model.train(mode=mode)
         res = np.mean(
             [
-                (model(x.to("cuda").round()).argmax(-1) == y.to("cuda"))
+                (
+                    model(
+                        x.to(
+                            "cuda"
+                            if torch.cuda.is_available()
+                            else "mps" if torch.mps.is_available() else "cpu"
+                        ).round()
+                    ).argmax(-1)
+                    == y.to(
+                        "cuda"
+                        if torch.cuda.is_available()
+                        else "mps" if torch.mps.is_available() else "cpu"
+                    )
+                )
                 .to(torch.float32)
                 .mean()
                 .item()
@@ -453,8 +472,16 @@ if __name__ == "__main__":
         desc="iteration",
         total=args.num_iterations,
     ):
-        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to("cuda")
-        y = y.to("cuda")
+        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.mps.is_available() else "cpu"
+        )
+        y = y.to(
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.mps.is_available() else "cpu"
+        )
 
         loss = train(model, x, y, loss_fn, optim)
 
@@ -481,6 +508,7 @@ if __name__ == "__main__":
             }
 
             if args.packbits_eval:
+                pass
                 r["train_acc_eval"] = packbits_eval(model, train_loader)
                 r["valid_acc_eval"] = packbits_eval(model, train_loader)
                 r["test_acc_eval"] = packbits_eval(model, test_loader)

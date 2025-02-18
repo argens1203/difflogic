@@ -1,8 +1,10 @@
 import torch
-import difflogic_cuda
+
+# import difflogic_cuda
 import numpy as np
 from .functional import bin_op_s, get_unique_connections, GradFactor
-from .packbitstensor import PackBitsTensor
+
+# from .packbitstensor import PackBitsTensor
 
 
 ########################################################################################################################
@@ -17,7 +19,7 @@ class LogicLayer(torch.nn.Module):
         self,
         in_dim: int,
         out_dim: int,
-        device: str = "cuda",
+        device: str = "cpu",
         grad_factor: float = 1.0,
         implementation: str = None,
         connections: str = "random",
@@ -81,21 +83,22 @@ class LogicLayer(torch.nn.Module):
         self.num_weights = out_dim
 
     def forward(self, x):
-        if isinstance(x, PackBitsTensor):
-            assert (
-                not self.training
-            ), "PackBitsTensor is not supported for the differentiable training mode."
-            assert self.device == "cuda", (
-                "PackBitsTensor is only supported for CUDA, not for {}. "
-                "If you want fast inference on CPU, please use CompiledDiffLogicModel."
-                "".format(self.device)
-            )
+        # if isinstance(x, PackBitsTensor):
+        #     assert (
+        #         not self.training
+        #     ), "PackBitsTensor is not supported for the differentiable training mode."
+        #     assert self.device == "cuda", (
+        #         "PackBitsTensor is only supported for CUDA, not for {}. "
+        #         "If you want fast inference on CPU, please use CompiledDiffLogicModel."
+        #         "".format(self.device)
+        #     )
 
-        else:
-            if self.grad_factor != 1.0:
-                x = GradFactor.apply(x, self.grad_factor)
+        # else:
+        if self.grad_factor != 1.0:
+            x = GradFactor.apply(x, self.grad_factor)
 
         if self.implementation == "cuda":
+            assert False
             if isinstance(x, PackBitsTensor):
                 return self.forward_cuda_eval(x)
             return self.forward_cuda(x)
@@ -108,9 +111,9 @@ class LogicLayer(torch.nn.Module):
         assert x.shape[-1] == self.in_dim, (x[0].shape[-1], self.in_dim)
 
         if self.indices[0].dtype == torch.int64 or self.indices[1].dtype == torch.int64:
-            print(self.indices[0].dtype, self.indices[1].dtype)
+            # print(self.indices[0].dtype, self.indices[1].dtype)
             self.indices = self.indices[0].long(), self.indices[1].long()
-            print(self.indices[0].dtype, self.indices[1].dtype)
+            # print(self.indices[0].dtype, self.indices[1].dtype)
 
         a, b = x[..., self.indices[0]], x[..., self.indices[1]]
         if self.training:
@@ -151,13 +154,14 @@ class LogicLayer(torch.nn.Module):
                     self.given_x_indices_of_y,
                 ).transpose(0, 1)
 
-    def forward_cuda_eval(self, x: PackBitsTensor):
+    def forward_cuda_eval(self, x):
         """
         WARNING: this is an in-place operation.
 
         :param x:
         :return:
         """
+        assert False
         assert not self.training
         assert isinstance(x, PackBitsTensor)
         assert x.t.shape[0] == self.in_dim, (x.t.shape, self.in_dim)
@@ -214,8 +218,8 @@ class GroupSum(torch.nn.Module):
         self.device = device
 
     def forward(self, x):
-        if isinstance(x, PackBitsTensor):
-            return x.group_sum(self.k)
+        # if isinstance(x, PackBitsTensor):
+        #     return x.group_sum(self.k)
 
         assert x.shape[-1] % self.k == 0, (x.shape, self.k)
         return (
