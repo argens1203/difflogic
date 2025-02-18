@@ -200,6 +200,7 @@ python experiments/apply_compiled_net.py
 python setup.py install && python experiments/main.py -bs 100 -t 100 --dataset cifar-10-3-thresholds -ni 100 -ef 100 -k 12_000 -l 4 --compile_model -eid 520001
 
 python setup.py install && python experiments/main.py  -bs 100 -t 100 --dataset iris -ni 200_000 -ef 1_000 -k 45 -l 4 --compile_model
+python setup.py install && python experiments/main.py  -bs 100 -t 100 --dataset iris -ni 2000 -ef 1_000 -k 45 -l 4 --compile_model
 
 cd experiments && python -m unittest
 ```
