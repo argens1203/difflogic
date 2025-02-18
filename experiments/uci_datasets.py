@@ -332,6 +332,8 @@ class AdultDataset(UCIDataset):
         feat = convert_data_to_feature_vectors(data)
         labels = get_labels(data)
 
+        print("feat", feat)
+        input()
         return feat, labels
 
 
@@ -490,6 +492,21 @@ class IrisDataset(UCIDataset):
 
         return data, label
 
+    def convert_sample_to_feature_vector(sample, maxes, mins):
+        number_of_bins = 10
+        ret = []
+        for value, maxx, minn in zip(sample[:-1], maxes, mins):
+            value = float(value)
+            bin_edges = np.linspace(minn, maxx, number_of_bins + 1)
+            bucket = max(np.digitize(value, bin_edges, right=True) - 1, 0)
+
+            vec = np.zeros(number_of_bins)
+            vec[bucket] = 1
+            ret.append(vec)
+
+        ret = np.concatenate(ret, dtype=float)
+        return ret
+
     @staticmethod
     def preprocess_iris_data(data_file_name):
 
@@ -503,22 +520,21 @@ class IrisDataset(UCIDataset):
                 if len(data[i]) <= 2:
                     data[i] = None
                 else:
-                    data[i] = data[i].strip("\n").strip(".").strip().split(",")
+                    data[i] = data[i].strip("\n").strip().split(",")
                     data[i] = [d for d in data[i]]
-                    data[i] = data[i]
 
             data = list(filter(lambda x: x is not None, data))
-
             return data
 
-        def convert_sample_to_feature_vector(sample):
-            vec = np.zeros(4)
-            for i in range(4):
-                vec[i] = float(sample[i])
-            return vec
-
         def convert_data_to_feature_vectors(data):
-            feat = [convert_sample_to_feature_vector(sample) for sample in data]
+            # TODO: vectorize and do it in one step
+            df = np.array(data).transpose()[:-1].astype(float)
+            maxes, mins = df.max(axis=1), df.min(axis=1)
+
+            feat = [
+                IrisDataset.convert_sample_to_feature_vector(sample, maxes, mins)
+                for sample in data
+            ]
             return torch.tensor(feat).float()
 
         def get_labels(data):
