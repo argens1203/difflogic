@@ -23,6 +23,7 @@ BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 # | 14 | not(A and B)         | 1     | 1     | 1     | 0     |
 # | 15 | 1                    | 1     | 1     | 1     | 1     |
 
+
 def bin_op(a, b, i):
     assert a[0].shape == b[0].shape, (a[0].shape, b[0].shape)
     if a.shape[0] > 1:
@@ -73,10 +74,12 @@ def bin_op_s(a, b, i_s):
 ########################################################################################################################
 
 
-def get_unique_connections(in_dim, out_dim, device='cuda'):
-    assert out_dim * 2 >= in_dim, 'The number of neurons ({}) must not be smaller than half of the number of inputs ' \
-                                  '({}) because otherwise not all inputs could be used or considered.'.format(
-        out_dim, in_dim
+def get_unique_connections(in_dim, out_dim, device="cuda"):
+    assert out_dim * 2 >= in_dim, (
+        "The number of neurons ({}) must not be smaller than half of the number of inputs "
+        "({}) because otherwise not all inputs could be used or considered.".format(
+            out_dim, in_dim
+        )
     )
 
     x = torch.arange(in_dim).long().unsqueeze(0)
@@ -139,6 +142,3 @@ class GradFactor(torch.autograd.Function):
 
 
 ########################################################################################################################
-
-
-

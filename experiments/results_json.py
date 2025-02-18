@@ -16,7 +16,7 @@ class ResultsJSON(object):
 
         self.args = None
 
-        self.server_name = socket.gethostname().split('.')[0]
+        self.server_name = socket.gethostname().split(".")[0]
 
     def store_args(self, args):
 
@@ -33,7 +33,7 @@ class ResultsJSON(object):
     def store_final_results(self, results: dict):
 
         for key, val in results.items():
-            key = key + '_'
+            key = key + "_"
 
             setattr(self, key, val)
 
@@ -43,18 +43,20 @@ class ResultsJSON(object):
 
         json_str = json.dumps(self.__dict__)
 
-        with open(os.path.join(self.path, '{:08d}.json'.format(self.eid)), mode='w') as f:
+        with open(
+            os.path.join(self.path, "{:08d}.json".format(self.eid)), mode="w"
+        ) as f:
             f.write(json_str)
 
     @staticmethod
     def load(eid: int, path: str, get_dict=False):
-        with open(os.path.join(path, '{:08d}.json'.format(eid)), mode='r') as f:
+        with open(os.path.join(path, "{:08d}.json".format(eid)), mode="r") as f:
             data = json.loads(f.read())
 
         if get_dict:
             return data
 
-        self = ResultsJSON(-1, '')
+        self = ResultsJSON(-1, "")
         self.__dict__.update(data)
 
         assert eid == self.eid
@@ -62,14 +64,14 @@ class ResultsJSON(object):
         return self
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    r = ResultsJSON(101, './')
+    r = ResultsJSON(101, "./")
 
     print(r.__dict__)
 
     r.save()
 
-    r2 = ResultsJSON.load(101, './')
+    r2 = ResultsJSON.load(101, "./")
 
     print(r2.__dict__)
