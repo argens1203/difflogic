@@ -25,7 +25,18 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
 
 def load_dataset(args):
     validation_loader = None
-    if args.dataset == "adult":
+    if args.dataset == "iris":
+        train_set = uci_datasets.IrisDataset(
+            "./data-uci", split="train", download=True, with_val=False
+        )
+        test_set = uci_datasets.IrisDataset("./data-uci", split="test", with_val=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True
+        )
+        test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=int(1e6), shuffle=False
+        )
+    elif args.dataset == "adult":
         train_set = uci_datasets.AdultDataset(
             "./data-uci", split="train", download=True, with_val=False
         )
@@ -173,6 +184,7 @@ def input_dim_of_dataset(dataset):
     return {
         "adult": 116,
         "breast_cancer": 51,
+        "iris": 4,
         "monk1": 17,
         "monk2": 17,
         "monk3": 17,
@@ -187,6 +199,7 @@ def num_classes_of_dataset(dataset):
     return {
         "adult": 2,
         "breast_cancer": 2,
+        "iris": 3,
         "monk1": 2,
         "monk2": 2,
         "monk3": 2,
@@ -318,6 +331,7 @@ if __name__ == "__main__":
         choices=[
             "adult",
             "breast_cancer",
+            "iris",
             "monk1",
             "monk2",
             "monk3",
