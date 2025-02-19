@@ -13,8 +13,7 @@ from results_json import ResultsJSON
 import mnist_dataset
 import uci_datasets
 
-# from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
-from difflogic import LogicLayer, GroupSum, CompiledLogicNet
+from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
 
 torch.set_num_threads(1)
 
