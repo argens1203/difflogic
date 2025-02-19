@@ -493,6 +493,7 @@ class IrisDataset(UCIDataset):
         return data, label
 
     def convert_sample_to_feature_vector(sample, maxes, mins):
+        # TODO: Use percentile
         number_of_bins = 10
         ret = []
         for value, maxx, minn in zip(sample[:-1], maxes, mins):
