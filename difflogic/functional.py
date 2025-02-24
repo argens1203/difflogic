@@ -64,6 +64,9 @@ def bin_op(a, b, i):
 
 
 def bin_op_s(a, b, i_s):
+    # a (batch_size, neuron_number): subset of input features
+    # b (batch_size, neuron_number): subset of input features
+    # i_s (neuron_number, bin_op_number): weight of bin_op (softmax'ed)
     r = torch.zeros_like(a)
     for i in range(16):
         u = bin_op(a, b, i)

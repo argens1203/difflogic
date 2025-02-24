@@ -111,14 +111,16 @@ class LogicLayer(torch.nn.Module):
             raise ValueError(self.implementation)
 
     def forward_python(self, x):
+        # x.shape: batch_size, input_dim
+        # self.indices: Tuple (neuron_size, neuron_size)
         assert (
             x.shape[-1] == self.in_dim
         ), "Input shape {} does not match model.in_dim {}".format(
             x[0].shape[-1], self.in_dim
         )
-
         self.indices = self.indices[0].long(), self.indices[1].long()
 
+        # Selects 2 subsets of input features as defined in self.get_connection
         a, b = x[..., self.indices[0]], x[..., self.indices[1]]
         if self.training:
             x = bin_op_s(a, b, torch.nn.functional.softmax(self.weights, dim=-1))
@@ -180,12 +182,17 @@ class LogicLayer(torch.nn.Module):
             self.in_dim, self.out_dim, "train" if self.training else "eval"
         )
 
-    def get_connections(self, connections, device="cuda"):
+    def get_connections(
+        self, connections, device="cuda"
+    ):  # Default connnections (is unique, from command line args)
         assert self.out_dim * 2 >= self.in_dim, (
             "The number of neurons ({}) must not be smaller than half of the "
             "number of inputs ({}) because otherwise not all inputs could be "
             "used or considered.".format(self.out_dim, self.in_dim)
         )
+        # REMARK: neither subset is complete (which is fine) nor non-repeating (which is also fine)
+        # The 2 subsets will become the "left" input and "right" input of all neurons in order
+        # Hence subset size = [neuron_size]
         if connections == "random":
             c = torch.randperm(2 * self.out_dim) % self.in_dim
             # c = torch.randperm(self.in_dim)[c]
