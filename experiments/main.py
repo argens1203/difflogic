@@ -14,6 +14,7 @@ import mnist_dataset
 import uci_datasets
 
 from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
+from model_print import model_print
 
 torch.set_num_threads(1)
 
@@ -226,7 +227,7 @@ def get_model(args):
     ####################################################################################################################
 
     if arch == "randomly_connected":
-        logic_layers.append(torch.nn.Flatten())
+        # logic_layers.append(torch.nn.Flatten())
         logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
         for _ in range(l - 1):
             logic_layers.append(LogicLayer(in_dim=k, out_dim=k, **llkw))
@@ -402,6 +403,9 @@ if __name__ == "__main__":
         action="store_true",
         help="Compile the final model with C for CPU.",
     )
+    parser.add_argument(
+        "--print_model", action="store_true", help="Prints out the final model"
+    )
 
     parser.add_argument(
         "--num-iterations",
@@ -462,6 +466,10 @@ if __name__ == "__main__":
     train_loader, validation_loader, test_loader = load_dataset(args)
     model, loss_fn, optim = get_model(args)
 
+    if args.print_model:
+        print("Model")
+        model_print(model)
+
     ####################################################################################################################
 
     best_acc = 0
@@ -486,6 +494,7 @@ if __name__ == "__main__":
 
         if (i + 1) % args.eval_freq == 0:
             if args.extensive_eval:
+                # Use train mode to test on training data
                 train_accuracy_train_mode = eval(model, train_loader, mode=True)
                 valid_accuracy_eval_mode = eval(model, validation_loader, mode=False)
                 valid_accuracy_train_mode = eval(model, validation_loader, mode=True)
@@ -493,6 +502,7 @@ if __name__ == "__main__":
                 train_accuracy_train_mode = -1
                 valid_accuracy_eval_mode = -1
                 valid_accuracy_train_mode = -1
+            # Use evaluation mode to test on training data
             train_accuracy_eval_mode = eval(model, train_loader, mode=False)
             test_accuracy_eval_mode = eval(model, test_loader, mode=False)
             test_accuracy_train_mode = eval(model, test_loader, mode=True)
@@ -576,3 +586,7 @@ if __name__ == "__main__":
 
                 acc3 = correct / total
                 print("COMPILED MODEL", num_bits, acc3)
+
+    if args.print_model:
+        print("Model")
+        model_print(model)

@@ -203,6 +203,8 @@ python setup.py install && python experiments/main.py  -bs 100 -t 100 --dataset 
 python setup.py install && python experiments/main.py  -bs 100 -t 100 --dataset iris -ni 2000 -ef 1_000 -k 45 -l 4 --compile_model
 
 cd experiments && python -m unittest
+
+python setup.py install && python experiments/main.py  -bs 100 -t 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 1 --print_model
 ```
 
 -ni number of iterations
