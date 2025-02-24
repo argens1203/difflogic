@@ -333,7 +333,6 @@ class AdultDataset(UCIDataset):
         labels = get_labels(data)
 
         print("feat", feat)
-        input()
         return feat, labels
 
 

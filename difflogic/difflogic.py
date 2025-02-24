@@ -111,12 +111,13 @@ class LogicLayer(torch.nn.Module):
             raise ValueError(self.implementation)
 
     def forward_python(self, x):
-        assert x.shape[-1] == self.in_dim, (x[0].shape[-1], self.in_dim)
+        assert (
+            x.shape[-1] == self.in_dim
+        ), "Input shape {} does not match model.in_dim {}".format(
+            x[0].shape[-1], self.in_dim
+        )
 
-        if self.indices[0].dtype == torch.int64 or self.indices[1].dtype == torch.int64:
-            # print(self.indices[0].dtype, self.indices[1].dtype)
-            self.indices = self.indices[0].long(), self.indices[1].long()
-            # print(self.indices[0].dtype, self.indices[1].dtype)
+        self.indices = self.indices[0].long(), self.indices[1].long()
 
         a, b = x[..., self.indices[0]], x[..., self.indices[1]]
         if self.training:
@@ -187,7 +188,7 @@ class LogicLayer(torch.nn.Module):
         )
         if connections == "random":
             c = torch.randperm(2 * self.out_dim) % self.in_dim
-            c = torch.randperm(self.in_dim)[c]
+            # c = torch.randperm(self.in_dim)[c]
             c = c.reshape(2, self.out_dim)
             a, b = c[0], c[1]
             a, b = a.to(torch.int64), b.to(torch.int64)
