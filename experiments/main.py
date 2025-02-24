@@ -185,7 +185,7 @@ def input_dim_of_dataset(dataset):
     return {
         "adult": 116,
         "breast_cancer": 51,
-        "iris": 40,
+        "iris": 8,
         "monk1": 17,
         "monk2": 17,
         "monk3": 17,
