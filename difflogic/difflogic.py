@@ -113,6 +113,7 @@ class LogicLayer(torch.nn.Module):
     def forward_python(self, x):
         # x.shape: batch_size, input_dim
         # self.indices: Tuple (neuron_size, neuron_size)
+        # self.weights: (neuron_size, bin_op_number)
         assert (
             x.shape[-1] == self.in_dim
         ), "Input shape {} does not match model.in_dim {}".format(
@@ -125,6 +126,8 @@ class LogicLayer(torch.nn.Module):
         if self.training:
             x = bin_op_s(a, b, torch.nn.functional.softmax(self.weights, dim=-1))
         else:
+            # weights: (neuron_size, 16)
+            # 16 being number of binary operations
             weights = torch.nn.functional.one_hot(self.weights.argmax(-1), 16).to(
                 torch.float32
             )
