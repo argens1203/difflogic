@@ -276,10 +276,10 @@ void apply_logic_gate_net (bool const *inp, {BITS_TO_DTYPE[32]} *out, size_t len
 
         with tempfile.NamedTemporaryFile(suffix=".so") as lib_file:
             # To write to specific file
-            # with open(f"temp.{'c' if self.device != 'cuda' else 'cu'}", "w") as c_file:
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".c" if self.device != "cuda" else ".cu"
-            ) as c_file:
+            with open(f"temp.{'c' if self.device != 'cuda' else 'cu'}", "w") as c_file:
+                # with tempfile.NamedTemporaryFile(
+                # mode="w", suffix=".c" if self.device != "cuda" else ".cu"
+                # ) as c_file:
                 if self.device == "cpu":
                     code = self.get_c_code()
                 else:
