@@ -14,7 +14,7 @@ import mnist_dataset
 import uci_datasets
 
 from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
-from model_print import model_print
+from model_print import model_print, get_formula
 
 torch.set_num_threads(1)
 
@@ -442,7 +442,7 @@ if __name__ == "__main__":
     parser.add_argument("--grad-factor", type=float, default=1.0)
 
     parser.add_argument(
-        "--print_model", action="store_true", help="Prints out the final model"
+        "--get_formula", action="store_true", help="Gets the formula of a model"
     )
     parser.add_argument(
         "--verbose", action="store_true", default=False, help="Sets vebosity"
@@ -469,10 +469,6 @@ if __name__ == "__main__":
 
     train_loader, validation_loader, test_loader = load_dataset(args)
     model, loss_fn, optim = get_model(args)
-
-    if args.print_model:
-        print("Model")
-        model_print(model)
 
     ####################################################################################################################
 
@@ -591,6 +587,5 @@ if __name__ == "__main__":
                 acc3 = correct / total
                 print("COMPILED MODEL", num_bits, acc3)
 
-    if args.print_model:
-        print("Model")
-        model_print(model)
+    if args.get_formula:
+        get_formula(model, input_dim_of_dataset(args.dataset))

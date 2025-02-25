@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 
+from pysat.formula import *
+
 BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 
 
@@ -22,6 +24,45 @@ BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 # | 13 | A implies B          | 1     | 1     | 0     | 1     |
 # | 14 | not(A and B)         | 1     | 1     | 1     | 0     |
 # | 15 | 1                    | 1     | 1     | 1     | 1     |
+
+
+def bit_add(*args):
+    return [i for i in args]
+
+
+def idx_to_formula(a, b, i):
+    if i == 0:
+        return False
+    if i == 1:
+        return And(a, b)
+    if i == 2:
+        return Neg(Implies(a, b))
+    if i == 3:
+        return a
+    if i == 4:
+        return Neg(Implies(b, a))
+    if i == 5:
+        return b
+    if i == 6:
+        return XOr(a, b)
+    if i == 7:
+        return Or(a, b)
+    if i == 8:
+        return Neg(Or(a, b))
+    if i == 9:
+        return Neg(XOr(a, b))
+    if i == 10:
+        return Neg(b)
+    if i == 11:
+        return Implies(b, a)
+    if i == 12:
+        return Neg(a)
+    if i == 13:
+        return Implies(a, b)
+    if i == 14:
+        return Neg(And(a, b))
+    if i == 15:
+        return True
 
 
 def idx_to_op(i):
