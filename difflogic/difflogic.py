@@ -228,6 +228,7 @@ class GroupSum(torch.nn.Module):
     """
 
     def __init__(self, k: int, tau: float = 1.0, device="cuda"):
+        # tau default is 10 from args
         """
 
         :param k: number of intended real valued outputs, e.g., number of classes
@@ -244,6 +245,9 @@ class GroupSum(torch.nn.Module):
             return x.group_sum(self.k)
 
         assert x.shape[-1] % self.k == 0, (x.shape, self.k)
+
+        # x.reshape(batch_size, output_dim, input_dim // output_dim) then sum in last dimension
+        # ie. summing every X outputs from previous layer, where X is input_dim divided by output_dim
         return (
             x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1) / self.tau
         )
