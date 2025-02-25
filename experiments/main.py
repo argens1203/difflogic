@@ -403,9 +403,6 @@ if __name__ == "__main__":
         action="store_true",
         help="Compile the final model with C for CPU.",
     )
-    parser.add_argument(
-        "--print_model", action="store_true", help="Prints out the final model"
-    )
 
     parser.add_argument(
         "--num-iterations",
@@ -443,6 +440,13 @@ if __name__ == "__main__":
     parser.add_argument("--num_layers", "-l", type=int)
 
     parser.add_argument("--grad-factor", type=float, default=1.0)
+
+    parser.add_argument(
+        "--print_model", action="store_true", help="Prints out the final model"
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", default=False, help="Sets vebosity"
+    )
 
     args = parser.parse_args()
 
@@ -569,7 +573,7 @@ if __name__ == "__main__":
                 compiled_model.compile(
                     opt_level=1 if args.num_layers * args.num_neurons < 50_000 else 0,
                     save_lib_path=save_lib_path,
-                    verbose=True,
+                    verbose=args.verbose,
                 )
 
                 correct, total = 0, 0
