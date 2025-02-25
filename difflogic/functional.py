@@ -24,6 +24,43 @@ BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 # | 15 | 1                    | 1     | 1     | 1     | 1     |
 
 
+def idx_to_op(i):
+    if i == 0:
+        return "FALSE"
+    elif i == 1:
+        return "a AND b"
+    elif i == 2:
+        return "NOT (a IMPLY b)"
+    elif i == 3:
+        return "a"
+    elif i == 4:
+        return "NOT (b IMPLY a)"
+    elif i == 5:
+        return "b"
+    elif i == 6:
+        return "a XOR b"
+    elif i == 7:
+        return "a OR b"
+    elif i == 8:
+        return "not (a OR b)"
+    elif i == 9:
+        return "not (a XOR b)"
+    elif i == 10:
+        return "not B"
+    elif i == 11:
+        return "b IMPLY a"
+    elif i == 12:
+        return "not A"
+    elif i == 13:
+        return "a IMPLY b"
+    elif i == 14:
+        return "not (a AND b)"
+    elif i == 15:
+        return "TRUE"
+
+    assert False
+
+
 def bin_op(a, b, i):
     assert a[0].shape == b[0].shape, (a[0].shape, b[0].shape)
     if a.shape[0] > 1:

@@ -2,7 +2,7 @@ import torch
 
 # import difflogic_cuda
 import numpy as np
-from .functional import bin_op_s, get_unique_connections, GradFactor
+from .functional import bin_op_s, get_unique_connections, GradFactor, idx_to_op
 
 from .packbitstensor import PackBitsTensor
 
@@ -208,6 +208,15 @@ class LogicLayer(torch.nn.Module):
             return get_unique_connections(self.in_dim, self.out_dim, device)
         else:
             raise ValueError(connections)
+
+    def __str__(self):
+        # weights = torch.nn.functional.one_hot(self.weights.argmax(-1), 16).to(
+        # torch.float32
+        ret = [
+            f"{idx_to_op(i)}: {a.item()}, {b.item()}"  # OP: left_index, right_index
+            for i, a, b in zip(self.weights.argmax(-1), *self.indices)
+        ]
+        return ret.__str__()
 
 
 ########################################################################################################################
