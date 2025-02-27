@@ -9,6 +9,7 @@ from pysat.formula import *
 
 def get_formula(model, input_dim):
     x = [Atom(i + 1) for i in range(input_dim)]
+    inputs = x
     all = set()
     for i in x:
         all.add(i)
@@ -21,4 +22,4 @@ def get_formula(model, input_dim):
         for o in x:
             all.add(o)
 
-    print(x)
+    return x, inputs

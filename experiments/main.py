@@ -24,6 +24,12 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
     64: torch.float64,
 }
 
+device = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps" if torch.mps.is_available() else "cpu"
+)
+
 
 def load_dataset(args):
     validation_loader = None
@@ -479,16 +485,8 @@ if __name__ == "__main__":
         desc="iteration",
         total=args.num_iterations,
     ):
-        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps" if torch.mps.is_available() else "cpu"
-        )
-        y = y.to(
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps" if torch.mps.is_available() else "cpu"
-        )
+        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(device)
+        y = y.to(device)
 
         loss = train(model, x, y, loss_fn, optim)
 
@@ -587,5 +585,101 @@ if __name__ == "__main__":
                 acc3 = correct / total
                 print("COMPILED MODEL", num_bits, acc3)
 
+    from pysat.formula import Atom
+
+    def summed_on(x, class_count_to_conform_to):
+        # TODO: use torch way
+        assert len(x) % class_count_to_conform_to == 0
+        ret = []
+        for i in range(0, len(x), len(x) // class_count_to_conform_to):
+            ret.append(sum(x[i : i + len(x) // class_count_to_conform_to]))
+        return ret
+
+    def formula_as_pseudo_model(formula, input_handles):
+        def pseudo_model(x):
+            simplified = [
+                [
+                    (
+                        0
+                        if f.simplified(
+                            assumptions=[
+                                ~inp if feat == 0 else inp
+                                for feat, inp in zip(xs, input_handles)
+                            ]
+                        )
+                        # TODO: better way of checking?
+                        == Atom(False)
+                        else 1
+                    )
+                    for f in formula
+                ]
+                for xs in x
+            ]
+            summed = (
+                torch.tensor(
+                    [
+                        summed_on(inter, num_classes_of_dataset(args.dataset))
+                        for inter in simplified
+                    ]
+                )
+                .to(device)
+                .int()
+            )
+            return summed
+
+        return pseudo_model
+
+    def assert_model_equal_formula_using_data(model, formula, input_handles):
+        with torch.no_grad():
+            model.train(False)
+
+            for x, _ in train_loader:
+                x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(
+                    device
+                )
+
+                logit = model(x)
+                p_logit = formula_as_pseudo_model(
+                    formula=formula, input_handles=input_handles
+                )(x)
+                assert logit.equal(p_logit)
+
+    def get_truth_table_loader(input_dim, batch_size=10):
+        count = 0
+
+        def get_one(x):
+            return list(map(int, format(x, f"0{input_dim}b")))
+
+        while count < 2**input_dim:
+            l = [
+                get_one(i) for i in range(count, min(count + batch_size, 2**input_dim))
+            ]
+            count += batch_size
+            yield torch.tensor(l), None
+
+    def assert_model_equal_formula_using_truth_table(model, formula, input_handles):
+        with torch.no_grad():
+            model.train(False)
+
+            for x, _ in get_truth_table_loader(input_dim_of_dataset(args.dataset)):
+                x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(
+                    device
+                )
+
+                logit = model(x)
+                p_logit = formula_as_pseudo_model(
+                    formula=formula, input_handles=input_handles
+                )(x)
+                assert logit.equal(p_logit)
+
     if args.get_formula:
-        get_formula(model, input_dim_of_dataset(args.dataset))
+        formula, input_handles = get_formula(model, input_dim_of_dataset(args.dataset))
+        print(formula)
+        print(input_handles)
+        input()
+        assert_model_equal_formula_using_data(
+            model=model, formula=formula, input_handles=input_handles
+        )
+        assert_model_equal_formula_using_truth_table(
+            model=model, formula=formula, input_handles=input_handles
+        )

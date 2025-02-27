@@ -262,6 +262,8 @@ class GroupSum(torch.nn.Module):
         # ie. summing every X outputs from previous layer, where X is input_dim divided by output_dim
         return (
             x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1) / self.tau
+            if self.training
+            else x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1)
         )
 
     def extra_repr(self):
