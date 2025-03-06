@@ -3,8 +3,6 @@ import random
 import numpy as np
 import torch
 
-from experiments.model_print import get_formula
-
 from lgn.pseudo_model import PseudoModel
 from lgn.dataset import (
     load_dataset,
@@ -54,9 +52,10 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-        formula, input_handles = get_formula(model, input_dim)
-        p_model = PseudoModel(
-            formula, input_handles, input_dim=input_dim, output_dim=output_dim
-        )
+
+        p_model = PseudoModel.from_model(model, input_dim, output_dim)
+        # p_model = PseudoModel(
+        #     formula, input_handles, input_dim=input_dim, output_dim=output_dim
+        # )
         p_model.print()
         p_model.check(model)
