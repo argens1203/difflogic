@@ -1,5 +1,5 @@
 import torch
-from constant import *
+from constant import device
 from .util import formula_as_pseudo_model, get_truth_table_loader
 
 fp_type = torch.float32

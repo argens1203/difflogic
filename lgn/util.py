@@ -1,5 +1,16 @@
-from constant import *
+import torch
+from constant import device
 from pysat.formula import Atom
+from experiments.results_json import ResultsJSON
+
+
+def get_results(experiment_id, args):
+    if experiment_id is not None:
+        assert 520_000 <= experiment_id < 530_000, experiment_id
+        results = ResultsJSON(eid=experiment_id, path="./results/")
+        results.store_args(args)
+        return results
+    return None
 
 
 def summed_on(x, class_count_to_conform_to):

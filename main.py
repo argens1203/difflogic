@@ -3,10 +3,7 @@ import random
 import numpy as np
 import torch
 
-from experiments.results_json import ResultsJSON
 from experiments.model_print import get_formula
-
-from constant import *
 
 from lgn.pseudo_model import PseudoModel
 from lgn.dataset import (
@@ -17,27 +14,22 @@ from lgn.dataset import (
 from lgn.model import get_model, compile_model
 from lgn.trainer import train_eval
 from lgn.args import get_args
+from lgn.util import get_results
 
 torch.set_num_threads(1)  # ???
 
-device = (
-    "cuda"
-    if torch.cuda.is_available()
-    else "mps" if torch.mps.is_available() else "cpu"
-)
+
+def seed_all(seed):
+    torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+
 
 if __name__ == "__main__":
     args = get_args()
 
-    results = None
-    if args.experiment_id is not None:
-        assert 520_000 <= args.experiment_id < 530_000, args.experiment_id
-        results = ResultsJSON(eid=args.experiment_id, path="./results/")
-        results.store_args(args)
-
-    torch.manual_seed(args.seed)
-    random.seed(args.seed)
-    np.random.seed(args.seed)
+    results = get_results(args.experiment_id, args)
+    seed_all(args.seed)
 
     ####################################################################################################################
 
