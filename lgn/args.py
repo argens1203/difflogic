@@ -127,7 +127,8 @@ def get_args():
 
     args = parser.parse_args()
 
-    print(vars(args))
+    if args.verbose:
+        print(vars(args))
 
     assert (
         args.num_iterations % args.eval_freq == 0

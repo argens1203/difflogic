@@ -535,7 +535,7 @@ class IrisDataset(UCIDataset):
                 IrisDataset.convert_sample_to_feature_vector(sample, maxes, mins)
                 for sample in data
             ]
-            return torch.tensor(feat).float()
+            return torch.tensor(np.array(feat)).float()
 
         def get_labels(data):
             num_samples = len(data)
