@@ -22,7 +22,7 @@ def summed_on(x, class_count_to_conform_to):
     return ret
 
 
-def formula_as_pseudo_model(formula, input_handles, output_dim):
+def formula_as_pseudo_model(formula, input_handles, class_dim):
     def pseudo_model(x):
         simplified = [
             [
@@ -43,7 +43,7 @@ def formula_as_pseudo_model(formula, input_handles, output_dim):
             for xs in x
         ]
         summed = (
-            torch.tensor([summed_on(inter, output_dim) for inter in simplified])
+            torch.tensor([summed_on(inter, class_dim) for inter in simplified])
             .to(device)
             .int()
         )

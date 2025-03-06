@@ -28,7 +28,7 @@ def get_formula(model, input_dim):
 
 
 class PseudoModel:
-    def __init__(self, model, input_dim, output_dim, fp_type=fp_type):
+    def __init__(self, model, input_dim, class_dim, fp_type=fp_type):
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
@@ -38,7 +38,7 @@ class PseudoModel:
             # TODO/REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
-        self.output_dim = output_dim
+        self.class_dim = class_dim
         self.fp_type = fp_type
 
     def check_model_with_data(self, model, data):
@@ -52,7 +52,7 @@ class PseudoModel:
                 p_logit = formula_as_pseudo_model(
                     formula=self.formula,
                     input_handles=self.input_handles,
-                    output_dim=self.output_dim,
+                    class_dim=self.class_dim,
                 )(x)
                 assert logit.equal(p_logit)
 
@@ -67,7 +67,7 @@ class PseudoModel:
                 p_logit = formula_as_pseudo_model(
                     formula=self.formula,
                     input_handles=self.input_handles,
-                    output_dim=self.output_dim,
+                    class_dim=self.class_dim,
                 )(x)
                 assert logit.equal(p_logit)
 
@@ -94,10 +94,10 @@ class PseudoModel:
                     print(id, f)
 
     def calc_bound(self):
-        return len(self.output_ids) // self.output_dim + 1
+        return len(self.output_ids) // self.class_dim + 1
 
     def get_output_ids(self, class_id):
-        step = len(self.output_ids) // self.output_dim
+        step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
         return self.output_ids[start : start + step]
 
