@@ -1,9 +1,13 @@
 import torch
+from contextlib import contextmanager
+
+from pysat.formula import Formula, Atom, IDPool
+from pysat.card import CardEnc, EncType
+from pysat.solvers import Solver
+from difflogic import LogicLayer, GroupSum
+
 from constant import device
 from .util import formula_as_pseudo_model, get_truth_table_loader
-from pysat.formula import Formula, Atom, IDPool
-from difflogic import LogicLayer, GroupSum
-from contextlib import contextmanager
 
 fp_type = torch.float32
 
@@ -93,8 +97,13 @@ class PseudoModel:
                 for f, id in vpool.obj2id.items():
                     print(id, f)
 
-    def calc_bound(self):
-        return len(self.output_ids) // self.class_dim + 1
+    def calc_bound(self, true_class, adj_class):
+        # TODO: CHECK
+        # If true_class < adj_class, then adj class need one more vote to be selected
+        # Else the number of vote needed is output neuron / number of classes
+        if true_class < adj_class:
+            return len(self.output_ids) // self.class_dim + 1
+        return len(self.output_ids) // self.class_dim
 
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
@@ -102,56 +111,45 @@ class PseudoModel:
         return self.output_ids[start : start + step]
 
     def pairwise_comparisons(self, true_class, adj_class, inp=None):
-        from pysat.card import CardEnc, EncType
+        print("==== Pairwise Comparisons ====")
 
         with self.use_context() as vpool:
-            pos = self.get_output_ids(true_class)
-            neg = [-a for a in self.get_output_ids(adj_class)]
-            clauses = pos + neg
-            print(clauses)
-            # comp = CardEnc.atleast(
-            #     lits=[5, 5, -12, -15], bound=3, encoding=EncType.totalizer, vpool=vpool
-            # )
+            pos = self.get_output_ids(adj_class)
+            neg = [-a for a in self.get_output_ids(true_class)]
+            clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
+            print("Lit: ", clauses)
+
+            # print("=== Run 1 ===")
+            # for f, id in vpool.obj2id.items():
+            #     print(id, f)
+            # print("=== Run 1 ===")
+            # for id, f in vpool.id2obj.items():
+            #     print(id, f)
             comp = CardEnc.atleast(
                 lits=clauses,
-                bound=self.calc_bound(),
+                bound=self.calc_bound(true_class, adj_class),
                 encoding=EncType.totalizer,
                 vpool=vpool,
             )
+            # print("=== Run 2 ===")
+            # for f, id in vpool.obj2id.items():
+            #     print(id, f)
+            # print("=== Run 2 ===")
+            # for id, f in vpool.id2obj.items():
+            #     print(id, f)
             clauses = comp.clauses
-            print(comp.clauses)
-
-            from pysat.solvers import Solver
+            print("Card Encoding Clauses: ", comp.clauses)
 
             with Solver(bootstrap_with=clauses) as solver:
+                # TODO: CHECK
+                # Check if it is satisfiable under cardinatlity constraint
                 solver.append_formula(comp)
-                print(solver.solve(assumptions=inp))
-
-    def try_it(self):
-        from pysat.card import CardEnc, EncType
-
-        self.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
-        self.pairwise_comparisons(1, 3, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
-
-        # with self.use_context() as vpool:
-        #     comp = CardEnc.atleast(
-        #         lits=[5, 5, -2, -16], bound=3, encoding=EncType.totalizer, vpool=vpool
-        #     )
-        #     clauses = comp.clauses
-        #     print(comp.clauses)
-
-        #     from pysat.solvers import Solver
-
-        #     with Solver(bootstrap_with=clauses) as solver:
-        #         solver.append_formula(comp)
-        #         print(solver.solve(assumptions=[-1, -2, -3, -4, 5, -6, -7, -8]))
+                print("Satisfiable", solver.solve(assumptions=inp))
 
     def check(self, model, data=None):
         if data != None:
             self.check_model_with_data(model, data)
         self.check_model_with_truth_table(model)
-        # for h in self.input_handles:
-        # print(id(h), id(Atom(h.name)))
 
     @contextmanager
     def use_context(self):

@@ -35,6 +35,7 @@ if __name__ == "__main__":
     model, loss_fn, optim = get_model(args, results)
 
     if args.load_model:
+        print("Loading Model...")
         model.load_state_dict(torch.load(args.model_path))
     else:
         train_eval(
@@ -62,8 +63,11 @@ if __name__ == "__main__":
         p_model = PseudoModel(model, input_dim, output_dim)
         p_model.check(model)
 
-        p_model.print()
-        p_model.try_it()
+        p_model.print(print_vpool=True)
+        p_model.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
+        p_model.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
+        p_model.pairwise_comparisons(1, 3, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
+        p_model.print(print_vpool=True)
 
         # new_model, loss_fn, optim = get_model(args, results)
         # new_p_model = PseudoModel(new_model, input_dim, output_dim)
