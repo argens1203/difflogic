@@ -29,8 +29,12 @@ def get_formula(model, input_dim):
 
 class PseudoModel:
     def __init__(self, model, input_dim, output_dim, fp_type=fp_type):
-        with self.use_context():
+        with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
+            self.input_ids = [vpool.id(h) for h in self.input_handles]
+            for f in self.formula:
+                f.clausify()
+            self.output_ids = [vpool.id(f) for f in self.formula]
             # TODO/REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
@@ -67,18 +71,80 @@ class PseudoModel:
                 )(x)
                 assert logit.equal(p_logit)
 
-    def print(self):
+    def print(self, print_vpool=False):
         with self.use_context() as vpool:
-            # Formula.cleanup()
-
-            print("formula: ")
+            print("==== Formula ==== ")
             for f in self.formula:
-                f.clausify()
-                print(f.simplified(), "...", f.clauses, "...", vpool.id(f))
-                # print()
-            # self.clausified = [f.clauses for f in self.formula]
-            # print("clausified: ", self.clausified)
-            print("input_handles:", self.input_handles)
+                print(
+                    f,
+                    "...",
+                    # f.simplified(), "...", f.clauses, "...", f.encoded, "...",
+                    vpool.id(f),
+                )
+
+            print("==== Input Ids ==== ")
+            print(self.input_ids)
+
+            print("==== Output Ids ==== ")
+            print(self.output_ids)
+
+            if print_vpool:
+                print("==== IDPool ====")
+                for f, id in vpool.obj2id.items():
+                    print(id, f)
+
+    def calc_bound(self):
+        return len(self.output_ids) // self.output_dim + 1
+
+    def get_output_ids(self, class_id):
+        step = len(self.output_ids) // self.output_dim
+        start = (class_id - 1) * step
+        return self.output_ids[start : start + step]
+
+    def pairwise_comparisons(self, true_class, adj_class, inp=None):
+        from pysat.card import CardEnc, EncType
+
+        with self.use_context() as vpool:
+            pos = self.get_output_ids(true_class)
+            neg = [-a for a in self.get_output_ids(adj_class)]
+            clauses = pos + neg
+            print(clauses)
+            # comp = CardEnc.atleast(
+            #     lits=[5, 5, -12, -15], bound=3, encoding=EncType.totalizer, vpool=vpool
+            # )
+            comp = CardEnc.atleast(
+                lits=clauses,
+                bound=self.calc_bound(),
+                encoding=EncType.totalizer,
+                vpool=vpool,
+            )
+            clauses = comp.clauses
+            print(comp.clauses)
+
+            from pysat.solvers import Solver
+
+            with Solver(bootstrap_with=clauses) as solver:
+                solver.append_formula(comp)
+                print(solver.solve(assumptions=inp))
+
+    def try_it(self):
+        from pysat.card import CardEnc, EncType
+
+        self.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
+        self.pairwise_comparisons(1, 3, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
+
+        # with self.use_context() as vpool:
+        #     comp = CardEnc.atleast(
+        #         lits=[5, 5, -2, -16], bound=3, encoding=EncType.totalizer, vpool=vpool
+        #     )
+        #     clauses = comp.clauses
+        #     print(comp.clauses)
+
+        #     from pysat.solvers import Solver
+
+        #     with Solver(bootstrap_with=clauses) as solver:
+        #         solver.append_formula(comp)
+        #         print(solver.solve(assumptions=[-1, -2, -3, -4, 5, -6, -7, -8]))
 
     def check(self, model, data=None):
         if data != None:
