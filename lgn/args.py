@@ -114,6 +114,17 @@ def get_args():
         "--verbose", action="store_true", default=False, help="Sets vebosity"
     )
 
+    parser.add_argument(
+        "--model_path", type=str, default="model.pth", help="Path to save the model"
+    )
+
+    parser.add_argument(
+        "--save_model", action="store_true", default=False, help="Save the model"
+    )
+    parser.add_argument(
+        "--load_model", action="store_true", default=False, help="Load the model"
+    )
+
     args = parser.parse_args()
 
     print(vars(args))

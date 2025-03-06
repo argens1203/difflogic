@@ -33,18 +33,25 @@ if __name__ == "__main__":
 
     train_loader, validation_loader, test_loader = load_dataset(args)
     model, loss_fn, optim = get_model(args, results)
-    train_eval(
-        args,
-        train_loader,
-        validation_loader,
-        test_loader,
-        model,
-        loss_fn,
-        optim,
-        results,
-    )
+
+    if args.load_model:
+        model.load_state_dict(torch.load(args.model_path))
+    else:
+        train_eval(
+            args,
+            train_loader,
+            validation_loader,
+            test_loader,
+            model,
+            loss_fn,
+            optim,
+            results,
+        )
 
     ####################################################################################################################
+
+    if args.save_model:
+        torch.save(model.state_dict(), args.model_path)
 
     if args.compile_model:
         compile_model(args, model, test_loader)
