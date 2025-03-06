@@ -35,10 +35,16 @@ def get_model(args, results=None):
 
     ####################################################################################################################
 
-    total_num_neurons = sum(map(lambda x: x.num_neurons, logic_layers[1:-1]))
-    print(f"total_num_neurons={total_num_neurons}")
-    total_num_weights = sum(map(lambda x: x.num_weights, logic_layers[1:-1]))
-    print(f"total_num_weights={total_num_weights}")
+    total_num_neurons = sum(
+        map(lambda x: x.num_neurons, logic_layers[1:-1])
+    )  # TODO: Why 1:-1?
+    if args.verbose:
+        print(f"total_num_neurons={total_num_neurons}")
+    total_num_weights = sum(
+        map(lambda x: x.num_weights, logic_layers[1:-1])
+    )  # TODO: Why 1:-1?
+    if args.verbose:
+        print(f"total_num_weights={total_num_weights}")
     if results is not None:
         results.store_results(
             {

@@ -89,7 +89,6 @@ class LogicLayer(torch.nn.Module):
                 dtype=torch.int64,
                 device=device,
             )
-
         self.num_neurons = out_dim
         self.num_weights = out_dim
 
