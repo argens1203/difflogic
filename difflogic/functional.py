@@ -32,7 +32,7 @@ def bit_add(*args):
 
 def idx_to_formula(a, b, i):
     if i == 0:
-        return False
+        return Atom(False)
     if i == 1:
         return And(a, b)
     if i == 2:
@@ -62,7 +62,7 @@ def idx_to_formula(a, b, i):
     if i == 14:
         return Neg(And(a, b))
     if i == 15:
-        return True
+        return Atom(True)
 
 
 def idx_to_op(i):

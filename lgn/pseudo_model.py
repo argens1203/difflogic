@@ -1,13 +1,15 @@
 import torch
 from constant import device
 from .util import formula_as_pseudo_model, get_truth_table_loader
-from pysat.formula import Formula, Atom
+from pysat.formula import Formula, Atom, IDPool
 from difflogic import LogicLayer, GroupSum
+from contextlib import contextmanager
 
 fp_type = torch.float32
 
 
 def get_formula(model, input_dim):
+    # x = [Atom() for i in range(input_dim)]
     x = [Atom(i + 1) for i in range(input_dim)]
     inputs = x
     all = set()
@@ -26,27 +28,17 @@ def get_formula(model, input_dim):
 
 
 class PseudoModel:
-    def from_model(model, input_dim, output_dim, fp_type=fp_type):
-        formula, input_handles = get_formula(model, input_dim)
-        return PseudoModel(
-            formula=formula,
-            input_handles=input_handles,
-            input_dim=input_dim,
-            output_dim=output_dim,
-            fp_type=fp_type,
-        )
-
-    def __init__(self, formula, input_handles, input_dim, output_dim, fp_type=fp_type):
-        self.formula = formula
-        self.input_handles = input_handles
+    def __init__(self, model, input_dim, output_dim, fp_type=fp_type):
+        with self.use_context():
+            self.formula, self.input_handles = get_formula(model, input_dim)
+            # TODO/REMARK: formula represents output from second last layer
+            # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.fp_type = fp_type
-        # print(id(self))
-        # input()
 
     def check_model_with_data(self, model, data):
-        with torch.no_grad():
+        with torch.no_grad(), self.use_context():
             model.train(False)
 
             for x, _ in data:
@@ -61,7 +53,7 @@ class PseudoModel:
                 assert logit.equal(p_logit)
 
     def check_model_with_truth_table(self, model):
-        with torch.no_grad():
+        with torch.no_grad(), self.use_context():
             model.train(False)
 
             for x, _ in get_truth_table_loader(input_dim=self.input_dim):
@@ -76,15 +68,34 @@ class PseudoModel:
                 assert logit.equal(p_logit)
 
     def print(self):
-        # Formula.cleanup()
-        print("formula: ", self.formula)
-        for f in self.formula:
-            f.clausify()
-        self.clausified = [f.clauses for f in self.formula]
-        print("clausified: ", self.clausified)
-        print("input_handles:", self.input_handles)
+        with self.use_context() as vpool:
+            # Formula.cleanup()
+
+            print("formula: ")
+            for f in self.formula:
+                f.clausify()
+                print(f.simplified(), "...", f.clauses, "...", vpool.id(f))
+                # print()
+            # self.clausified = [f.clauses for f in self.formula]
+            # print("clausified: ", self.clausified)
+            print("input_handles:", self.input_handles)
 
     def check(self, model, data=None):
         if data != None:
             self.check_model_with_data(model, data)
         self.check_model_with_truth_table(model)
+        # for h in self.input_handles:
+        # print(id(h), id(Atom(h.name)))
+
+    @contextmanager
+    def use_context(self):
+        hashable = id(self)
+        prev = Formula._context
+        try:
+            Formula.set_context(hashable)
+            yield Formula.export_vpool(active=True)
+        finally:
+            Formula.set_context(prev)
+
+    def __del__(self):
+        Formula.cleanup(id(self))

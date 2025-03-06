@@ -52,10 +52,11 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-
-        p_model = PseudoModel.from_model(model, input_dim, output_dim)
-        # p_model = PseudoModel(
-        #     formula, input_handles, input_dim=input_dim, output_dim=output_dim
-        # )
+        p_model = PseudoModel(model, input_dim, output_dim)
         p_model.print()
         p_model.check(model)
+
+        # new_model, loss_fn, optim = get_model(args, results)
+        # new_p_model = PseudoModel(new_model, input_dim, output_dim)
+        # new_p_model.print()
+        # new_p_model.check(new_model)

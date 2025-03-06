@@ -1,7 +1,9 @@
-from .dataset import input_dim_of_dataset, num_classes_of_dataset
-from difflogic import LogicLayer, GroupSum
 import torch
-from experiments.results_json import ResultsJSON
+
+from difflogic import LogicLayer, GroupSum
+
+from .dataset import input_dim_of_dataset, num_classes_of_dataset
+from constant import device
 
 
 def get_model(args, results=None):
@@ -45,11 +47,7 @@ def get_model(args, results=None):
             }
         )
 
-    model = model.to(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps" if torch.mps.is_available() else "cpu"
-    )
+    model = model.to(device)
 
     print(model)
     if results is not None:
