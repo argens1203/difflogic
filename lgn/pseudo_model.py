@@ -45,6 +45,15 @@ class PseudoModel:
         self.class_dim = class_dim
         self.fp_type = fp_type
 
+    # Returns the votes, or logits, before argmax of prediction
+    def predict_votes(self, x):
+        with self.use_context():
+            return formula_as_pseudo_model(
+                formula=self.formula,
+                input_handles=self.input_handles,
+                class_dim=self.class_dim,
+            )(x)
+
     def check_model_with_data(self, model, data):
         with torch.no_grad(), self.use_context():
             model.train(False)
@@ -53,11 +62,7 @@ class PseudoModel:
                 x = x.to(self.fp_type).to(device)
 
                 logit = model(x)
-                p_logit = formula_as_pseudo_model(
-                    formula=self.formula,
-                    input_handles=self.input_handles,
-                    class_dim=self.class_dim,
-                )(x)
+                p_logit = self.predict_votes(x)
                 assert logit.equal(p_logit)
 
     def check_model_with_truth_table(self, model):
@@ -68,11 +73,7 @@ class PseudoModel:
                 x = x.to(self.fp_type).to(device)
 
                 logit = model(x)
-                p_logit = formula_as_pseudo_model(
-                    formula=self.formula,
-                    input_handles=self.input_handles,
-                    class_dim=self.class_dim,
-                )(x)
+                p_logit = self.predict_votes(x)
                 assert logit.equal(p_logit)
 
     def print(self, print_vpool=False):

@@ -63,11 +63,36 @@ if __name__ == "__main__":
         p_model = PseudoModel(model, input_dim, output_dim)
         p_model.check(model)
 
-        p_model.print(print_vpool=True)
+        # p_model.print(print_vpool=True)
         p_model.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
         p_model.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
         p_model.pairwise_comparisons(1, 3, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
-        p_model.print(print_vpool=True)
+        # p_model.print(print_vpool=True)
+
+        # ============= ============= ============= ============= ============= ============= ============= =============
+
+        instance = train_loader.dataset[0]
+        feat, label = instance
+        print(instance)
+        print(feat.to(int))
+
+        def feat_to_input(feat):
+            inp = [idx + 1 if f == 1 else -(idx + 1) for idx, f in enumerate(feat)]
+            return inp
+
+        inp = feat_to_input(feat)
+        print(inp)
+
+        def explain(feat):
+            true_class = p_model.predict_votes(feat)
+            print(true_class)
+
+        explain([inp])
+
+        #     for cls in range(1, 4):
+        #         for
+
+        # ============= ============= ============= ============= ============= ============= ============= =============
 
         # new_model, loss_fn, optim = get_model(args, results)
         # new_p_model = PseudoModel(new_model, input_dim, output_dim)
