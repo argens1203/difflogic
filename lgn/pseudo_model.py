@@ -1,3 +1,4 @@
+import logging
 import torch
 from contextlib import contextmanager
 
@@ -10,6 +11,8 @@ from constant import device
 from .util import formula_as_pseudo_model, get_truth_table_loader, feat_to_input
 
 fp_type = torch.float32
+
+logger = logging.getLogger(__name__)
 
 
 def get_formula(model, input_dim):
@@ -112,13 +115,17 @@ class PseudoModel:
         return self.output_ids[start : start + step]
 
     def pairwise_comparisons(self, true_class, adj_class, inp=None):
-        print("==== Pairwise Comparisons ====")
+        logger.info(
+            "==== Pairwise Comparisons Between %d(True Class) and %d====",
+            true_class,
+            adj_class,
+        )
 
         with self.use_context() as vpool:
             pos = self.get_output_ids(adj_class)
             neg = [-a for a in self.get_output_ids(true_class)]
             clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
-            print("Lit: ", clauses)
+            logger.info("Lit: %s", str(clauses))
 
             comp = CardEnc.atleast(
                 lits=clauses,
@@ -128,7 +135,7 @@ class PseudoModel:
             )
 
             clauses = comp.clauses
-            print("Card Encoding Clauses: ", comp.clauses)
+            logger.info("Card Encoding Clauses: %s", str(comp.clauses))
 
             # Enumerate all clauses
             with Solver(bootstrap_with=clauses) as solver:
@@ -136,10 +143,10 @@ class PseudoModel:
                 # Check if it is satisfiable under cardinatlity constraint
                 solver.append_formula(comp)
                 result = solver.solve(assumptions=inp)
-                print("Satisfiable", result)
+                logger.info("Satisfiable: %s", result)
                 return result
 
-        assert (False, "Pairwise comparison error")
+        assert False, "Pairwise comparison error"
 
     def check(self, model, data=None):
         if data != None:

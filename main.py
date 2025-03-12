@@ -1,4 +1,5 @@
 import random
+import logging
 
 import numpy as np
 import torch
@@ -15,6 +16,9 @@ from lgn.args import get_args
 from lgn.util import get_results
 
 torch.set_num_threads(1)  # ???
+
+# logging.basicConfig(filename="main.log", level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
 def seed_all(seed):
