@@ -7,7 +7,7 @@ from pysat.solvers import Solver
 from difflogic import LogicLayer, GroupSum
 
 from constant import device
-from .util import formula_as_pseudo_model, get_truth_table_loader
+from .util import formula_as_pseudo_model, get_truth_table_loader, feat_to_input
 
 fp_type = torch.float32
 
@@ -120,37 +120,67 @@ class PseudoModel:
             clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
             print("Lit: ", clauses)
 
-            # print("=== Run 1 ===")
-            # for f, id in vpool.obj2id.items():
-            #     print(id, f)
-            # print("=== Run 1 ===")
-            # for id, f in vpool.id2obj.items():
-            #     print(id, f)
             comp = CardEnc.atleast(
                 lits=clauses,
                 bound=self.calc_bound(true_class, adj_class),
                 encoding=EncType.totalizer,
                 vpool=vpool,
             )
-            # print("=== Run 2 ===")
-            # for f, id in vpool.obj2id.items():
-            #     print(id, f)
-            # print("=== Run 2 ===")
-            # for id, f in vpool.id2obj.items():
-            #     print(id, f)
+
             clauses = comp.clauses
             print("Card Encoding Clauses: ", comp.clauses)
 
+            # Enumerate all clauses
             with Solver(bootstrap_with=clauses) as solver:
                 # TODO: CHECK
                 # Check if it is satisfiable under cardinatlity constraint
                 solver.append_formula(comp)
-                print("Satisfiable", solver.solve(assumptions=inp))
+                result = solver.solve(assumptions=inp)
+                print("Satisfiable", result)
+                return result
+
+        assert (False, "Pairwise comparison error")
 
     def check(self, model, data=None):
         if data != None:
             self.check_model_with_data(model, data)
         self.check_model_with_truth_table(model)
+
+    def explain(self, feat):
+        inp = feat_to_input(feat)
+        print(inp)
+        true_class = self.predict_votes([inp]).argmax().int() + 1
+        print("true_class", true_class)
+
+        assert self.uniquely_satisfied_by(inp, true_class)
+
+        reduced = self.reduce(inp, true_class)
+        print("Final reduced: ", reduced)
+
+    def reduce(self, inp, true_class):
+        temp = inp.copy()
+        for feature in inp:
+            temp.remove(feature)
+            if self.uniquely_satisfied_by(inp=temp, true_class=true_class):
+                continue
+            else:
+                temp.append(feature)
+        return temp
+
+    def uniquely_satisfied_by(
+        self,
+        inp,
+        true_class,  # true_class as in not true class of data, but that predicted by model
+    ):  # Return true means that only the true_class can satisfy all contraints given the input
+        for cls in range(1, self.class_dim + 1):  # TODO: use more consistent ways
+            if cls == true_class:
+                continue
+            if (
+                self.pairwise_comparisons(true_class=true_class, adj_class=cls, inp=inp)
+                is True
+            ):
+                return False
+        return True
 
     @contextmanager
     def use_context(self):

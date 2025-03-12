@@ -4,6 +4,11 @@ from pysat.formula import Atom
 from experiments.results_json import ResultsJSON
 
 
+def feat_to_input(feat):
+    inp = [idx + 1 if f == 1 else -(idx + 1) for idx, f in enumerate(feat)]
+    return inp
+
+
 def get_results(experiment_id, args):
     if experiment_id is not None:
         assert 520_000 <= experiment_id < 530_000, experiment_id
