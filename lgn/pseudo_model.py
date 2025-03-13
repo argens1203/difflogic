@@ -115,8 +115,8 @@ class PseudoModel:
         return self.output_ids[start : start + step]
 
     def pairwise_comparisons(self, true_class, adj_class, inp=None):
-        logger.info(
-            "==== Pairwise Comparisons Between %d(True Class) and %d====",
+        logger.debug(
+            "Pairwise Comparisons (%d > %d)",
             true_class,
             adj_class,
         )
@@ -125,7 +125,7 @@ class PseudoModel:
             pos = self.get_output_ids(adj_class)
             neg = [-a for a in self.get_output_ids(true_class)]
             clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
-            logger.info("Lit: %s", str(clauses))
+            logger.debug("Lit: %s", str(clauses))
 
             comp = CardEnc.atleast(
                 lits=clauses,
@@ -135,7 +135,7 @@ class PseudoModel:
             )
 
             clauses = comp.clauses
-            logger.info("Card Encoding Clauses: %s", str(comp.clauses))
+            logger.debug("Card Encoding Clauses: %s", str(comp.clauses))
 
             # Enumerate all clauses
             with Solver(bootstrap_with=clauses) as solver:
@@ -143,7 +143,7 @@ class PseudoModel:
                 # Check if it is satisfiable under cardinatlity constraint
                 solver.append_formula(comp)
                 result = solver.solve(assumptions=inp)
-                logger.info("Satisfiable: %s", result)
+                logger.debug("Satisfiable: %s", result)
                 return result
 
         assert False, "Pairwise comparison error"
@@ -155,18 +155,19 @@ class PseudoModel:
 
     def explain(self, feat):
         inp = feat_to_input(feat)
-        print(inp)
+        logger.info("Explaining: %s", inp)
         true_class = self.predict_votes([inp]).argmax().int() + 1
-        print("true_class", true_class)
+        logger.info("Predicted Class - %s", true_class)
 
         assert self.uniquely_satisfied_by(inp, true_class)
 
         reduced = self.reduce(inp, true_class)
-        print("Final reduced: ", reduced)
+        logger.info("Final reduced: %s", reduced)
 
     def reduce(self, inp, true_class):
         temp = inp.copy()
         for feature in inp:
+            logger.info("Testing removal of %d", feature)
             temp.remove(feature)
             if self.uniquely_satisfied_by(inp=temp, true_class=true_class):
                 continue
