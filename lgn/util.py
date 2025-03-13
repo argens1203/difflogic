@@ -1,7 +1,10 @@
+import logging
 import torch
 from constant import device
 from pysat.formula import Atom
 from experiments.results_json import ResultsJSON
+
+logger = logging.getLogger(__name__)
 
 
 def feat_to_input(feat):

@@ -33,7 +33,8 @@ if __name__ == "__main__":
     args = get_args()
 
     results = get_results(args.experiment_id, args)
-    seed_all(args.seed)
+    # seed_all(args.seed)
+    seed_all(1)
 
     ####################################################################################################################
 

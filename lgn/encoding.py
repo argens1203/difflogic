@@ -60,7 +60,7 @@ class Encoding:
     def check_model_with_data(self, model, data):
         with torch.no_grad(), self.use_context():
             model.train(False)
-
+            logger.debug("Checking model with data")
             for x, _ in data:
                 x = x.to(self.fp_type).to(device)
 
@@ -126,9 +126,11 @@ class Encoding:
             clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
             logger.debug("Lit: %s", str(clauses))
 
+            bound = self.calc_bound(true_class, adj_class)
+            logger.debug("Bound: %d", bound)
             comp = CardEnc.atleast(
                 lits=clauses,
-                bound=self.calc_bound(true_class, adj_class),
+                bound=bound,
                 encoding=EncType.totalizer,
                 vpool=vpool,
             )
@@ -153,9 +155,13 @@ class Encoding:
         self.check_model_with_truth_table(model)
 
     def explain(self, feat):
+        logger.debug("feat: %s", feat)
         inp = feat_to_input(feat)
+        logger.debug("inp: %s", inp)
         logger.info("Explaining: %s", inp)
-        true_class = self.predict_votes([inp]).argmax().int() + 1
+        votes = self.predict_votes(torch.tensor([inp]))
+        logger.debug("Votes: %s", votes)
+        true_class = votes.argmax().int() + 1
         logger.info("Predicted Class - %s", true_class)
 
         assert self.uniquely_satisfied_by(inp, true_class)

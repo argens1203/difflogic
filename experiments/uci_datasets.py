@@ -1,9 +1,12 @@
+import logging
 import torch
 import numpy as np
 from torch.utils.data import Dataset
 from torchvision.datasets.utils import download_url, check_integrity
 import os
 from sklearn.model_selection import train_test_split
+
+logger = logging.getLogger(__name__)
 
 
 class UCIDataset(Dataset):
@@ -492,6 +495,7 @@ class IrisDataset(UCIDataset):
         return data, label
 
     def convert_sample_to_feature_vector(sample, maxes, mins):
+        logger.debug(f"sample={sample}")
         # TODO: Use percentile
         number_of_bins = 2
         ret = []
@@ -505,6 +509,7 @@ class IrisDataset(UCIDataset):
             ret.append(vec)
 
         ret = np.concatenate(ret, dtype=float)
+        logger.debug(f"ret={ret}")
         return ret
 
     @staticmethod

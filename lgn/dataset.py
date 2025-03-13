@@ -1,8 +1,11 @@
+import logging
 import experiments.mnist_dataset as mnist_dataset
 import experiments.uci_datasets as uci_datasets
 import torch
 import math
 import torchvision
+
+logger = logging.getLogger(__name__)
 
 
 def load_dataset(args):
@@ -258,6 +261,9 @@ class CustomDataset(Dataset):
         return self.features, self.labels
 
 
+import torch.nn.functional as F
+
+
 class Binarizer:
     def __init__(self, dataset: Dataset, bin_count=2):
         self.bin_edges = self.get_bins(dataset, bin_count)
@@ -273,6 +279,10 @@ class Binarizer:
 
     def __call__(self, feature):
         ret = []
+        logger.debug(f"feature={feature}")
         for f, bin_edges in zip(feature.reshape(-1, 1), self.bin_edges):
-            ret.append(max(torch.bucketize(f, bin_edges) - 1, torch.tensor([0])))
-        return torch.stack(ret).reshape(-1)
+            bucket = max(torch.bucketize(f, bin_edges) - 1, torch.tensor([0]))
+            ret.append(F.one_hot(bucket, num_classes=len(bin_edges) - 1))
+        ret = torch.stack(ret).reshape(-1)
+        logger.debug(f"ret={ret}")
+        return ret
