@@ -67,26 +67,9 @@ if __name__ == "__main__":
         p_model = PseudoModel(model, input_dim, output_dim)
         p_model.check(model)
 
-        # p_model.print(print_vpool=True)
-        p_model.pairwise_comparisons(1, 2, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
-        p_model.pairwise_comparisons(1, 3, inp=[-1, -2, -3, -4, 5, -6, -7, -8])
-        # p_model.print(print_vpool=True)
-
         # ============= ============= ============= ============= ============= ============= ============= =============
 
         instance = train_loader.dataset[0]
         feat, label = instance
-        print(instance)
-        print(feat.to(int))
 
         p_model.explain(feat)
-
-        #     for cls in range(1, 4):
-        #         for
-
-        # ============= ============= ============= ============= ============= ============= ============= =============
-
-        # new_model, loss_fn, optim = get_model(args, results)
-        # new_p_model = PseudoModel(new_model, input_dim, output_dim)
-        # new_p_model.print()
-        # new_p_model.check(new_model)
