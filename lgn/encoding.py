@@ -84,10 +84,9 @@ class Encoding:
             print("==== Formula ==== ")
             for f in self.formula:
                 print(
+                    (str(vpool.id(f)) + ")").ljust(4),
                     f,
-                    "...",
                     # f.simplified(), "...", f.clauses, "...", f.encoded, "...",
-                    vpool.id(f),
                 )
 
             print("==== Input Ids ==== ")
@@ -187,6 +186,7 @@ class Encoding:
                 self.pairwise_comparisons(true_class=true_class, adj_class=cls, inp=inp)
                 is True
             ):
+                logger.debug("Satisfied by %d", cls)
                 return False
         return True
 

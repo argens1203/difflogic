@@ -190,3 +190,89 @@ def num_classes_of_dataset(dataset):
         "cifar-10-3-thresholds": 10,
         "cifar-10-31-thresholds": 10,
     }[dataset]
+
+
+from torchvision.datasets.utils import download_url, check_integrity
+from torch.utils.data import Dataset, DataLoader
+import os
+
+
+class CustomDataset(Dataset):
+    url, md5 = (
+        "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
+        "42615765a885ddf54427f12c34a0a070",
+    )
+    location = "iris.data"
+    root = "data-uci"
+
+    fpath = os.path.join(root, url.split("/")[-1])
+    label_dict = {"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2}
+
+    def __init__(self, transform=None):
+        self.transform = transform
+        if not check_integrity(self.fpath, self.md5):
+            download_url(self.url, self.root, self.url.split("/")[-1], self.md5)
+        self.load_data()
+
+    def load_data(self):
+        def read_raw_data(filepath):
+            with open(filepath, "r") as f:
+                data = f.readlines()
+
+            for i in range(len(data)):
+                if len(data[i]) <= 2:
+                    data[i] = None
+                else:
+                    data[i] = data[i].strip("\n").strip().split(",")
+                    data[i] = [d for d in data[i]]
+
+            data = list(filter(lambda x: x is not None, data))
+            return data
+
+        def parse_feature(features):
+            return [float(f) for f in features]
+
+        def parse(data):
+            features = [parse_feature(sample[:-1]) for sample in data]
+            labels = [self.label_dict[sample[-1]] for sample in data]
+            features, labels = (
+                torch.tensor(features).float(),
+                torch.tensor(labels).float(),
+            )
+
+            return features, labels
+
+        raw_data = read_raw_data(self.fpath)
+        self.features, self.labels = parse(raw_data)
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, index):
+        feature, label = self.features[index], self.labels[index]
+        if self.transform is not None:
+            feature = self.transform(feature)
+        return feature, label
+
+    def get_all(self):
+        return self.features, self.labels
+
+
+class Binarizer:
+    def __init__(self, dataset: Dataset, bin_count=2):
+        self.bin_edges = self.get_bins(dataset, bin_count)
+
+    def get_bins(self, dataset: Dataset, bin_count):
+        feature, _ = next(
+            DataLoader(dataset, batch_size=len(dataset))._get_iterator()
+        )  # TODO: handle large datasets
+        bins = feature.quantile(
+            torch.linspace(0, 1, bin_count + 1), dim=0
+        )  # len(bins) = bin_count + 1
+        return bins.transpose(0, 1)  # len(bins) = feature_dim
+
+    def __call__(self, feature):
+        ret = []
+        for f, bin_edges in zip(feature.reshape(-1, 1), self.bin_edges):
+            ret.append(max(torch.bucketize(f, bin_edges) - 1, torch.tensor([0])))
+        return torch.stack(ret).reshape(-1)
