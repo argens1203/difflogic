@@ -34,7 +34,7 @@ def get_formula(model, input_dim):
     return x, inputs
 
 
-class PseudoModel:
+class Encoding:
     def __init__(self, model, input_dim, class_dim, fp_type=fp_type):
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)

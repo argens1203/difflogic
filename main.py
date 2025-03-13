@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import torch
 
-from lgn.pseudo_model import PseudoModel
+from lgn.encoding import Encoding
 from lgn.dataset import (
     load_dataset,
     input_dim_of_dataset,
@@ -64,12 +64,12 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-        p_model = PseudoModel(model, input_dim, output_dim)
-        p_model.check(model)
+        encoding = Encoding(model, input_dim, output_dim)
+        encoding.check(model)
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 
         instance = train_loader.dataset[0]
         feat, label = instance
 
-        p_model.explain(feat)
+        encoding.explain(feat)
