@@ -80,7 +80,8 @@ if __name__ == "__main__":
         output_dim = num_classes_of_dataset(args.dataset)
         encoding = Encoding(model, input_dim, output_dim)
         encoding.print()
-        encoding.check(model)
+        encoding.check(model, data=train_loader)
+        encoding.check(model, data=test_loader)
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 

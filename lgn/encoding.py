@@ -50,6 +50,7 @@ class Encoding:
 
     # Returns the votes, or logits, before argmax of prediction
     def predict_votes(self, x):
+        # logger.debug("Predicting votes for x: %s", x)
         with self.use_context():
             return formula_as_pseudo_model(
                 formula=self.formula,
@@ -69,6 +70,7 @@ class Encoding:
                 assert logit.equal(p_logit)
 
     def check_model_with_truth_table(self, model):
+        logger.debug("Checking model with truth table")
         with torch.no_grad(), self.use_context():
             model.train(False)
 
@@ -159,7 +161,7 @@ class Encoding:
         inp = feat_to_input(feat)
         logger.debug("inp: %s", inp)
         logger.info("Explaining: %s", inp)
-        votes = self.predict_votes(torch.tensor([inp]))
+        votes = self.predict_votes(feat.reshape(1, -1))
         logger.debug("Votes: %s", votes)
         true_class = votes.argmax().int() + 1
         logger.info("Predicted Class - %s", true_class)
