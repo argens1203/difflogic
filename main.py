@@ -80,20 +80,23 @@ if __name__ == "__main__":
         output_dim = num_classes_of_dataset(args.dataset)
         encoding = Encoding(model, input_dim, output_dim)
         encoding.print()
-        encoding.check(model, data=train_loader)
-        encoding.check(model, data=test_loader)
+        from lgn.validator import Validator
+        from lgn.explainer import Explainer
+
+        Validator.validate(encoding, model, data=train_loader)
+        Validator.validate(encoding, model, data=test_loader)
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 
-        # instance = train_loader.dataset[0]
-        # feat, label = instance
+        instance = train_loader.dataset[0]
+        feat, label = instance
 
-        # encoding.explain(feat)
+        Explainer.explain(encoding, feat)
 
-        for batch, label in train_loader:
-            for feat in batch:
-                encoding.print()
-                encoding.explain(feat)
+        # for batch, label in train_loader:
+        #     for feat in batch:
+        #         encoding.print()
+        #         encoding.explain(feat)
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
 # Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"

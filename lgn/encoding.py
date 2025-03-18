@@ -2,13 +2,10 @@ import logging
 import torch
 from contextlib import contextmanager
 
-from pysat.formula import Formula, Atom, IDPool
-from pysat.card import CardEnc, EncType
-from pysat.solvers import Solver
+from pysat.formula import Formula, Atom
 from difflogic import LogicLayer, GroupSum
 
-from constant import device
-from .util import formula_as_pseudo_model, get_truth_table_loader, feat_to_input
+from .util import formula_as_pseudo_model
 
 fp_type = torch.float32
 
@@ -58,29 +55,6 @@ class Encoding:
                 class_dim=self.class_dim,
             )(x)
 
-    def check_model_with_data(self, model, data):
-        with torch.no_grad(), self.use_context():
-            model.train(False)
-            logger.debug("Checking model with data")
-            for x, _ in data:
-                x = x.to(self.fp_type).to(device)
-
-                logit = model(x)
-                p_logit = self.predict_votes(x)
-                assert logit.equal(p_logit)
-
-    def check_model_with_truth_table(self, model):
-        logger.debug("Checking model with truth table")
-        with torch.no_grad(), self.use_context():
-            model.train(False)
-
-            for x, _ in get_truth_table_loader(input_dim=self.input_dim):
-                x = x.to(self.fp_type).to(device)
-
-                logit = model(x)
-                p_logit = self.predict_votes(x)
-                assert logit.equal(p_logit)
-
     def print(self, print_vpool=False):
         with self.use_context() as vpool:
             print("==== Formula ==== ")
@@ -102,102 +76,10 @@ class Encoding:
                 for f, id in vpool.obj2id.items():
                     print(id, f)
 
-    def calc_bound(self, true_class, adj_class):
-        # TODO: CHECK
-        # If true_class < adj_class, then adj class need one more vote to be selected
-        # Else the number of vote needed is output neuron / number of classes
-        if true_class < adj_class:
-            return len(self.output_ids) // self.class_dim + 1
-        return len(self.output_ids) // self.class_dim
-
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
         return self.output_ids[start : start + step]
-
-    def pairwise_comparisons(self, true_class, adj_class, inp=None):
-        logger.debug(
-            "==== Pairwise Comparisons (%d > %d) ====",
-            true_class,
-            adj_class,
-        )
-
-        with self.use_context() as vpool:
-            pos = self.get_output_ids(adj_class)
-            neg = [-a for a in self.get_output_ids(true_class)]
-            clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
-            logger.debug("Lit: %s", str(clauses))
-
-            bound = self.calc_bound(true_class, adj_class)
-            logger.debug("Bound: %d", bound)
-            comp = CardEnc.atleast(
-                lits=clauses,
-                bound=bound,
-                encoding=EncType.totalizer,
-                vpool=vpool,
-            )
-
-            clauses = comp.clauses
-            logger.debug("Card Encoding Clauses: %s", str(comp.clauses))
-
-            # Enumerate all clauses
-            with Solver(bootstrap_with=clauses) as solver:
-                # TODO: CHECK
-                # Check if it is satisfiable under cardinatlity constraint
-                solver.append_formula(comp)
-                logger.debug("Input: %s", inp)
-                result = solver.solve(assumptions=inp)
-                logger.debug("Satisfiable: %s", result)
-                return result
-
-        assert False, "Pairwise comparison error"
-
-    def check(self, model, data=None):
-        if data != None:
-            self.check_model_with_data(model, data)
-        self.check_model_with_truth_table(model)
-
-    def explain(self, feat):
-        logger.debug("==== Explaining: %s ====", feat)
-        inp = feat_to_input(feat)
-        logger.debug("inp: %s", inp)
-        logger.info("Explaining: %s", inp)
-        votes = self.predict_votes(feat.reshape(1, -1))
-        logger.debug("Votes: %s", votes)
-        true_class = votes.argmax().int() + 1
-        logger.info("Predicted Class - %s", true_class)
-
-        assert self.uniquely_satisfied_by(inp, true_class)
-
-        reduced = self.reduce(inp, true_class)
-        logger.info("Final reduced: %s", reduced)
-
-    def reduce(self, inp, true_class):
-        temp = inp.copy()
-        for feature in inp:
-            logger.info("Testing removal of %d", feature)
-            temp.remove(feature)
-            if self.uniquely_satisfied_by(inp=temp, true_class=true_class):
-                continue
-            else:
-                temp.append(feature)
-        return temp
-
-    def uniquely_satisfied_by(
-        self,
-        inp,
-        true_class,  # true_class as in not true class of data, but that predicted by model
-    ):  # Return true means that only the true_class can satisfy all contraints given the input
-        for cls in range(1, self.class_dim + 1):  # TODO: use more consistent ways
-            if cls == true_class:
-                continue
-            if (
-                self.pairwise_comparisons(true_class=true_class, adj_class=cls, inp=inp)
-                is True
-            ):
-                logger.debug("Satisfied by %d", cls)
-                return False
-        return True
 
     @contextmanager
     def use_context(self):
