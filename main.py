@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     results = get_results(args.experiment_id, args)
     # seed_all(args.seed)
-    seed_all(1)
+    seed_all(0)
 
     ####################################################################################################################
 
@@ -85,7 +85,15 @@ if __name__ == "__main__":
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 
-        instance = train_loader.dataset[0]
-        feat, label = instance
+        # instance = train_loader.dataset[0]
+        # feat, label = instance
 
-        encoding.explain(feat)
+        # encoding.explain(feat)
+
+        for batch, label in train_loader:
+            for feat in batch:
+                encoding.print()
+                encoding.explain(feat)
+
+# First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
+# Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"

@@ -117,7 +117,7 @@ class Encoding:
 
     def pairwise_comparisons(self, true_class, adj_class, inp=None):
         logger.debug(
-            "Pairwise Comparisons (%d > %d)",
+            "==== Pairwise Comparisons (%d > %d) ====",
             true_class,
             adj_class,
         )
@@ -145,6 +145,7 @@ class Encoding:
                 # TODO: CHECK
                 # Check if it is satisfiable under cardinatlity constraint
                 solver.append_formula(comp)
+                logger.debug("Input: %s", inp)
                 result = solver.solve(assumptions=inp)
                 logger.debug("Satisfiable: %s", result)
                 return result
@@ -157,7 +158,7 @@ class Encoding:
         self.check_model_with_truth_table(model)
 
     def explain(self, feat):
-        logger.debug("feat: %s", feat)
+        logger.debug("==== Explaining: %s ====", feat)
         inp = feat_to_input(feat)
         logger.debug("inp: %s", inp)
         logger.info("Explaining: %s", inp)
