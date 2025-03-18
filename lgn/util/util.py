@@ -30,36 +30,6 @@ def summed_on(x, class_count_to_conform_to):
     return ret
 
 
-def formula_as_pseudo_model(formula, input_handles, class_dim):
-    def pseudo_model(x):
-        simplified = [
-            [
-                (
-                    0
-                    if f.simplified(
-                        assumptions=[
-                            ~inp if feat == 0 else inp
-                            for feat, inp in zip(xs, input_handles)
-                        ]
-                    )
-                    # TODO: better way of checking?
-                    == Atom(False)
-                    else 1
-                )
-                for f in formula
-            ]
-            for xs in x
-        ]
-        summed = (
-            torch.tensor([summed_on(inter, class_dim) for inter in simplified])
-            .to(device)
-            .int()
-        )
-        return summed
-
-    return pseudo_model
-
-
 def get_truth_table_loader(input_dim, batch_size=10):
     count = 0
 

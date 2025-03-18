@@ -5,7 +5,8 @@ from contextlib import contextmanager
 from pysat.formula import Formula, Atom
 from difflogic import LogicLayer, GroupSum
 
-from ..util import formula_as_pseudo_model
+from lgn.util import summed_on
+from constant import device
 
 fp_type = torch.float32
 
@@ -45,16 +46,6 @@ class Encoding:
         self.class_dim = class_dim
         self.fp_type = fp_type
 
-    # Returns the votes, or logits, before argmax of prediction
-    def predict_votes(self, x):
-        # logger.debug("Predicting votes for x: %s", x)
-        with self.use_context():
-            return formula_as_pseudo_model(
-                formula=self.formula,
-                input_handles=self.input_handles,
-                class_dim=self.class_dim,
-            )(x)
-
     def print(self, print_vpool=False):
         with self.use_context() as vpool:
             print("==== Formula ==== ")
@@ -81,6 +72,27 @@ class Encoding:
         start = (class_id - 1) * step
         return self.output_ids[start : start + step]
 
+    def as_model(self):
+        """
+        The method returns a callable model which predicts the class labels given instances.
+
+        :return: labels
+        :rtype: torch.Tensor (batch_size)
+
+        Example:
+
+        .. code-block:: python
+            >>> x = Torch.tensor([[1, 0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 1, 1, 0, 0, 1]])
+            >>> encoding.as_model()(x)
+            'Torch.tensor([0, 1])'
+        """
+        model_args = {
+            "input_handles": self.input_handles,
+            "formula": self.formula,
+            "class_dim": self.class_dim,
+        }
+        return PseudoModel(**model_args)
+
     @contextmanager
     def use_context(self):
         hashable = id(self)
@@ -93,3 +105,41 @@ class Encoding:
 
     def __del__(self):
         Formula.cleanup(id(self))
+
+
+class PseudoModel:
+    def __init__(self, input_handles, formula, class_dim):
+        self.input_handles = input_handles
+        self.formula = formula
+        self.class_dim = class_dim
+
+    def __call__(self, x: torch.Tensor, logit=False):
+        simplified = [
+            [
+                (
+                    0
+                    if f.simplified(
+                        assumptions=[
+                            ~inp if feat == 0 else inp
+                            for feat, inp in zip(xs, self.input_handles)
+                        ]
+                    )
+                    # TODO: better way of checking?
+                    == Atom(False)
+                    else 1
+                )
+                for f in self.formula
+            ]
+            for xs in x
+        ]
+        summed = (
+            torch.tensor([summed_on(inter, self.class_dim) for inter in simplified])
+            .to(device)
+            .int()
+        )
+        if logit:
+            return summed
+
+        cls_label = summed.argmax().int()
+        logger.debug("Class Label: %d", cls_label)
+        return cls_label

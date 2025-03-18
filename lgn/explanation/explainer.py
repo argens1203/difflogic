@@ -72,22 +72,22 @@ class Explainer:
 
         assert False, "Pairwise comparison error"
 
-    def explain(self: Encoding, feat):
+    def explain(encoding: Encoding, feat):
         logger.debug("==== Explaining: %s ====", feat)
 
         inp = feat_to_input(feat)
         logger.debug("inp: %s", inp)
         logger.info("Explaining: %s", inp)
 
-        votes = self.predict_votes(feat.reshape(1, -1))
-        logger.debug("Votes: %s", votes)
+        class_label = encoding.as_model()(feat.reshape(1, -1))
+        # logger.debug("Votes: %s", votes)
 
-        true_class = votes.argmax().int() + 1
-        logger.info("Predicted Class - %s", true_class)
+        pred_class = class_label + 1
+        logger.info("Predicted Class - %s", pred_class)
 
-        assert Explainer.is_uniquely_satisfied_by(self, inp, true_class)
+        assert Explainer.is_uniquely_satisfied_by(encoding, inp, pred_class)
 
-        reduced = Explainer.reduce_input(self, inp, true_class)
+        reduced = Explainer.reduce_input(encoding, inp, pred_class)
         logger.info("Final reduced: %s", reduced)
 
     def reduce_input(self, inp, predicted_cls):
