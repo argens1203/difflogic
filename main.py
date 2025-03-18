@@ -83,15 +83,14 @@ if __name__ == "__main__":
         from lgn.encoding.validator import Validator
         from lgn.explanation.explainer import Explainer
 
-        Validator.validate(encoding, model, data=train_loader)
-        Validator.validate(encoding, model, data=test_loader)
+        Validator.validate_with_truth_table(encoding=encoding, model=model)
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 
         instance = train_loader.dataset[0]
         feat, label = instance
 
-        Explainer.explain(encoding, feat)
+        Explainer(encoding).explain(feat)
 
         # for batch, label in train_loader:
         #     for feat in batch:

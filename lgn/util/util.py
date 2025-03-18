@@ -21,16 +21,20 @@ def get_results(experiment_id, args):
     return None
 
 
-def summed_on(x, class_count_to_conform_to):
-    # TODO: use torch way
-    assert len(x) % class_count_to_conform_to == 0
-    ret = []
-    for i in range(0, len(x), len(x) // class_count_to_conform_to):
-        ret.append(sum(x[i : i + len(x) // class_count_to_conform_to]))
-    return ret
-
-
 def get_truth_table_loader(input_dim, batch_size=10):
+    """
+    This generator yields all possible binary inputs for a given input dimension. The labels are set to None to adhere to the format of DataLodaers.
+
+    returns: (x, None)
+
+    Example:
+
+    .. code-block:: python
+        >>> instances = next(get_truth_table_loader(input_dim=2, batch_size=2))
+        >>> print(instances)
+        (tensor([[0, 0],
+                [0, 1]]), None)
+    """
     count = 0
 
     def get_one(x):
