@@ -5,7 +5,7 @@ from tqdm import tqdm
 from difflogic import PackBitsTensor
 
 from constant import device, BITS_TO_TORCH_FLOATING_POINT_TYPE
-from lgn.dataset import load_n
+from lgn.dataset.dataset import load_n
 
 
 def train(model, x, y, loss_fn, optimizer):

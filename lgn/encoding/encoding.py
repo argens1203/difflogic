@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pysat.formula import Formula, Atom
 from difflogic import LogicLayer, GroupSum
 
-from .util import formula_as_pseudo_model
+from ..util import formula_as_pseudo_model
 
 fp_type = torch.float32
 

@@ -2,7 +2,7 @@ import torch
 import logging
 
 from constant import device
-from .util import get_truth_table_loader
+from ..util import get_truth_table_loader
 
 logger = logging.getLogger(__name__)
 
@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 class Validator:
     def validate(self, model, data=None):
         if data != None:
-            Validator.check_model_with_data(encoding=self, model=model, data=data)
-        Validator.check_model_with_truth_table(encoding=self, model=model)
+            Validator.validate_with_data(encoding=self, model=model, data=data)
+        Validator.validate_with_truth_table(encoding=self, model=model)
 
-    def check_model_with_data(encoding, model, data):
+    def validate_with_data(encoding, model, data):
         with torch.no_grad(), encoding.use_context():
             model.train(False)
             logger.debug("Checking model with data")
@@ -24,7 +24,7 @@ class Validator:
                 p_logit = encoding.predict_votes(x)
                 assert logit.equal(p_logit)
 
-    def check_model_with_truth_table(encoding, model):
+    def validate_with_truth_table(encoding, model):
         logger.debug("Checking model with truth table")
         with torch.no_grad(), encoding.use_context():
             model.train(False)

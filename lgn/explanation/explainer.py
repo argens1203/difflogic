@@ -2,8 +2,8 @@ import logging
 from pysat.card import CardEnc, EncType
 from pysat.solvers import Solver
 
-from .util import feat_to_input
-from .encoding import Encoding
+from lgn.util import feat_to_input
+from lgn.encoding import Encoding
 
 logger = logging.getLogger(__name__)
 

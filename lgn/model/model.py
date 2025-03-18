@@ -2,7 +2,7 @@ import torch
 
 from difflogic import LogicLayer, GroupSum
 
-from .dataset import input_dim_of_dataset, num_classes_of_dataset
+from lgn.dataset import input_dim_of_dataset, num_classes_of_dataset
 from constant import device
 
 

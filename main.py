@@ -4,8 +4,8 @@ import logging
 import numpy as np
 import torch
 
-from lgn.encoding import Encoding
-from lgn.dataset import (
+from lgn.encoding.encoding import Encoding
+from lgn.dataset.dataset import (
     load_dataset,
     CustomDataset,
     Binarizer,
@@ -13,8 +13,8 @@ from lgn.dataset import (
     num_classes_of_dataset,
 )
 from lgn.model import get_model, compile_model
-from lgn.trainer import train_eval
-from lgn.args import get_args
+from lgn.model import train_eval
+from lgn.util import get_args
 from lgn.util import get_results
 
 torch.set_num_threads(1)  # ???
@@ -80,8 +80,8 @@ if __name__ == "__main__":
         output_dim = num_classes_of_dataset(args.dataset)
         encoding = Encoding(model, input_dim, output_dim)
         encoding.print()
-        from lgn.validator import Validator
-        from lgn.explainer import Explainer
+        from lgn.encoding.validator import Validator
+        from lgn.explanation.explainer import Explainer
 
         Validator.validate(encoding, model, data=train_loader)
         Validator.validate(encoding, model, data=test_loader)
