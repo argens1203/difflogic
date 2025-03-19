@@ -36,12 +36,17 @@ class Encoding:
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
-            cnf = CNF()
+            self.cnf = CNF()
+            self.output_ids = []
+
             for f in self.formula:
                 f.clausify()
-                cnf.extend(f.simplified())
-            self.cnf = cnf
-            self.output_ids = [vpool.id(f) for f in self.formula]
+                # adding the clauses to a global CNF
+            for f in self.formula:
+                f.clausify()
+                self.cnf.extend(list(f)[:-1])
+                self.output_ids.append(f.clauses[-1][0])
+            # self.output_ids = [vpool.id(f) for f in self.formula]
             # TODO/REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
