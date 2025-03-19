@@ -70,7 +70,7 @@ class SatOracle:
         with self.encoding.use_context() as vpool:
             clauses = self.get_clauses(true_class, adj_class)
             # Enumerate all clauses
-            with Solver(bootstrap_with=[]) as solver:
+            with Solver(bootstrap_with=self.encoding.cnf.clauses) as solver:
                 solver.append_formula(clauses)
                 logger.debug("Input: %s", inp)
 

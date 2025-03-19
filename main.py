@@ -20,7 +20,7 @@ from lgn.util import get_results
 torch.set_num_threads(1)  # ???
 
 # logging.basicConfig(filename="main.log", level=logging.INFO)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 def seed_all(seed):
