@@ -4,7 +4,8 @@ import logging
 import numpy as np
 import torch
 
-from lgn.encoding.encoding import Encoding
+from lgn.encoding import Validator, Encoding
+from lgn.explanation import Explainer
 from lgn.dataset.dataset import (
     load_dataset,
     CustomDataset,
@@ -20,7 +21,6 @@ from lgn.util import get_results
 torch.set_num_threads(1)  # ???
 
 # logging.basicConfig(filename="main.log", level=logging.INFO)
-logging.basicConfig(level=logging.DEBUG)
 
 
 def seed_all(seed):
@@ -31,10 +31,22 @@ def seed_all(seed):
 
 if __name__ == "__main__":
     args = get_args()
+    args.batch_size = 100
+    args.dataset = "iris"
+    args.num_iterations = 2000
+    args.eval_freq = 1000
+    args.num_neurons = 6
+    args.num_layers = 2
+    args.get_formula = True
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
     results = get_results(args.experiment_id, args)
     # seed_all(args.seed)
-    seed_all(1)
+    seed_all(0)
 
     ####################################################################################################################
 
@@ -80,8 +92,6 @@ if __name__ == "__main__":
         output_dim = num_classes_of_dataset(args.dataset)
         encoding = Encoding(model, input_dim, output_dim)
         encoding.print()
-        from lgn.encoding.validator import Validator
-        from lgn.explanation.explainer import Explainer
 
         Validator.validate_with_truth_table(encoding=encoding, model=model)
 
@@ -95,7 +105,7 @@ if __name__ == "__main__":
         explainer = Explainer(encoding)
         for batch, label in train_loader:
             for feat in batch:
-                encoding.print()
+                # encoding.print()
                 explainer.explain(feat)
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
