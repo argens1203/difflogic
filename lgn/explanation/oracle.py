@@ -11,6 +11,7 @@ class SatOracle:
     def __init__(self, encoding: Encoding):
         self.encoding = encoding
         self.votes_per_cls = self.encoding.get_votes_per_cls()
+        self.clauses = dict()
 
     def is_uniquely_satisfied_by(
         self,
@@ -30,12 +31,12 @@ class SatOracle:
                 return False
         return True
 
-    def pairwise_comparisons(self, true_class, adj_class, inp=None):
-        logger.debug(
-            "==== Pairwise Comparisons (%d > %d) ====",
-            true_class,
-            adj_class,
-        )
+    def get_clauses(self, true_class, adj_class):
+        if (true_class, adj_class) in self.clauses:
+            logger.debug(
+                "Cached Clauses: %s", str(self.clauses[(true_class, adj_class)])
+            )
+            return self.clauses[(true_class, adj_class)]
 
         with self.encoding.use_context() as vpool:
             pos = self.encoding.get_output_ids(adj_class)
@@ -46,6 +47,7 @@ class SatOracle:
 
             bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
             logger.debug("Bound: %d", bound)
+
             comp = CardEnc.atleast(
                 lits=clauses,
                 bound=bound,
@@ -54,11 +56,22 @@ class SatOracle:
             )
 
             clauses = comp.clauses
-            logger.debug("Card Encoding Clauses: %s", str(comp.clauses))
+            logger.debug("Recalculated Clauses: %s", str(comp.clauses))
+            self.clauses[(true_class, adj_class)] = clauses
+            return clauses
 
+    def pairwise_comparisons(self, true_class, adj_class, inp=None):
+        logger.debug(
+            "==== Pairwise Comparisons (%d > %d) ====",
+            true_class,
+            adj_class,
+        )
+
+        with self.encoding.use_context() as vpool:
+            clauses = self.get_clauses(true_class, adj_class)
             # Enumerate all clauses
-            with Solver(bootstrap_with=clauses) as solver:
-                solver.append_formula(comp)
+            with Solver(bootstrap_with=[]) as solver:
+                solver.append_formula(clauses)
                 logger.debug("Input: %s", inp)
 
                 result = solver.solve(assumptions=inp)
