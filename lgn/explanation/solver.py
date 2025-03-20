@@ -15,7 +15,7 @@ class Solver:
         self.solver = BaseSolver()
         self.encoding = encoding
         self._append_formula(encoding.cnf.clauses)
-        Formula.attach_vpool(id(self), self._copy_vpool(encoding))
+        Formula.attach_vpool(self._copy_vpool(encoding), id(self))
 
     def set_cardinality(self, lits, bound):
         with self.use_context() as vpool:
