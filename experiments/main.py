@@ -12,6 +12,7 @@ from results_json import ResultsJSON
 
 import mnist_dataset
 import uci_datasets
+
 from difflogic import LogicLayer, GroupSum, PackBitsTensor, CompiledLogicNet
 
 torch.set_num_threads(1)
@@ -22,10 +23,27 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
     64: torch.float64,
 }
 
+device = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps" if torch.mps.is_available() else "cpu"
+)
+
 
 def load_dataset(args):
     validation_loader = None
-    if args.dataset == "adult":
+    if args.dataset == "iris":
+        train_set = uci_datasets.IrisDataset(
+            "./data-uci", split="train", download=True, with_val=False
+        )
+        test_set = uci_datasets.IrisDataset("./data-uci", split="test", with_val=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True
+        )
+        test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=int(1e6), shuffle=False
+        )
+    elif args.dataset == "adult":
         train_set = uci_datasets.AdultDataset(
             "./data-uci", split="train", download=True, with_val=False
         )
@@ -173,6 +191,7 @@ def input_dim_of_dataset(dataset):
     return {
         "adult": 116,
         "breast_cancer": 51,
+        "iris": 8,
         "monk1": 17,
         "monk2": 17,
         "monk3": 17,
@@ -187,6 +206,7 @@ def num_classes_of_dataset(dataset):
     return {
         "adult": 2,
         "breast_cancer": 2,
+        "iris": 3,
         "monk1": 2,
         "monk2": 2,
         "monk3": 2,
@@ -212,7 +232,7 @@ def get_model(args):
     ####################################################################################################################
 
     if arch == "randomly_connected":
-        logic_layers.append(torch.nn.Flatten())
+        # logic_layers.append(torch.nn.Flatten())
         logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
         for _ in range(l - 1):
             logic_layers.append(LogicLayer(in_dim=k, out_dim=k, **llkw))
@@ -238,7 +258,11 @@ def get_model(args):
             }
         )
 
-    model = model.to("cuda")
+    model = model.to(
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps" if torch.mps.is_available() else "cpu"
+    )
 
     print(model)
     if args.experiment_id is not None:
@@ -267,7 +291,20 @@ def eval(model, loader, mode):
         model.train(mode=mode)
         res = np.mean(
             [
-                (model(x.to("cuda").round()).argmax(-1) == y.to("cuda"))
+                (
+                    model(
+                        x.to(
+                            "cuda"
+                            if torch.cuda.is_available()
+                            else "mps" if torch.mps.is_available() else "cpu"
+                        ).round()
+                    ).argmax(-1)
+                    == y.to(
+                        "cuda"
+                        if torch.cuda.is_available()
+                        else "mps" if torch.mps.is_available() else "cpu"
+                    )
+                )
                 .to(torch.float32)
                 .mean()
                 .item()
@@ -318,6 +355,7 @@ if __name__ == "__main__":
         choices=[
             "adult",
             "breast_cancer",
+            "iris",
             "monk1",
             "monk2",
             "monk3",
@@ -408,6 +446,13 @@ if __name__ == "__main__":
 
     parser.add_argument("--grad-factor", type=float, default=1.0)
 
+    parser.add_argument(
+        "--get_formula", action="store_true", help="Gets the formula of a model"
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", default=False, help="Sets vebosity"
+    )
+
     args = parser.parse_args()
 
     ####################################################################################################################
@@ -439,13 +484,14 @@ if __name__ == "__main__":
         desc="iteration",
         total=args.num_iterations,
     ):
-        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to("cuda")
-        y = y.to("cuda")
+        x = x.to(BITS_TO_TORCH_FLOATING_POINT_TYPE[args.training_bit_count]).to(device)
+        y = y.to(device)
 
         loss = train(model, x, y, loss_fn, optim)
 
         if (i + 1) % args.eval_freq == 0:
             if args.extensive_eval:
+                # Use train mode to test on training data
                 train_accuracy_train_mode = eval(model, train_loader, mode=True)
                 valid_accuracy_eval_mode = eval(model, validation_loader, mode=False)
                 valid_accuracy_train_mode = eval(model, validation_loader, mode=True)
@@ -453,6 +499,7 @@ if __name__ == "__main__":
                 train_accuracy_train_mode = -1
                 valid_accuracy_eval_mode = -1
                 valid_accuracy_train_mode = -1
+            # Use evaluation mode to test on training data
             train_accuracy_eval_mode = eval(model, train_loader, mode=False)
             test_accuracy_eval_mode = eval(model, test_loader, mode=False)
             test_accuracy_train_mode = eval(model, test_loader, mode=True)
@@ -467,6 +514,7 @@ if __name__ == "__main__":
             }
 
             if args.packbits_eval:
+                pass
                 r["train_acc_eval"] = packbits_eval(model, train_loader)
                 r["valid_acc_eval"] = packbits_eval(model, train_loader)
                 r["test_acc_eval"] = packbits_eval(model, test_loader)
@@ -518,7 +566,7 @@ if __name__ == "__main__":
                 compiled_model.compile(
                     opt_level=1 if args.num_layers * args.num_neurons < 50_000 else 0,
                     save_lib_path=save_lib_path,
-                    verbose=True,
+                    verbose=args.verbose,
                 )
 
                 correct, total = 0, 0

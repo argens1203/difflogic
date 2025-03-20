@@ -1,9 +1,12 @@
+import logging
 import torch
 import numpy as np
 from torch.utils.data import Dataset
 from torchvision.datasets.utils import download_url, check_integrity
 import os
 from sklearn.model_selection import train_test_split
+
+logger = logging.getLogger(__name__)
 
 
 class UCIDataset(Dataset):
@@ -332,6 +335,7 @@ class AdultDataset(UCIDataset):
         feat = convert_data_to_feature_vectors(data)
         labels = get_labels(data)
 
+        print("feat", feat)
         return feat, labels
 
 
@@ -490,6 +494,24 @@ class IrisDataset(UCIDataset):
 
         return data, label
 
+    def convert_sample_to_feature_vector(sample, maxes, mins):
+        logger.debug(f"sample={sample}")
+        # TODO: Use percentile
+        number_of_bins = 2
+        ret = []
+        for value, maxx, minn in zip(sample[:-1], maxes, mins):
+            value = float(value)
+            bin_edges = np.linspace(minn, maxx, number_of_bins + 1)
+            bucket = max(np.digitize(value, bin_edges, right=True) - 1, 0)
+
+            vec = np.zeros(number_of_bins)
+            vec[bucket] = 1
+            ret.append(vec)
+
+        ret = np.concatenate(ret, dtype=float)
+        logger.debug(f"ret={ret}")
+        return ret
+
     @staticmethod
     def preprocess_iris_data(data_file_name):
 
@@ -503,23 +525,22 @@ class IrisDataset(UCIDataset):
                 if len(data[i]) <= 2:
                     data[i] = None
                 else:
-                    data[i] = data[i].strip("\n").strip(".").strip().split(",")
+                    data[i] = data[i].strip("\n").strip().split(",")
                     data[i] = [d for d in data[i]]
-                    data[i] = data[i]
 
             data = list(filter(lambda x: x is not None, data))
-
             return data
 
-        def convert_sample_to_feature_vector(sample):
-            vec = np.zeros(4)
-            for i in range(4):
-                vec[i] = float(sample[i])
-            return vec
-
         def convert_data_to_feature_vectors(data):
-            feat = [convert_sample_to_feature_vector(sample) for sample in data]
-            return torch.tensor(feat).float()
+            # TODO: vectorize and do it in one step
+            df = np.array(data).transpose()[:-1].astype(float)
+            maxes, mins = df.max(axis=1), df.min(axis=1)
+
+            feat = [
+                IrisDataset.convert_sample_to_feature_vector(sample, maxes, mins)
+                for sample in data
+            ]
+            return torch.tensor(np.array(feat)).float()
 
         def get_labels(data):
             num_samples = len(data)

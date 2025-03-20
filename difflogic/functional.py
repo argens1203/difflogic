@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 
+from pysat.formula import *
+
 BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 
 
@@ -22,6 +24,82 @@ BITS_TO_NP_DTYPE = {8: np.int8, 16: np.int16, 32: np.int32, 64: np.int64}
 # | 13 | A implies B          | 1     | 1     | 0     | 1     |
 # | 14 | not(A and B)         | 1     | 1     | 1     | 0     |
 # | 15 | 1                    | 1     | 1     | 1     | 1     |
+
+
+def bit_add(*args):
+    return [i for i in args]
+
+
+def idx_to_formula(a, b, i):
+    if i == 0:
+        return Atom(False)
+    if i == 1:
+        return And(a, b)
+    if i == 2:
+        return Neg(Implies(a, b))
+    if i == 3:
+        return a
+    if i == 4:
+        return Neg(Implies(b, a))
+    if i == 5:
+        return b
+    if i == 6:
+        return XOr(a, b)
+    if i == 7:
+        return Or(a, b)
+    if i == 8:
+        return Neg(Or(a, b))
+    if i == 9:
+        return Neg(XOr(a, b))
+    if i == 10:
+        return Neg(b)
+    if i == 11:
+        return Implies(b, a)
+    if i == 12:
+        return Neg(a)
+    if i == 13:
+        return Implies(a, b)
+    if i == 14:
+        return Neg(And(a, b))
+    if i == 15:
+        return Atom(True)
+
+
+def idx_to_op(i):
+    if i == 0:
+        return "FALSE"
+    elif i == 1:
+        return "a AND b"
+    elif i == 2:
+        return "NOT (a IMPLY b)"
+    elif i == 3:
+        return "a"
+    elif i == 4:
+        return "NOT (b IMPLY a)"
+    elif i == 5:
+        return "b"
+    elif i == 6:
+        return "a XOR b"
+    elif i == 7:
+        return "a OR b"
+    elif i == 8:
+        return "not (a OR b)"
+    elif i == 9:
+        return "not (a XOR b)"
+    elif i == 10:
+        return "not B"
+    elif i == 11:
+        return "b IMPLY a"
+    elif i == 12:
+        return "not A"
+    elif i == 13:
+        return "a IMPLY b"
+    elif i == 14:
+        return "not (a AND b)"
+    elif i == 15:
+        return "TRUE"
+
+    assert False
 
 
 def bin_op(a, b, i):
@@ -64,11 +142,20 @@ def bin_op(a, b, i):
 
 
 def bin_op_s(a, b, i_s):
-    r = torch.zeros_like(a)
-    for i in range(16):
-        u = bin_op(a, b, i)
-        r = r + i_s[..., i] * u
-    return r
+    # a (batch_size, neuron_number): subset of input features
+    # b (batch_size, neuron_number): subset of input features
+    # i_s (neuron_number, bin_op_number): weight of bin_op (softmax'ed)
+
+    # r = torch.zeros_like(a)
+    # for i in range(16):
+    #     u = bin_op(a, b, i)
+    #     r = r + i_s[..., i] * u
+    # return r
+
+    y = torch.stack([bin_op(a, b, i) for i in range(16)], dim=2)
+    y = i_s * y
+    y = y.sum(dim=-1)
+    return y
 
 
 ########################################################################################################################

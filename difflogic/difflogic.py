@@ -1,7 +1,16 @@
 import torch
-import difflogic_cuda
+
+# import difflogic_cuda
 import numpy as np
-from .functional import bin_op_s, get_unique_connections, GradFactor
+from .functional import (
+    bin_op_s,
+    get_unique_connections,
+    GradFactor,
+    idx_to_op,
+    idx_to_formula,
+    bit_add,
+)
+
 from .packbitstensor import PackBitsTensor
 
 
@@ -17,7 +26,11 @@ class LogicLayer(torch.nn.Module):
         self,
         in_dim: int,
         out_dim: int,
-        device: str = "cuda",
+        device: str = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.mps.is_available() else "cpu"
+        ),
         grad_factor: float = 1.0,
         implementation: str = None,
         connections: str = "random",
@@ -48,7 +61,7 @@ class LogicLayer(torch.nn.Module):
         self.implementation = implementation
         if self.implementation is None and device == "cuda":
             self.implementation = "cuda"
-        elif self.implementation is None and device == "cpu":
+        elif self.implementation is None and (device == "cpu" or device == "mps"):
             self.implementation = "python"
         assert self.implementation in ["cuda", "python"], self.implementation
 
@@ -76,7 +89,6 @@ class LogicLayer(torch.nn.Module):
                 dtype=torch.int64,
                 device=device,
             )
-
         self.num_neurons = out_dim
         self.num_weights = out_dim
 
@@ -105,17 +117,23 @@ class LogicLayer(torch.nn.Module):
             raise ValueError(self.implementation)
 
     def forward_python(self, x):
-        assert x.shape[-1] == self.in_dim, (x[0].shape[-1], self.in_dim)
+        # x.shape: batch_size, input_dim
+        # self.indices: Tuple (neuron_size, neuron_size)
+        # self.weights: (neuron_size, bin_op_number)
+        assert (
+            x.shape[-1] == self.in_dim
+        ), "Input shape {} does not match model.in_dim {}".format(
+            x[0].shape[-1], self.in_dim
+        )
+        self.indices = self.indices[0].long(), self.indices[1].long()
 
-        if self.indices[0].dtype == torch.int64 or self.indices[1].dtype == torch.int64:
-            print(self.indices[0].dtype, self.indices[1].dtype)
-            self.indices = self.indices[0].long(), self.indices[1].long()
-            print(self.indices[0].dtype, self.indices[1].dtype)
-
+        # Selects 2 subsets of input features as defined in self.get_connection
         a, b = x[..., self.indices[0]], x[..., self.indices[1]]
         if self.training:
             x = bin_op_s(a, b, torch.nn.functional.softmax(self.weights, dim=-1))
         else:
+            # weights: (neuron_size, 16)
+            # 16 being number of binary operations
             weights = torch.nn.functional.one_hot(self.weights.argmax(-1), 16).to(
                 torch.float32
             )
@@ -151,7 +169,7 @@ class LogicLayer(torch.nn.Module):
                     self.given_x_indices_of_y,
                 ).transpose(0, 1)
 
-    def forward_cuda_eval(self, x: PackBitsTensor):
+    def forward_cuda_eval(self, x):
         """
         WARNING: this is an in-place operation.
 
@@ -164,7 +182,7 @@ class LogicLayer(torch.nn.Module):
 
         a, b = self.indices
         w = self.weights.argmax(-1).to(torch.uint8)
-        x.t = difflogic_cuda.eval(x.t, a, b, w)
+        # x.t = difflogic_cuda.eval(x.t, a, b, w)
 
         return x
 
@@ -173,15 +191,20 @@ class LogicLayer(torch.nn.Module):
             self.in_dim, self.out_dim, "train" if self.training else "eval"
         )
 
-    def get_connections(self, connections, device="cuda"):
+    def get_connections(
+        self, connections, device="cuda"
+    ):  # Default connnections (is unique, from command line args)
         assert self.out_dim * 2 >= self.in_dim, (
             "The number of neurons ({}) must not be smaller than half of the "
             "number of inputs ({}) because otherwise not all inputs could be "
             "used or considered.".format(self.out_dim, self.in_dim)
         )
+        # REMARK: neither subset is complete (which is fine) nor non-repeating (which is also fine)
+        # The 2 subsets will become the "left" input and "right" input of all neurons in order
+        # Hence subset size = [neuron_size]
         if connections == "random":
             c = torch.randperm(2 * self.out_dim) % self.in_dim
-            c = torch.randperm(self.in_dim)[c]
+            # c = torch.randperm(self.in_dim)[c]
             c = c.reshape(2, self.out_dim)
             a, b = c[0], c[1]
             a, b = a.to(torch.int64), b.to(torch.int64)
@@ -191,6 +214,20 @@ class LogicLayer(torch.nn.Module):
             return get_unique_connections(self.in_dim, self.out_dim, device)
         else:
             raise ValueError(connections)
+
+    def get_formula(self, x):
+        # weights = torch.nn.functional.one_hot(self.weights.argmax(-1), 16).to(
+        # torch.float32
+        # repr = [
+        #     f"{idx_to_op(i)}: {a.item()}, {b.item()}"  # OP: left_index, right_index
+        #     for i, a, b in zip(self.weights.argmax(-1), *self.indices)
+        # ]
+        # return str(repr)
+        formulas = [
+            idx_to_formula(x[a], x[b], i)
+            for i, a, b in zip(self.weights.argmax(-1), *self.indices)
+        ]
+        return formulas
 
 
 ########################################################################################################################
@@ -202,6 +239,7 @@ class GroupSum(torch.nn.Module):
     """
 
     def __init__(self, k: int, tau: float = 1.0, device="cuda"):
+        # tau default is 10 from args
         """
 
         :param k: number of intended real valued outputs, e.g., number of classes
@@ -218,12 +256,22 @@ class GroupSum(torch.nn.Module):
             return x.group_sum(self.k)
 
         assert x.shape[-1] % self.k == 0, (x.shape, self.k)
+
+        # x.reshape(batch_size, output_dim, input_dim // output_dim) then sum in last dimension
+        # ie. summing every X outputs from previous layer, where X is input_dim divided by output_dim
         return (
             x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1) / self.tau
+            if self.training
+            else x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1)
         )
 
     def extra_repr(self):
         return "k={}, tau={}".format(self.k, self.tau)
+
+    def get_formula(self, x):
+        step_size = len(x) // self.k
+        formulas = [bit_add(*[x[i * step_size + j] for j in step_size]) for i in self.k]
+        return formulas
 
 
 ########################################################################################################################
