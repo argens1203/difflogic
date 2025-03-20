@@ -32,10 +32,18 @@ class Explainer:
 
         assert self.is_uniquely_satisfied_by(inp, pred_class)
 
-        reduced = self.reduce_input(inp, pred_class)
-        logger.info("One AXP: %s", reduced)
+        axp = self.get_one_axp(inp, pred_class)
+        logger.info("One AXP: %s", axp)
 
-    def reduce_input(self, inp, predicted_cls):
+    def get_one_axp(self, inp, predicted_cls):
+        """
+        Get one AXP for the input and predicted class
+
+        :param inp: input features
+        :param predicted_cls: predicted class
+
+        :return: AXP
+        """
         tmp_input = inp.copy()
         for feature in inp:
             logger.debug("Testing removal of %d", feature)
@@ -53,14 +61,19 @@ class Explainer:
         inp,
         predicted_cls,  # true_class as in not true class of data, but that predicted by model
     ):  # Return true means that only the true_class can satisfy all contraints given the input
+        """
+        Check if the input is uniquely satisfied by the predicted class
+
+        :param inp: input features
+        :param predicted_cls: predicted class
+
+        :return: True if the input is uniquely satisfied by the predicted class
+        """
         for cls in self.encoding.get_classes():
             if cls == predicted_cls:
                 continue
-            if (
-                self.pairwise_comparisons(
-                    true_class=predicted_cls, adj_class=cls, inp=inp
-                )
-                is True
+            if self.is_adj_class_satisfiable(
+                true_class=predicted_cls, adj_class=cls, inp=inp
             ):
                 logger.debug("Satisfied by %d", cls)
                 return False
@@ -95,14 +108,14 @@ class Explainer:
             self.clauses[(true_class, adj_class)] = clauses
             return clauses
 
-    def pairwise_comparisons(self, true_class, adj_class, inp=None):
+    def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
         logger.debug(
             "==== Pairwise Comparisons (%d > %d) ====",
             true_class,
             adj_class,
         )
 
-        with self.encoding.use_context() as vpool:
+        with self.encoding.use_context() as vpool:  # TODO: use class dependent vpool
             clauses = self.get_clauses(true_class, adj_class)
             # Enumerate all clauses
             solver = self.get_solver(true_class, adj_class)
