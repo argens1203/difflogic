@@ -279,10 +279,10 @@ class Binarizer:
 
     def __call__(self, feature):
         ret = []
-        logger.debug(f"feature={feature}")
+        # logger.debug(f"feature={feature}")
         for f, bin_edges in zip(feature.reshape(-1, 1), self.bin_edges):
             bucket = max(torch.bucketize(f, bin_edges) - 1, torch.tensor([0]))
             ret.append(F.one_hot(bucket, num_classes=len(bin_edges) - 1))
         ret = torch.stack(ret).reshape(-1)
-        logger.debug(f"ret={ret}")
+        # logger.debug(f"ret={ret}")
         return ret

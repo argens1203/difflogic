@@ -495,7 +495,7 @@ class IrisDataset(UCIDataset):
         return data, label
 
     def convert_sample_to_feature_vector(sample, maxes, mins):
-        logger.debug(f"sample={sample}")
+        # logger.debug(f"sample={sample}")
         # TODO: Use percentile
         number_of_bins = 2
         ret = []
@@ -509,7 +509,7 @@ class IrisDataset(UCIDataset):
             ret.append(vec)
 
         ret = np.concatenate(ret, dtype=float)
-        logger.debug(f"ret={ret}")
+        # logger.debug(f"ret={ret}")
         return ret
 
     @staticmethod

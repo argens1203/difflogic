@@ -1,5 +1,6 @@
 import random
 import logging
+import os
 
 import numpy as np
 import torch
@@ -20,7 +21,13 @@ from lgn.util import get_results
 
 torch.set_num_threads(1)  # ???
 
-# logging.basicConfig(filename="main.log", level=logging.INFO)
+console_handler = logging.StreamHandler()
+console_format = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+console_handler.setFormatter(console_format)
+
+LOG_FILE_PATH = "main.log"
 
 
 def seed_all(seed):
@@ -40,9 +47,28 @@ if __name__ == "__main__":
     args.get_formula = True
 
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+
+        console_handler.setLevel(logging.DEBUG)
+        logger.addHandler(console_handler)
     else:
-        logging.basicConfig(level=logging.INFO)
+        if os.path.exists(LOG_FILE_PATH):
+            os.remove(LOG_FILE_PATH)
+        file_handler = logging.FileHandler(LOG_FILE_PATH)
+        file_format = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        file_handler.setFormatter(file_format)
+
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+
+        console_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
+
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
 
     results = get_results(args.experiment_id, args)
     # seed_all(args.seed)

@@ -20,9 +20,9 @@ class Explainer:
         self.solvers = dict()
 
     def explain(self, feat):
-        logger.debug("==== Explaining: %s ====", feat)
 
         inp = feat_to_input(feat)
+        logger.info("\n")
         logger.info("Explaining Input: %s", inp)
 
         class_label = self.encoding.as_model()(feat.reshape(1, -1)).item()
@@ -46,7 +46,7 @@ class Explainer:
         """
         tmp_input = inp.copy()
         for feature in inp:
-            logger.debug("Testing removal of %d", feature)
+            logger.debug("Testing removal of input %d", feature)
             tmp_input.remove(feature)
             if self.is_uniquely_satisfied_by(
                 inp=tmp_input, predicted_cls=predicted_cls
@@ -81,10 +81,11 @@ class Explainer:
 
     def get_clauses(self, true_class, adj_class):
         if (true_class, adj_class) in self.clauses:
-            logger.debug(
-                "Cached Clauses: %s", str(self.clauses[(true_class, adj_class)])
-            )
+            Stat.inc_cache_hit(Cached.CLAUSE)
+            logger.info("Returning cached clauses ======================")
             return self.clauses[(true_class, adj_class)]
+
+        Stat.inc_cache_miss(Cached.CLAUSE)
 
         with self.encoding.use_context() as vpool:
             pos = self.encoding.get_output_ids(adj_class)
@@ -109,27 +110,29 @@ class Explainer:
             return clauses
 
     def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
+        is_satisfiable = self.get_solver(true_class, adj_class).solve(assumptions=inp)
+
         logger.debug(
-            "==== Pairwise Comparisons (%d > %d) ====",
-            true_class,
+            "Adj class %d having more votes than %d is %spossible with input %s",
             adj_class,
+            true_class,
+            "" if is_satisfiable else "NOT ",
+            str(inp),
         )
-        logger.debug("Input: %s", inp)
-
-        result = self.get_solver(true_class, adj_class).solve(assumptions=inp)
-
-        logger.debug("Satisfiable: %s", result)
-        return result
+        return is_satisfiable
 
     def get_solver(self, true_class, adj_class):
         if (true_class, adj_class) in self.solvers:
-            logger.debug("Cached Solver")
+            Stat.inc_cache_hit(Cached.SOLVER)
             return self.solvers[(true_class, adj_class)]
 
-        logger.info("Creating new solver (%d, %d)", true_class, adj_class)
+        Stat.inc_cache_miss(Cached.SOLVER)
 
-        solver = Solver(bootstrap_with=self.encoding.cnf.clauses)
+        solver = Solver()
+
+        solver.append_formula(self.encoding.cnf.clauses)
         solver.append_formula(self.get_clauses(true_class, adj_class))
+
         self.solvers[(true_class, adj_class)] = solver
 
         return solver
@@ -138,3 +141,21 @@ class Explainer:
         for _, solver in self.solvers.items():
             solver.delete()
         logger.debug("Deleted all solvers")
+        logger.debug("Cache Hit: %s", str(Stat.cache_hit))
+        logger.debug("Cache Miss: %s", str(Stat.cache_miss))
+
+
+class Cached:
+    CLAUSE = "clause"
+    SOLVER = "solver"
+
+
+class Stat:
+    cache_hit = {Cached.CLAUSE: 0, Cached.SOLVER: 0}
+    cache_miss = {Cached.CLAUSE: 0, Cached.SOLVER: 0}
+
+    def inc_cache_hit(flag: str):
+        Stat.cache_hit[flag] += 1
+
+    def inc_cache_miss(flag: str):
+        Stat.cache_miss[flag] += 1
