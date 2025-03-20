@@ -23,7 +23,8 @@ torch.set_num_threads(1)  # ???
 
 console_handler = logging.StreamHandler()
 console_format = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    "%(message)s"
 )
 console_handler.setFormatter(console_format)
 
@@ -57,7 +58,8 @@ if __name__ == "__main__":
             os.remove(LOG_FILE_PATH)
         file_handler = logging.FileHandler(LOG_FILE_PATH)
         file_format = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            "%(message)s"
         )
         file_handler.setFormatter(file_format)
 

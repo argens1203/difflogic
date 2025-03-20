@@ -2,21 +2,21 @@ import logging
 import logging
 
 from pysat.card import CardEnc, EncType
-from pysat.solvers import Solver
 
-
+from lgn.encoding import Encoding
 from lgn.util import feat_to_input
+
+from .solver import Solver
 
 logger = logging.getLogger(__name__)
 
 
 class Explainer:
-    def __init__(self, encoding):
+    def __init__(self, encoding: Encoding):
         self.encoding = encoding
 
         self.encoding = encoding
         self.votes_per_cls = self.encoding.get_votes_per_cls()
-        self.clauses = dict()
         self.solvers = dict()
 
     def explain(self, feat):
@@ -79,36 +79,6 @@ class Explainer:
                 return False
         return True
 
-    def get_clauses(self, true_class, adj_class):
-        if (true_class, adj_class) in self.clauses:
-            Stat.inc_cache_hit(Cached.CLAUSE)
-            logger.info("Returning cached clauses ======================")
-            return self.clauses[(true_class, adj_class)]
-
-        Stat.inc_cache_miss(Cached.CLAUSE)
-
-        with self.encoding.use_context() as vpool:
-            pos = self.encoding.get_output_ids(adj_class)
-            neg = [-a for a in self.encoding.get_output_ids(true_class)]
-            clauses = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
-
-            logger.debug("Lit: %s", str(clauses))
-
-            bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
-            logger.debug("Bound: %d", bound)
-
-            comp = CardEnc.atleast(
-                lits=clauses,
-                bound=bound,
-                encoding=EncType.totalizer,
-                vpool=vpool,
-            )
-
-            clauses = comp.clauses
-            logger.debug("Recalculated Clauses: %s", str(comp.clauses))
-            self.clauses[(true_class, adj_class)] = clauses
-            return clauses
-
     def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
         is_satisfiable = self.get_solver(true_class, adj_class).solve(assumptions=inp)
 
@@ -121,6 +91,20 @@ class Explainer:
         )
         return is_satisfiable
 
+    def get_lits(self, true_class, adj_class):
+        pos = self.encoding.get_output_ids(adj_class)
+        neg = [-a for a in self.encoding.get_output_ids(true_class)]
+        lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
+
+        logger.debug("Lit: %s", str(lits))
+        return lits
+
+    def get_bound(self, true_class, adj_class):
+        bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
+
+        logger.debug("Bound: %d", bound)
+        return bound
+
     def get_solver(self, true_class, adj_class):
         if (true_class, adj_class) in self.solvers:
             Stat.inc_cache_hit(Cached.SOLVER)
@@ -128,10 +112,25 @@ class Explainer:
 
         Stat.inc_cache_miss(Cached.SOLVER)
 
+        clauses = []
+        lits = self.get_lits(true_class, adj_class)
+        bound = self.get_bound(true_class, adj_class)
+
+        with self.encoding.use_context() as vpool:
+            comp = CardEnc.atleast(
+                lits=lits,
+                bound=bound,
+                encoding=EncType.totalizer,
+                vpool=vpool,
+            )
+
+            clauses = comp.clauses
+            logger.debug("Clauses: %s", str(comp.clauses))
+
         solver = Solver()
 
         solver.append_formula(self.encoding.cnf.clauses)
-        solver.append_formula(self.get_clauses(true_class, adj_class))
+        solver.append_formula(clauses)
 
         self.solvers[(true_class, adj_class)] = solver
 
@@ -146,13 +145,12 @@ class Explainer:
 
 
 class Cached:
-    CLAUSE = "clause"
     SOLVER = "solver"
 
 
 class Stat:
-    cache_hit = {Cached.CLAUSE: 0, Cached.SOLVER: 0}
-    cache_miss = {Cached.CLAUSE: 0, Cached.SOLVER: 0}
+    cache_hit = {Cached.SOLVER: 0}
+    cache_miss = {Cached.SOLVER: 0}
 
     def inc_cache_hit(flag: str):
         Stat.cache_hit[flag] += 1
