@@ -1,5 +1,4 @@
 import logging
-import logging
 
 from pysat.card import CardEnc, EncType
 
@@ -112,25 +111,12 @@ class Explainer:
 
         Stat.inc_cache_miss(Cached.SOLVER)
 
-        clauses = []
         lits = self.get_lits(true_class, adj_class)
         bound = self.get_bound(true_class, adj_class)
 
-        with self.encoding.use_context() as vpool:
-            comp = CardEnc.atleast(
-                lits=lits,
-                bound=bound,
-                encoding=EncType.totalizer,
-                vpool=vpool,
-            )
+        solver = Solver(encoding=self.encoding)
 
-            clauses = comp.clauses
-            logger.debug("Clauses: %s", str(comp.clauses))
-
-        solver = Solver()
-
-        solver.append_formula(self.encoding.cnf.clauses)
-        solver.append_formula(clauses)
+        solver.set_cardinality(lits, bound)
 
         self.solvers[(true_class, adj_class)] = solver
 
