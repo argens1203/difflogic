@@ -114,30 +114,27 @@ class Explainer:
             true_class,
             adj_class,
         )
+        logger.debug("Input: %s", inp)
 
-        with self.encoding.use_context() as vpool:  # TODO: use class dependent vpool
-            clauses = self.get_clauses(true_class, adj_class)
-            # Enumerate all clauses
-            solver = self.get_solver(true_class, adj_class)
+        result = self.get_solver(true_class, adj_class).solve(assumptions=inp)
 
-            solver.append_formula(clauses)
-            logger.debug("Input: %s", inp)
-
-            result = solver.solve(assumptions=inp)
-            logger.debug("Satisfiable: %s", result)
-            return result
+        logger.debug("Satisfiable: %s", result)
+        return result
 
     def get_solver(self, true_class, adj_class):
         if (true_class, adj_class) in self.solvers:
             logger.debug("Cached Solver")
             return self.solvers[(true_class, adj_class)]
+
         logger.info("Creating new solver (%d, %d)", true_class, adj_class)
+
         solver = Solver(bootstrap_with=self.encoding.cnf.clauses)
         solver.append_formula(self.get_clauses(true_class, adj_class))
         self.solvers[(true_class, adj_class)] = solver
+
         return solver
 
     def __del__(self):
         for _, solver in self.solvers.items():
             solver.delete()
-        logger.info("Deleted all solvers")
+        logger.debug("Deleted all solvers")
