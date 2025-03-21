@@ -12,6 +12,11 @@ def feat_to_input(feat):
     return inp
 
 
+def input_to_feat(inp):
+    feat = [1 if i > 0 else 0 for i in inp]
+    return torch.Tensor(feat).to(device)
+
+
 def get_results(experiment_id, args):
     if experiment_id is not None:
         assert 520_000 <= experiment_id < 530_000, experiment_id

@@ -3,7 +3,7 @@ import logging
 from pysat.card import CardEnc, EncType
 
 from lgn.encoding import Encoding
-from lgn.util import feat_to_input
+from lgn.util import feat_to_input, input_to_feat
 
 from .solver import Solver
 
@@ -18,9 +18,12 @@ class Explainer:
         self.votes_per_cls = self.encoding.get_votes_per_cls()
         self.solvers = dict()
 
-    def explain(self, feat):
+    def explain(self, feat=None, inp=None):
+        if inp is None:
+            inp = feat_to_input(feat)
+        if feat is None:
+            feat = input_to_feat(inp)
 
-        inp = feat_to_input(feat)
         logger.info("\n")
         logger.info("Explaining Input: %s", inp)
 

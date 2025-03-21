@@ -131,10 +131,19 @@ if __name__ == "__main__":
         # Explainer(encoding).explain(feat)
 
         explainer = Explainer(encoding)
-        for batch, label in train_loader:
-            for feat in batch:
-                # encoding.print()
-                explainer.explain(feat)
+
+        if args.explain is not None:
+            inp = args.explain.split(",")
+            inp = [int(i) for i in inp]
+            try:
+                explainer.explain(inp=inp)
+            except Exception as e:
+                logger.error(e)
+        else:
+            for batch, label in train_loader:
+                for feat in batch:
+                    # encoding.print()
+                    explainer.explain(feat=feat)
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
 # Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"

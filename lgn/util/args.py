@@ -125,6 +125,13 @@ def get_args():
         "--load_model", action="store_true", default=False, help="Load the model"
     )
 
+    parser.add_argument(
+        "--explain",
+        type=str,
+        default=None,
+        help="Explain the prediction for a given input",
+    )
+
     args = parser.parse_args()
 
     if args.verbose:
