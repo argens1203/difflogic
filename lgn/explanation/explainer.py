@@ -32,7 +32,9 @@ class Explainer:
 
         logger.debug("Predicted Class - %s", pred_class)
 
-        assert self.is_uniquely_satisfied_by(inp, pred_class)
+        assert self.is_uniquely_satisfied_by(
+            inp, pred_class
+        ), "Assertion Error: " + ",".join(map(str, inp))
 
         axp = self.get_one_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
