@@ -2,7 +2,7 @@ import logging
 import torch
 from contextlib import contextmanager
 
-from pysat.formula import Formula, Atom, CNF
+from pysat.formula import Formula, Atom, CNF, Or
 from difflogic import LogicLayer, GroupSum
 
 from constant import device
@@ -39,15 +39,15 @@ class Encoding:
             self.cnf = CNF()
             self.output_ids = []
 
-            for f in self.formula:
-                f.clausify()
-                # adding the clauses to a global CNF
-            for f in self.formula:
+            # adding the clauses to a global CNF
+            for f in [Or(Atom(False), f) for f in self.formula]:  # TODO: Confirm this:
                 f.clausify()
                 self.cnf.extend(list(f)[:-1])
-                self.output_ids.append(f.clauses[-1][0])
-            # self.output_ids = [vpool.id(f) for f in self.formula]
-            # TODO/REMARK: formula represents output from second last layer
+                self.output_ids.append(f.clauses[-1][1])
+
+                logger.debug("Modified formulas: %s", list(f))
+            logger.debug("CNF Clauses: %s", self.cnf.clauses)
+            # REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
         self.class_dim = class_dim

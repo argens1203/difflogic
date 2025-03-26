@@ -78,17 +78,17 @@ if __name__ == "__main__":
 
     ####################################################################################################################
 
-    # dataset = CustomDataset(transform=Binarizer(CustomDataset(), 2))
-    # train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
-    # train_loader = torch.utils.data.DataLoader(
-    #     train_set, batch_size=args.batch_size, shuffle=True
-    # )
-    # test_loader = torch.utils.data.DataLoader(
-    #     test_set, batch_size=int(1e6), shuffle=False
-    # )
-    # validation_loader = None
+    dataset = CustomDataset(transform=Binarizer(CustomDataset(), 2))
+    train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
+    train_loader = torch.utils.data.DataLoader(
+        train_set, batch_size=args.batch_size, shuffle=True
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_set, batch_size=int(1e6), shuffle=False
+    )
+    validation_loader = None
 
-    train_loader, validation_loader, test_loader = load_dataset(args)
+    # train_loader, validation_loader, test_loader = load_dataset(args)
 
     model, loss_fn, optim = get_model(args, results)
 
