@@ -9,15 +9,23 @@ from lgn.encoding import Validator, Encoding
 from lgn.explanation import Explainer
 from lgn.dataset.dataset import (
     load_dataset,
-    CustomDataset,
+    IrisDataset,
+    AdultDataset,
+    MonkDataset,
+    BreastCancerDataset,
     Binarizer,
     input_dim_of_dataset,
+    Flatten,
     num_classes_of_dataset,
+    Caltech101Dataset,
 )
 from lgn.model import get_model, compile_model
 from lgn.model import train_eval
 from lgn.util import get_args
 from lgn.util import get_results
+
+import torchvision.datasets
+from torchvision import transforms
 
 torch.set_num_threads(1)  # ???
 
@@ -78,7 +86,8 @@ if __name__ == "__main__":
 
     ####################################################################################################################
 
-    dataset = CustomDataset(transform=Binarizer(CustomDataset(), 2))
+    # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
+    dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(
         train_set, batch_size=args.batch_size, shuffle=True

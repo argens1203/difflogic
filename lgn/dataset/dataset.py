@@ -201,21 +201,38 @@ import os
 
 
 class CustomDataset(Dataset):
+    root = "data-uci"
+
+    def __init__(self, transform=None, root=None):
+        self.root = root if root is not None else self.root
+        self.transform = transform
+        self.fpath = os.path.join(self.root, self.url.split("/")[-1])
+
+        if not check_integrity(self.fpath, self.md5):
+            download_url(self.url, self.root, self.url.split("/")[-1], self.md5)
+        self.load_data()
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, index):
+        feature, label = self.features[index], self.labels[index]
+        if self.transform is not None:
+            feature = self.transform(feature)
+        return feature, label
+
+    def get_all(self):
+        return self.features, self.labels
+
+
+class IrisDataset(CustomDataset):
     url, md5 = (
         "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data",
         "42615765a885ddf54427f12c34a0a070",
     )
-    location = "iris.data"
-    root = "data-uci"
+    # location = "iris.data"
 
-    fpath = os.path.join(root, url.split("/")[-1])
     label_dict = {"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2}
-
-    def __init__(self, transform=None):
-        self.transform = transform
-        if not check_integrity(self.fpath, self.md5):
-            download_url(self.url, self.root, self.url.split("/")[-1], self.md5)
-        self.load_data()
 
     def load_data(self):
         def read_raw_data(filepath):
@@ -248,17 +265,49 @@ class CustomDataset(Dataset):
         raw_data = read_raw_data(self.fpath)
         self.features, self.labels = parse(raw_data)
 
-    def __len__(self):
-        return len(self.labels)
 
-    def __getitem__(self, index):
-        feature, label = self.features[index], self.labels[index]
-        if self.transform is not None:
-            feature = self.transform(feature)
-        return feature, label
+class AdultDataset(CustomDataset):
+    file_list = [
+        (
+            "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
+            "5d7c39d7b8804f071cdd1f2a7c460872",
+        ),
+        (
+            "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
+            "35238206dfdf7f1fe215bbb874adecdc",
+        ),
+    ]
 
-    def get_all(self):
-        return self.features, self.labels
+    def __init__(self, train=True, transform=None):
+        self.url, self.md5 = self.file_list[0] if train else self.file_list[1]
+        CustomDataset.__init__(self, transform)
+
+
+class MonkDataset(CustomDataset):
+    file_list = [
+        (
+            "https://archive.ics.uci.edu/ml/machine-learning-databases/monks-problems/monks-1.train",
+            "fc1fc3a673e00908325c67cf16283335",
+        ),
+        (
+            "https://archive.ics.uci.edu/ml/machine-learning-databases/monks-problems/monks-1.test",
+            "de4255acb72fb29be5125a7c874e28a0",
+        ),
+    ]
+
+    def __init__(self, train=True, transform=None):
+        self.url, self.md5 = self.file_list[0] if train else self.file_list[1]
+        CustomDataset.__init__(self, transform)
+
+
+class BreastCancerDataset(CustomDataset):
+    url, md5 = (
+        "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer/breast-cancer.data",
+        "d887db31e2b99e39c4b7fc79d2f36a3a",
+    )
+
+    def __init__(self, train=True, transform=None):
+        CustomDataset.__init__(self, transform)
 
 
 import torch.nn.functional as F
@@ -286,3 +335,43 @@ class Binarizer:
         ret = torch.stack(ret).reshape(-1)
         # logger.debug(f"ret={ret}")
         return ret
+
+
+class Flatten:
+    def __call__(self, x: torch.Tensor) -> torch.Tensor:
+        return x.view(-1)
+
+
+import torchvision.datasets
+from torchvision import transforms
+
+
+class Caltech101Dataset:
+    dataset = torchvision.datasets.Caltech101(
+        "data-uci",
+        download=True,
+        transform=transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((64, 64)),
+                transforms.Grayscale(),
+                Flatten(),
+            ]
+        ),
+    )
+    dataset = torchvision.datasets.Caltech101(
+        "data-uci",
+        download=False,
+        transform=transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((64, 64)),
+                transforms.Grayscale(),
+                Flatten(),
+                Binarizer(dataset, 2),
+            ]
+        ),
+    )
+
+    def __call__(self):
+        return self.dataset
