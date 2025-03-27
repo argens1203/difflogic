@@ -137,6 +137,10 @@ class Explainer:
         return solver
 
     def is_satisfiable(self, pred_class, inp):
+        is_satisfiable, _ = self.is_satisfiable_with_model(pred_class, inp)
+        return is_satisfiable
+
+    def is_satisfiable_with_model(self, pred_class, inp):
         logger.debug("Checking satisfiability of %s", str(inp))
         is_uniquely_satsified, model = self.is_uniquely_satisfied_by(inp, pred_class)
         return not is_uniquely_satsified, model
@@ -163,10 +167,7 @@ class Explainer:
         ) as hitman:
             # computing unit-size MCSes
             for i, hypo in enumerate(inp):
-                is_satisfiable, model = self.is_satisfiable(
-                    pred_class, inp=inp[:i] + inp[(i + 1) :]
-                )
-                if is_satisfiable:
+                if self.is_satisfiable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
                     hitman.hit([hypo])  # Add unit-size MCS
                     duals.append([hypo])  # Add unit-size MCS to duals
 
@@ -182,7 +183,9 @@ class Explainer:
                 if hset == None:
                     break
 
-                is_satisfiable, model = self.is_satisfiable(pred_class, inp=hset)
+                is_satisfiable, model = self.is_satisfiable_with_model(
+                    pred_class, inp=hset
+                )
                 logger.debug("Model: %s", model)
                 # test_sat, _ = self.is_satisfiable(inp=model)
                 # assert test_sat, "Assertion Error: " + ",".join(map(str, model))
@@ -205,10 +208,7 @@ class Explainer:
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        is_satisfiable, _ = self.is_satisfiable(
-                            pred_class, inp=hset + [h]
-                        )
-                        if is_satisfiable:
+                        if self.is_satisfiable(pred_class, inp=hset + [h]):
                             hset.append(h)
                         else:
                             to_hit.append(h)
