@@ -101,7 +101,13 @@ class Explainer:
         neg = [-a for a in self.encoding.get_output_ids(true_class)]
         lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
 
-        logger.debug("Lit: %s", str(lits))
+        logger.debug(
+            "Lit(%d %s %d): %s",
+            adj_class,
+            ">" if true_class < adj_class else ">=",
+            true_class,
+            str(lits),
+        )
         return lits
 
     def get_bound(self, true_class, adj_class):
@@ -128,11 +134,18 @@ class Explainer:
 
         return solver
 
-    def mhs_mus_enumeration(self, inp, xnum=1000, smallest=False):
+    def is_satisfiable(self, inp):
+        class_label = self.encoding.as_model()(input_to_feat(inp).reshape(1, -1)).item()
+        pred_class = class_label + 1
+        return not self.is_uniquely_satisfied_by(inp, pred_class)
+
+    def mhs_mus_enumeration(self, inp=None, feat=None, xnum=1000, smallest=False):
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
 
+        if inp is None:
+            inp = feat_to_input(feat)
         # result
         expls = []
 
@@ -144,23 +157,23 @@ class Explainer:
         ) as hitman:
             # computing unit-size MCSes
             for i, hypo in enumerate(inp):
-                if self.oracle.solve(assumptions=inp[:i] + inp[(i + 1) :]):
-                    hitman.hit([hypo])
-                    duals.append([hypo])
+                if self.is_satisfiable(inp=inp[:i] + inp[(i + 1) :]):
+                    hitman.hit([hypo])  # Add unit-size MCS
+                    duals.append([hypo])  # Add unit-size MCS to duals
 
             # main loop
-            itrs = 0
+            itr = 0
             while True:
-                hset = hitman.get()
-                itrs += 1
+                hset = hitman.get()  # Get candidate MUS
+                itr += 1
 
-                print("iter:", itrs)
-                print("cand:", hset)
+                # logger.debug("itr:", itr)
+                # print("cand:", hset)
 
                 if hset == None:
                     break
 
-                if self.oracle.solve(assumptions=hset):
+                if self.is_satisfiable(inp=hset):
                     to_hit = []
                     satisfied, unsatisfied = [], []
 
@@ -175,7 +188,7 @@ class Explainer:
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        if self.oracle.solve(assumptions=hset + [h]):
+                        if self.is_satisfiable(inp=hset + [h]):
                             hset.append(h)
                         else:
                             to_hit.append(h)
@@ -194,6 +207,7 @@ class Explainer:
                         hitman.block(hset)
                     else:
                         break
+        return expls, duals
 
     def __del__(self):
         for _, solver in self.solvers.items():
