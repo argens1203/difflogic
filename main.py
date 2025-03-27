@@ -18,6 +18,7 @@ from lgn.dataset.dataset import (
     Flatten,
     num_classes_of_dataset,
     Caltech101Dataset,
+    MNISTDataset,
 )
 from lgn.model import get_model, compile_model
 from lgn.model import train_eval
@@ -56,8 +57,12 @@ def new_load_dataset(args):
         return load_dataset(args)
     elif args.dataset == "breast_cancer":
         return load_dataset(args)
+    elif args.dataset == "mnist":
+        dataset = MNISTDataset()
         # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
 
+    print(dataset[0][0].shape)
+    print(dataset[0][0])
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(
         train_set, batch_size=args.batch_size, shuffle=True
@@ -90,6 +95,8 @@ if __name__ == "__main__":
         args.num_neurons = 10  # >= 9, div 2
     elif args.dataset == "breast_cancer":
         args.num_neurons = 26  # >= 26, div 2
+    elif args.dataset == "mnist":
+        args.num_neurons = 400  # >= 400, div 10
 
     if args.verbose:
         logger = logging.getLogger()

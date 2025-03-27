@@ -4,6 +4,7 @@ import experiments.uci_datasets as uci_datasets
 import torch
 import math
 import torchvision
+import torchvision.transforms as T
 
 logger = logging.getLogger(__name__)
 
@@ -65,9 +66,13 @@ def load_dataset(args):
             train=True,
             download=True,
             remove_border=args.dataset == "mnist20x20",
+            transform=T.Compose([T.Lambda(lambda x: torch.flatten(x))]),
         )
         test_set = mnist_dataset.MNIST(
-            "./data-mnist", train=False, remove_border=args.dataset == "mnist20x20"
+            "./data-mnist",
+            train=False,
+            remove_border=args.dataset == "mnist20x20",
+            transform=T.Compose([T.Lambda(lambda x: torch.flatten(x))]),
         )
 
         train_set_size = math.ceil((1 - args.valid_set_size) * len(train_set))
@@ -173,7 +178,7 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
         "monk1": 17,
         "monk2": 17,
         "monk3": 17,
-        "mnist": 784,
+        "mnist": 400 * 2,
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
         "cifar-10-31-thresholds": 3 * 32 * 32 * 31,
@@ -389,6 +394,41 @@ class Caltech101Dataset:
                 transforms.ToTensor(),
                 transforms.Resize((64, 64)),
                 transforms.Grayscale(),
+                Flatten(),
+                Binarizer(dataset, 2),
+            ]
+        ),
+    )
+
+    def __call__(self):
+        return self.dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index):
+        return self.dataset[index]
+
+
+class MNISTDataset:
+    dataset = torchvision.datasets.MNIST(
+        "data-uci",
+        download=True,
+        transform=transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((20, 20)),
+                Flatten(),
+            ]
+        ),
+    )
+    dataset = torchvision.datasets.MNIST(
+        "data-uci",
+        download=True,
+        transform=transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((20, 20)),
                 Flatten(),
                 Binarizer(dataset, 2),
             ]
