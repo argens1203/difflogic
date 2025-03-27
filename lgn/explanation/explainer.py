@@ -257,19 +257,23 @@ class Explainer:
         """
         expls = []  # result
         duals = []  # just in case, let's save dual (abductive) explanations
+        possibility = 0
         if inp is None:
             inp = feat_to_input(feat)
+
+        class_label = self.encoding.as_model()(input_to_feat(inp).reshape(1, -1)).item()
+        pred_class = class_label + 1
 
         with Hitman(
             bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
             # computing unit-size MUSes
             for i, hypo in enumerate(inp):
-                if not self.is_satisfiable(inp=[hypo]):
+                if not self.is_satisfiable(pred_class=pred_class, inp=[hypo]):
                     hitman.hit([hypo])
                     duals.append([hypo])
                 elif unit_mcs and self.is_satisfiable(
-                    assumptions=inp[:i] + inp[(i + 1) :]
+                    pred_class=pred_class, inp=inp[:i] + inp[(i + 1) :]
                 ):
                     # this is a unit-size MCS => block immediately
                     hitman.block([hypo])
@@ -287,11 +291,15 @@ class Explainer:
                 if hset == None:
                     break
 
-                is_satisfiable, model, core = self.is_satisfiable(
-                    assumptions=sorted(set(inp).difference(set(hset)))
+                is_satisfiable, model, core = self.is_satisfiable_with_model_or_core(
+                    pred_class=pred_class,
+                    inp=sorted(set(inp).difference(set(hset))),
                 )
                 if not is_satisfiable:
                     to_hit = core
+
+                    if len(to_hit) > 1:
+                        possibility += 1
 
                     if len(to_hit) > 1 and reduce_ != "none":
                         to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
@@ -308,6 +316,8 @@ class Explainer:
                         hitman.block(hset)
                     else:
                         break
+        logger.debug("Chances of further enhancements: %d", possibility)
+        return expls, duals
 
 
 class Cached:
