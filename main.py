@@ -50,6 +50,9 @@ def new_load_dataset(args):
         dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
     elif args.dataset == "caltech101":
         dataset = Caltech101Dataset()
+    elif args.dataset == "adult":
+        return load_dataset(args)
+        # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
 
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(
@@ -75,7 +78,9 @@ if __name__ == "__main__":
     if args.dataset == "iris":
         args.num_neurons = 6
     elif args.dataset == "caltech101":
-        args.num_neurons = 41 * 101
+        args.num_neurons = 41 * 101  # >= 4096
+    elif args.dataset == "adult":
+        args.num_neurons = 58  # >= 58
 
     if args.verbose:
         logger = logging.getLogger()
