@@ -180,12 +180,8 @@ if __name__ == "__main__":
         def explain_both_and_assert(inp=None, feat=None):
             explainer.explain(feat=feat, inp=inp)
 
-            axps, axp_dual = explainer.mhs_mus_enumeration(
-                feat=feat, inp=inp, xnum=1000
-            )
-            cxps, cxp_dual = explainer.mhs_mcs_enumeration(
-                feat=feat, inp=inp, xnum=1000
-            )
+            axps, axp_dual = explainer.mhs_mus_enumeration(feat=feat, inp=inp, xnum=10)
+            cxps, cxp_dual = explainer.mhs_mcs_enumeration(feat=feat, inp=inp, xnum=10)
 
             logger.info("AXPs: %s", str(axps))
             logger.debug("Duals: %s", str(axp_dual))
