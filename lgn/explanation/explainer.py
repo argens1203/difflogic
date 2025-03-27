@@ -237,70 +237,61 @@ class Explainer:
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
         logger.debug("Cache Miss: %s", str(Stat.cache_miss))
 
-    def mhs_mcs_enumeration(self, xnum, smallest=False, reduce_="none", unit_mcs=False):
+    def mhs_mcs_enumeration(
+        self, xnum, smallest=False, reduce_="none", unit_mcs=False, inp=None, feat=None
+    ):
         """
         Enumerate subset- and cardinality-minimal contrastive explanations.
         """
-
-        # result
-        self.expls = []
-
-        # just in case, let's save dual (abductive) explanations
-        self.duals = []
+        expls = []  # result
+        duals = []  # just in case, let's save dual (abductive) explanations
+        if inp is None:
+            inp = feat_to_input(feat)
 
         with Hitman(
-            bootstrap_with=[self.hypos], htype="sorted" if smallest else "lbx"
+            bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
             # computing unit-size MUSes
-            for i, hypo in enumerate(self.hypos):
-                self.calls += 1
-
+            for i, hypo in enumerate(inp):
                 if not self.oracle.solve(assumptions=[hypo]):
                     hitman.hit([hypo])
-                    self.duals.append([hypo])
+                    duals.append([hypo])
                 elif unit_mcs and self.oracle.solve(
-                    assumptions=self.hypos[:i] + self.hypos[(i + 1) :]
+                    assumptions=inp[:i] + inp[(i + 1) :]
                 ):
                     # this is a unit-size MCS => block immediately
-                    self.calls += 1
                     hitman.block([hypo])
-                    self.expls.append([hypo])
+                    expls.append([hypo])
 
             # main loop
-            iters = 0
+            itr = 0
             while True:
                 hset = hitman.get()
-                iters += 1
+                itr += 1
 
-                if self.options.verb > 2:
-                    print("iter:", iters)
-                    print("cand:", hset)
+                logger.debug("itr: %s", itr)
+                logger.debug("cand: %s", hset)
 
                 if hset == None:
                     break
 
-                self.calls += 1
                 if not self.oracle.solve(
-                    assumptions=sorted(set(self.hypos).difference(set(hset)))
+                    assumptions=sorted(set(inp).difference(set(hset)))
                 ):
                     to_hit = self.oracle.get_core()
 
                     if len(to_hit) > 1 and reduce_ != "none":
                         to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
 
-                    self.duals.append(to_hit)
+                    logger.debug("to_hit: %s", to_hit)
 
-                    if self.options.verb > 2:
-                        print("coex:", to_hit)
-
+                    duals.append(to_hit)
                     hitman.hit(to_hit)
                 else:
-                    if self.options.verb > 2:
-                        print("expl:", hset)
+                    logger.debug("expl: %s", hset)
+                    expls.append(hset)
 
-                    self.expls.append(hset)
-
-                    if len(self.expls) != xnum:
+                    if len(expls) != xnum:
                         hitman.block(hset)
                     else:
                         break
