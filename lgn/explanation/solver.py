@@ -33,6 +33,9 @@ class Solver:
     def solve(self, assumptions=[]):
         return self.solver.solve(assumptions=assumptions)
 
+    def get_model(self):
+        return self.solver.get_model()
+
     def _append_formula(self, clauses=[]):
         self.solver.append_formula(clauses)
         return self

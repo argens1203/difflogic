@@ -151,6 +151,7 @@ if __name__ == "__main__":
             expl, duals = explainer.mhs_mus_enumeration(inp=inp, xnum=1000)
             logger.debug("Explanation: %s", str(expl))
             logger.debug("Duals: %s", str(duals))
+            logger.info("Explainations: %s", str(expl))
             # except Exception as e:
             # logger.error(e)
         else:
@@ -159,9 +160,10 @@ if __name__ == "__main__":
                     # encoding.print()
                     explainer.explain(feat=feat)
 
-                    # expl, duals = explainer.mhs_mus_enumeration(feat=feat, xnum=1000)
-                    # logger.debug("Explanation: %s", str(expl))
-                    # logger.debug("Duals: %s", str(duals))
+                    expl, duals = explainer.mhs_mus_enumeration(feat=feat, xnum=1000)
+                    logger.debug("Explanation: %s", str(expl))
+                    logger.debug("Duals: %s", str(duals))
+                    logger.info("Explainations: %s", str(expl))
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
 # Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"
