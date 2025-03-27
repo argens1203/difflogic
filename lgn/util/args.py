@@ -24,6 +24,7 @@ def get_args():
             "mnist20x20",
             "cifar-10-3-thresholds",
             "cifar-10-31-thresholds",
+            "caltech101",
         ],
         required=True,
         help="the dataset to use",

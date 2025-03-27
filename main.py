@@ -45,15 +45,37 @@ def seed_all(seed):
     np.random.seed(seed)
 
 
+def new_load_dataset(args):
+    if args.dataset == "iris":
+        dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
+    elif args.dataset == "caltech101":
+        dataset = Caltech101Dataset()
+
+    train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
+    train_loader = torch.utils.data.DataLoader(
+        train_set, batch_size=args.batch_size, shuffle=True
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_set, batch_size=int(1e6), shuffle=False
+    )
+    validation_loader = None
+    return train_loader, validation_loader, test_loader
+
+
 if __name__ == "__main__":
     args = get_args()
     args.batch_size = 100
-    args.dataset = "iris"
+    # args.dataset = "iris"
     args.num_iterations = 2000
     args.eval_freq = 1000
-    args.num_neurons = 6
+    # args.num_neurons = 6
     args.num_layers = 2
     args.get_formula = True
+
+    if args.dataset == "iris":
+        args.num_neurons = 6
+    elif args.dataset == "caltech101":
+        args.num_neurons = 41 * 101
 
     if args.verbose:
         logger = logging.getLogger()
@@ -87,15 +109,7 @@ if __name__ == "__main__":
     ####################################################################################################################
 
     # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
-    dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
-    train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
-    train_loader = torch.utils.data.DataLoader(
-        train_set, batch_size=args.batch_size, shuffle=True
-    )
-    test_loader = torch.utils.data.DataLoader(
-        test_set, batch_size=int(1e6), shuffle=False
-    )
-    validation_loader = None
+    train_loader, validation_loader, test_loader = new_load_dataset(args)
 
     # train_loader, validation_loader, test_loader = load_dataset(args)
 

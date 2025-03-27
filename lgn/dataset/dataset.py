@@ -169,7 +169,7 @@ def input_dim_of_dataset(dataset):
     return {
         "adult": 116,
         "breast_cancer": 51,
-        "iris": 8,
+        "iris": 4 * 2,
         "monk1": 17,
         "monk2": 17,
         "monk3": 17,
@@ -177,6 +177,7 @@ def input_dim_of_dataset(dataset):
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
         "cifar-10-31-thresholds": 3 * 32 * 32 * 31,
+        "caltech101": 64 * 64 * 2,
     }[dataset]
 
 
@@ -192,6 +193,7 @@ def num_classes_of_dataset(dataset):
         "mnist20x20": 10,
         "cifar-10-3-thresholds": 10,
         "cifar-10-31-thresholds": 10,
+        "caltech101": 101,
     }[dataset]
 
 
@@ -375,3 +377,9 @@ class Caltech101Dataset:
 
     def __call__(self):
         return self.dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, index):
+        return self.dataset[index]
