@@ -155,6 +155,7 @@ if __name__ == "__main__":
             logger.debug("Duals: %s", str(axp_dual))
             logger.info("CXPs: %s", str(cxps))
             logger.debug("Duals: %s", str(cxp_dual))
+
         else:
             for batch, label in train_loader:
                 for feat in batch:
@@ -168,6 +169,26 @@ if __name__ == "__main__":
                     logger.debug("Duals: %s", str(axp_dual))
                     logger.info("CXPs: %s", str(cxps))
                     logger.debug("Duals: %s", str(cxp_dual))
+
+                    axp_set = set()
+                    for axp in axps:
+                        axp_set.add(frozenset(axp))
+                    cxp_set = set()
+                    for cxp in cxps:
+                        cxp_set.add(frozenset(cxp))
+                    axp_dual_set = set()
+                    for axp_d in axp_dual:
+                        axp_dual_set.add(frozenset(axp_d))
+                    cxp_dual_set = set()
+                    for cxp_d in cxp_dual:
+                        cxp_dual_set.add(frozenset(cxp_d))
+
+                    assert axp_set.difference(cxp_dual_set) == set()
+                    assert cxp_dual_set.difference(axp_set) == set()
+
+                    assert axp_dual_set.difference(cxp_set) == set()
+                    assert cxp_set.difference(axp_dual_set) == set()
+
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
 # Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"

@@ -229,7 +229,7 @@ class Explainer:
 
                     hitman.hit(to_hit)
 
-                    duals.append([to_hit])
+                    duals.append(to_hit)
                 else:
                     logger.debug("Is NOT satisfied %s", hset)
                     # print("expl:", hset)
@@ -301,8 +301,9 @@ class Explainer:
                     if len(to_hit) > 1:
                         possibility += 1
 
-                    if len(to_hit) > 1 and reduce_ != "none":
-                        to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
+                    if len(to_hit) > 1:
+                        to_hit = self.get_one_axp(inp=to_hit, predicted_cls=pred_class)
+                        # to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
 
                     logger.debug("to_hit: %s", to_hit)
 
