@@ -128,48 +128,43 @@ class Explainer:
 
         return solver
 
-    def mhs_mus_enumeration(self, xnum, smallest=False):
+    def mhs_mus_enumeration(self, inp, xnum=1000, smallest=False):
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
 
         # result
-        self.expls = []
+        expls = []
 
         # just in case, let's save dual (contrastive) explanations
-        self.duals = []
+        duals = []
 
         with Hitman(
-            bootstrap_with=[self.hypos], htype="sorted" if smallest else "lbx"
+            bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
             # computing unit-size MCSes
-            for i, hypo in enumerate(self.hypos):
-                self.calls += 1
-                if self.oracle.solve(
-                    assumptions=self.hypos[:i] + self.hypos[(i + 1) :]
-                ):
+            for i, hypo in enumerate(inp):
+                if self.oracle.solve(assumptions=inp[:i] + inp[(i + 1) :]):
                     hitman.hit([hypo])
-                    self.duals.append([hypo])
+                    duals.append([hypo])
 
             # main loop
-            iters = 0
+            itrs = 0
             while True:
                 hset = hitman.get()
-                iters += 1
+                itrs += 1
 
-                if self.options.verb > 2:
-                    print("iter:", iters)
-                    print("cand:", hset)
+                print("iter:", itrs)
+                print("cand:", hset)
 
                 if hset == None:
                     break
 
-                self.calls += 1
                 if self.oracle.solve(assumptions=hset):
                     to_hit = []
                     satisfied, unsatisfied = [], []
 
-                    removed = list(set(self.hypos).difference(set(hset)))
+                    removed = list(set(inp).difference(set(hset)))
 
                     model = self.oracle.get_model()
                     for h in removed:
@@ -180,25 +175,22 @@ class Explainer:
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        self.calls += 1
                         if self.oracle.solve(assumptions=hset + [h]):
                             hset.append(h)
                         else:
                             to_hit.append(h)
 
-                    if self.options.verb > 2:
-                        print("coex:", to_hit)
+                    print("coex:", to_hit)
 
                     hitman.hit(to_hit)
 
-                    self.duals.append([to_hit])
+                    duals.append([to_hit])
                 else:
-                    if self.options.verb > 2:
-                        print("expl:", hset)
+                    print("expl:", hset)
 
-                    self.expls.append(hset)
+                    expls.append(hset)
 
-                    if len(self.expls) != xnum:
+                    if len(expls) != xnum:
                         hitman.block(hset)
                     else:
                         break
