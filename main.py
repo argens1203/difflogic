@@ -141,53 +141,58 @@ if __name__ == "__main__":
 
         explainer = Explainer(encoding)
 
-        if args.explain is not None:
-            inp = args.explain.split(",")
-            inp = [int(i) for i in inp]
-            print(inp)
-            # try:
-            explainer.explain(inp=inp)
+        def explain_both_and_assert(inp=None, feat=None):
+            explainer.explain(feat=feat, inp=inp)
 
-            axps, axp_dual = explainer.mhs_mus_enumeration(inp=inp, xnum=1000)
-            cxps, cxp_dual = explainer.mhs_mcs_enumeration(inp=inp, xnum=1000)
+            axps, axp_dual = explainer.mhs_mus_enumeration(
+                feat=feat, inp=inp, xnum=1000
+            )
+            cxps, cxp_dual = explainer.mhs_mcs_enumeration(
+                feat=feat, inp=inp, xnum=1000
+            )
 
             logger.info("AXPs: %s", str(axps))
             logger.debug("Duals: %s", str(axp_dual))
             logger.info("CXPs: %s", str(cxps))
             logger.debug("Duals: %s", str(cxp_dual))
 
-        else:
+            axp_set = set()
+            for axp in axps:
+                axp_set.add(frozenset(axp))
+            cxp_set = set()
+            for cxp in cxps:
+                cxp_set.add(frozenset(cxp))
+            axp_dual_set = set()
+            for axp_d in axp_dual:
+                axp_dual_set.add(frozenset(axp_d))
+            cxp_dual_set = set()
+            for cxp_d in cxp_dual:
+                cxp_dual_set.add(frozenset(cxp_d))
+
+            assert axp_set.difference(cxp_dual_set) == set()
+            assert cxp_dual_set.difference(axp_set) == set()
+
+            assert axp_dual_set.difference(cxp_set) == set()
+            assert cxp_set.difference(axp_dual_set) == set()
+
+        if args.explain is not None:
+            inp = args.explain.split(",")
+            inp = [int(i) for i in inp]
+            print(inp)
+            # try:
+            explain_both_and_assert(inp=inp)
+
+        elif args.explain_all:
+            for batch, label in test_loader:
+                for feat in batch:
+                    explain_both_and_assert(feat=feat)
             for batch, label in train_loader:
                 for feat in batch:
-                    # encoding.print()
-                    explainer.explain(feat=feat)
-
-                    axps, axp_dual = explainer.mhs_mus_enumeration(feat=feat, xnum=1000)
-                    cxps, cxp_dual = explainer.mhs_mcs_enumeration(feat=feat, xnum=1000)
-
-                    logger.info("AXPs: %s", str(axps))
-                    logger.debug("Duals: %s", str(axp_dual))
-                    logger.info("CXPs: %s", str(cxps))
-                    logger.debug("Duals: %s", str(cxp_dual))
-
-                    axp_set = set()
-                    for axp in axps:
-                        axp_set.add(frozenset(axp))
-                    cxp_set = set()
-                    for cxp in cxps:
-                        cxp_set.add(frozenset(cxp))
-                    axp_dual_set = set()
-                    for axp_d in axp_dual:
-                        axp_dual_set.add(frozenset(axp_d))
-                    cxp_dual_set = set()
-                    for cxp_d in cxp_dual:
-                        cxp_dual_set.add(frozenset(cxp_d))
-
-                    assert axp_set.difference(cxp_dual_set) == set()
-                    assert cxp_dual_set.difference(axp_set) == set()
-
-                    assert axp_dual_set.difference(cxp_set) == set()
-                    assert cxp_set.difference(axp_dual_set) == set()
+                    explain_both_and_assert(feat=feat)
+        else:
+            for batch, label in test_loader:
+                for feat in batch:
+                    explain_both_and_assert(feat=feat)
 
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
