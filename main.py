@@ -145,7 +145,9 @@ if __name__ == "__main__":
             inp = args.explain.split(",")
             inp = [int(i) for i in inp]
             try:
-                explainer.explain(inp=inp)
+                # explainer.explain(inp=inp)
+                expl = explainer.mhs_mus_enumeration(inp=inp, xnum=1000)
+                print(expl)
             except Exception as e:
                 logger.error(e)
         else:

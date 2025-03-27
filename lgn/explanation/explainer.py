@@ -1,6 +1,7 @@
 import logging
 
 from pysat.card import CardEnc, EncType
+from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
 from lgn.util import feat_to_input, input_to_feat
@@ -126,6 +127,81 @@ class Explainer:
         self.solvers[(true_class, adj_class)] = solver
 
         return solver
+
+    def mhs_mus_enumeration(self, xnum, smallest=False):
+        """
+        Enumerate subset- and cardinality-minimal explanations.
+        """
+
+        # result
+        self.expls = []
+
+        # just in case, let's save dual (contrastive) explanations
+        self.duals = []
+
+        with Hitman(
+            bootstrap_with=[self.hypos], htype="sorted" if smallest else "lbx"
+        ) as hitman:
+            # computing unit-size MCSes
+            for i, hypo in enumerate(self.hypos):
+                self.calls += 1
+                if self.oracle.solve(
+                    assumptions=self.hypos[:i] + self.hypos[(i + 1) :]
+                ):
+                    hitman.hit([hypo])
+                    self.duals.append([hypo])
+
+            # main loop
+            iters = 0
+            while True:
+                hset = hitman.get()
+                iters += 1
+
+                if self.options.verb > 2:
+                    print("iter:", iters)
+                    print("cand:", hset)
+
+                if hset == None:
+                    break
+
+                self.calls += 1
+                if self.oracle.solve(assumptions=hset):
+                    to_hit = []
+                    satisfied, unsatisfied = [], []
+
+                    removed = list(set(self.hypos).difference(set(hset)))
+
+                    model = self.oracle.get_model()
+                    for h in removed:
+                        if model[abs(h) - 1] != h:
+                            unsatisfied.append(h)
+                        else:
+                            hset.append(h)
+
+                    # computing an MCS (expensive)
+                    for h in unsatisfied:
+                        self.calls += 1
+                        if self.oracle.solve(assumptions=hset + [h]):
+                            hset.append(h)
+                        else:
+                            to_hit.append(h)
+
+                    if self.options.verb > 2:
+                        print("coex:", to_hit)
+
+                    hitman.hit(to_hit)
+
+                    self.duals.append([to_hit])
+                else:
+                    if self.options.verb > 2:
+                        print("expl:", hset)
+
+                    self.expls.append(hset)
+
+                    if len(self.expls) != xnum:
+                        hitman.block(hset)
+                    else:
+                        break
 
     def __del__(self):
         for _, solver in self.solvers.items():
