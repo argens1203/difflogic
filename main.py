@@ -52,6 +52,10 @@ def new_load_dataset(args):
         dataset = Caltech101Dataset()
     elif args.dataset == "adult":
         return load_dataset(args)
+    elif args.dataset in ["monk1", "monk2", "monk3"]:
+        return load_dataset(args)
+    elif args.dataset == "breast_cancer":
+        return load_dataset(args)
         # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
 
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
@@ -67,6 +71,7 @@ def new_load_dataset(args):
 
 if __name__ == "__main__":
     args = get_args()
+    args.model_path = args.dataset + "_" + args.model_path
     args.batch_size = 100
     # args.dataset = "iris"
     args.num_iterations = 2000
@@ -76,11 +81,15 @@ if __name__ == "__main__":
     args.get_formula = True
 
     if args.dataset == "iris":
-        args.num_neurons = 6
+        args.num_neurons = 6  # >= 4, div 3
     elif args.dataset == "caltech101":
-        args.num_neurons = 41 * 101  # >= 4096
+        args.num_neurons = 41 * 101  # >= 4096, div 101
     elif args.dataset == "adult":
-        args.num_neurons = 58  # >= 58
+        args.num_neurons = 58  # >= 58, div 2
+    elif args.dataset in ["monk1", "monk2", "monk3"]:
+        args.num_neurons = 10  # >= 9, div 2
+    elif args.dataset == "breast_cancer":
+        args.num_neurons = 26  # >= 26, div 2
 
     if args.verbose:
         logger = logging.getLogger()
