@@ -108,9 +108,20 @@ class Explainer:
         )
         return is_satisfiable, solver.get_model(), solver.get_core()
 
-    def get_lits(self, true_class, adj_class):
-        pos = self.encoding.get_output_ids(adj_class)
-        neg = [-a for a in self.encoding.get_output_ids(true_class)]
+    def remove_none(self, lst):
+        ret = []
+        indices = []
+        for idx, l in enumerate(lst):
+            if l is not None:
+                ret.append(l)
+            else:
+                indices.append(idx)
+        return ret, indices
+
+    def get_lits_and_bound(self, true_class, adj_class):
+        pos, pos_none_idxs = self.remove_none(self.encoding.get_output_ids(adj_class))
+        neg, neg_none_idxs = self.remove_none(self.encoding.get_output_ids(true_class))
+        neg = [-a for a in neg]
         lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
 
         logger.debug(
@@ -120,13 +131,18 @@ class Explainer:
             true_class,
             str(lits),
         )
-        return lits
 
-    def get_bound(self, true_class, adj_class):
         bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
 
+        for idx in pos_none_idxs:
+            if self.encoding.get_truth_value(idx) is True:
+                bound -= 1  # One vote less for each defenite True in the output of the adj class
+        for idx in neg_none_idxs:
+            if self.encoding.get_truth_value(idx) is True:
+                bound += 1  # One vote more is needed for each defenite True in the output of the true class
+
         logger.debug("Bound: %d", bound)
-        return bound
+        return lits, bound
 
     def get_solver(self, true_class, adj_class):
         if (true_class, adj_class) in self.solvers:
@@ -135,8 +151,7 @@ class Explainer:
 
         Stat.inc_cache_miss(Cached.SOLVER)
 
-        lits = self.get_lits(true_class, adj_class)
-        bound = self.get_bound(true_class, adj_class)
+        lits, bound = self.get_lits_and_bound(true_class, adj_class)
 
         solver = Solver(encoding=self.encoding)
 

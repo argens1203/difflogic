@@ -140,6 +140,8 @@ def get_args():
         help="Explain all predictions (Default: Explain only on test set)",
     )
 
+    parser.add_argument("--explain_one", action="store_true", default=False)
+
     args = parser.parse_args()
 
     if args.verbose:

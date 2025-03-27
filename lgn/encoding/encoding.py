@@ -38,14 +38,21 @@ class Encoding:
             self.input_ids = [vpool.id(h) for h in self.input_handles]
             self.cnf = CNF()
             self.output_ids = []
-
+            self.special = dict()
             # adding the clauses to a global CNF
             for f in [
                 Or(Atom(False), f.simplified()) for f in self.formula
             ]:  # TODO: Confirm this:
                 f.clausify()
                 self.cnf.extend(list(f)[:-1])
+                logger.debug("Formula: %s", f)
+                logger.debug("CNF Clauses: %s", f.clauses)
+                logger.debug("Simplified: %s", f.simplified())
+                idx = 0
+                if f.clauses[-1][1] is None:
+                    self.special[idx] = f.simplified()
                 self.output_ids.append(f.clauses[-1][1])
+                idx += 1
 
                 logger.debug("Modified formulas: %s", list(f))
             logger.debug("CNF Clauses: %s", self.cnf.clauses)
@@ -59,6 +66,9 @@ class Encoding:
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
         return self.output_ids[start : start + step]
+
+    def get_truth_value(self, idx):
+        return self.special.get(idx, None)
 
     def get_votes_per_cls(self):
         return len(self.output_ids) // self.class_dim
@@ -93,7 +103,7 @@ class Encoding:
             for f in self.formula:
                 print(
                     (str(vpool.id(f)) + ")").ljust(4),
-                    f,
+                    f.simplified(),
                     # f.simplified(), "...", f.clauses, "...", f.encoded, "...",
                 )
 
