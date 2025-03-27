@@ -33,7 +33,7 @@ class Explainer:
 
         logger.debug("Predicted Class - %s", pred_class)
 
-        is_uniquely_satisfied, model = self.is_uniquely_satisfied_by(inp, pred_class)
+        is_uniquely_satisfied, _, __ = self.is_uniquely_satisfied_by(inp, pred_class)
         assert is_uniquely_satisfied, "Assertion Error: " + ",".join(map(str, inp))
 
         axp = self.get_one_axp(inp, pred_class)
@@ -52,7 +52,7 @@ class Explainer:
         for feature in inp:
             logger.debug("Testing removal of input %d", feature)
             tmp_input.remove(feature)
-            is_uniquely_satisfied, _ = self.is_uniquely_satisfied_by(
+            is_uniquely_satisfied, _, __ = self.is_uniquely_satisfied_by(
                 inp=tmp_input, predicted_cls=predicted_cls
             )
             if is_uniquely_satisfied:
@@ -74,16 +74,26 @@ class Explainer:
 
         :return: True if the input is uniquely satisfied by the predicted class
         """
+        cores = []
         for cls in self.encoding.get_classes():
             if cls == predicted_cls:
                 continue
-            is_satisfiable, model = self.is_adj_class_satisfiable(
+            is_satisfiable, model, core = self.is_adj_class_satisfiable(
                 true_class=predicted_cls, adj_class=cls, inp=inp
             )
             if is_satisfiable:
                 logger.debug("Satisfied by %d", cls)
-                return False, model
-        return True, None
+                return False, model, None
+            else:
+                cores.append(core)
+        # print(cores)
+        # input()
+        combined_core = set()
+        for core in cores:
+            combined_core = combined_core.union(set(core))
+        # print(combined_core)
+        # input()
+        return True, None, list(combined_core)
 
     def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
         solver = self.get_solver(true_class, adj_class)
@@ -96,7 +106,7 @@ class Explainer:
             "" if is_satisfiable else "NOT ",
             str(inp),
         )
-        return is_satisfiable, solver.get_model()
+        return is_satisfiable, solver.get_model(), solver.get_core()
 
     def get_lits(self, true_class, adj_class):
         pos = self.encoding.get_output_ids(adj_class)
@@ -137,13 +147,15 @@ class Explainer:
         return solver
 
     def is_satisfiable(self, pred_class, inp):
-        is_satisfiable, _ = self.is_satisfiable_with_model(pred_class, inp)
+        is_satisfiable, _, __ = self.is_satisfiable_with_model_or_core(pred_class, inp)
         return is_satisfiable
 
-    def is_satisfiable_with_model(self, pred_class, inp):
+    def is_satisfiable_with_model_or_core(self, pred_class, inp):
         logger.debug("Checking satisfiability of %s", str(inp))
-        is_uniquely_satsified, model = self.is_uniquely_satisfied_by(inp, pred_class)
-        return not is_uniquely_satsified, model
+        is_uniquely_satsified, model, core = self.is_uniquely_satisfied_by(
+            inp, pred_class
+        )
+        return not is_uniquely_satsified, model, core
 
     def mhs_mus_enumeration(self, inp=None, feat=None, xnum=1000, smallest=False):
         """
@@ -183,7 +195,7 @@ class Explainer:
                 if hset == None:
                     break
 
-                is_satisfiable, model = self.is_satisfiable_with_model(
+                is_satisfiable, model, _ = self.is_satisfiable_with_model_or_core(
                     pred_class, inp=hset
                 )
                 logger.debug("Model: %s", model)
@@ -253,10 +265,10 @@ class Explainer:
         ) as hitman:
             # computing unit-size MUSes
             for i, hypo in enumerate(inp):
-                if not self.oracle.solve(assumptions=[hypo]):
+                if not self.is_satisfiable(inp=[hypo]):
                     hitman.hit([hypo])
                     duals.append([hypo])
-                elif unit_mcs and self.oracle.solve(
+                elif unit_mcs and self.is_satisfiable(
                     assumptions=inp[:i] + inp[(i + 1) :]
                 ):
                     # this is a unit-size MCS => block immediately
@@ -275,10 +287,11 @@ class Explainer:
                 if hset == None:
                     break
 
-                if not self.oracle.solve(
+                is_satisfiable, model, core = self.is_satisfiable(
                     assumptions=sorted(set(inp).difference(set(hset)))
-                ):
-                    to_hit = self.oracle.get_core()
+                )
+                if not is_satisfiable:
+                    to_hit = core
 
                     if len(to_hit) > 1 and reduce_ != "none":
                         to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)

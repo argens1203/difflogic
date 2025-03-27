@@ -36,6 +36,9 @@ class Solver:
     def get_model(self):
         return self.solver.get_model()
 
+    def get_core(self):
+        return self.solver.get_core()
+
     def _append_formula(self, clauses=[]):
         self.solver.append_formula(clauses)
         return self
