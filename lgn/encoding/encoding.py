@@ -40,7 +40,9 @@ class Encoding:
             self.output_ids = []
 
             # adding the clauses to a global CNF
-            for f in [Or(Atom(False), f) for f in self.formula]:  # TODO: Confirm this:
+            for f in [
+                Or(Atom(False), f.simplified()) for f in self.formula
+            ]:  # TODO: Confirm this:
                 f.clausify()
                 self.cnf.extend(list(f)[:-1])
                 self.output_ids.append(f.clauses[-1][1])
