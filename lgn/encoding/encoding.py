@@ -28,6 +28,7 @@ def get_formula(model, input_dim):
         for o in x:
             all.add(o)
 
+    x[0] = Atom(False)
     return x, inputs
 
 

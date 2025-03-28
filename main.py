@@ -190,25 +190,25 @@ if __name__ == "__main__":
             logger.info("CXPs: %s", str(cxps))
             logger.info("Duals: %s", str(cxp_dual))
 
-            # axp_set = set()
-            # for axp in axps:
-            #     axp_set.add(frozenset(axp))
-            # cxp_set = set()
-            # for cxp in cxps:
-            #     cxp_set.add(frozenset(cxp))
-            # axp_dual_set = set()
-            # for axp_d in axp_dual:
-            #     axp_dual_set.add(frozenset(axp_d))
-            # cxp_dual_set = set()
-            # for cxp_d in cxp_dual:
-            #     cxp_dual_set.add(frozenset(cxp_d))
+            axp_set = set()
+            for axp in axps:
+                axp_set.add(frozenset(axp))
+            cxp_set = set()
+            for cxp in cxps:
+                cxp_set.add(frozenset(cxp))
+            axp_dual_set = set()
+            for axp_d in axp_dual:
+                axp_dual_set.add(frozenset(axp_d))
+            cxp_dual_set = set()
+            for cxp_d in cxp_dual:
+                cxp_dual_set.add(frozenset(cxp_d))
 
             # TODO: does not work on adult (test set)
-            # assert axp_set.difference(cxp_dual_set) == set()
-            # assert cxp_dual_set.difference(axp_set) == set()
+            assert axp_set.difference(cxp_dual_set) == set()
+            assert cxp_dual_set.difference(axp_set) == set()
 
-            # assert axp_dual_set.difference(cxp_set) == set()
-            # assert cxp_set.difference(axp_dual_set) == set()
+            assert axp_dual_set.difference(cxp_set) == set()
+            assert cxp_set.difference(axp_dual_set) == set()
 
         if args.explain is not None:
             inp = args.explain.split(",")
