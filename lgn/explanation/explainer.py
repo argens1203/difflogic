@@ -204,10 +204,10 @@ class Explainer:
                 hset = hitman.get()  # Get candidate MUS
                 itr += 1
 
-                logger.debug("itr: %s", itr)
-                logger.debug("cand: %s", hset)
+                logger.info("itr: %s", itr)
+                logger.debug("itr %s) cand: %s", hset)
 
-                if hset == None:
+                if hset == None:  # Terminates when there is no more candidate MUS
                     break
 
                 is_satisfiable, model, _ = self.is_satisfiable_with_model_or_core(
@@ -221,35 +221,43 @@ class Explainer:
                     to_hit = []
                     satisfied, unsatisfied = [], []
 
-                    removed = list(set(inp).difference(set(hset)))
+                    removed = list(
+                        set(inp).difference(set(hset))
+                    )  # CXP lies within removed features
 
                     # model = self.oracle.get_model()
                     for h in removed:
-                        if model[abs(h) - 1] != h:
-                            unsatisfied.append(h)
+                        if (
+                            model[abs(h) - 1] != h
+                        ):  # If a feature(hypothesis) of the input is different from that of the "solution"(model)
+                            unsatisfied.append(h)  # Add it to unsatisfied
                         else:
-                            hset.append(h)
+                            hset.append(h)  # Else append it to hset
+                            # How can we be sure adding h to hset keeps hset satisfiable?
 
                     logger.debug("Unsatisfied: %s", unsatisfied)
                     logger.debug("Hset: %s", hset)
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        if self.is_satisfiable(pred_class, inp=hset + [h]):
+                        if self.is_satisfiable(
+                            pred_class, inp=hset + [h]
+                        ):  # Keep adding while satisfiable
                             hset.append(h)
                         else:
                             to_hit.append(h)
+                            # Partial MCS found in a reversed manner
 
                     logger.debug("To hit: %s", to_hit)
 
-                    hitman.hit(to_hit)
+                    hitman.hit(to_hit)  # the entirity of to_hit is a MCS
 
                     duals.append(to_hit)
                 else:
                     logger.debug("Is NOT satisfied %s", hset)
                     # print("expl:", hset)
 
-                    expls.append(hset)
+                    expls.append(hset)  # Minimum Unsatisfiable Subset found - AXP found
 
                     if len(expls) != xnum:
                         hitman.block(hset)
@@ -300,8 +308,9 @@ class Explainer:
                 hset = hitman.get()
                 itr += 1
 
-                logger.debug("itr: %s", itr)
-                logger.debug("cand: %s", hset)
+                logger.info("itr: %s", itr)
+                # logger.debug("itr: %s", itr)
+                logger.debug("itr %s) cand: %s", hset)
 
                 if hset == None:
                     break
@@ -311,7 +320,7 @@ class Explainer:
                     inp=sorted(set(inp).difference(set(hset))),
                 )
                 if not is_satisfiable:
-                    to_hit = core
+                    to_hit = core  # Core is a weak (non-minimal) AXP?
 
                     if len(to_hit) > 1:
                         possibility += 1
@@ -323,13 +332,13 @@ class Explainer:
                     logger.debug("to_hit: %s", to_hit)
 
                     duals.append(to_hit)
-                    hitman.hit(to_hit)
+                    hitman.hit(to_hit)  # Hit AXP
                 else:
                     logger.debug("expl: %s", hset)
                     expls.append(hset)
 
                     if len(expls) != xnum:
-                        hitman.block(hset)
+                        hitman.block(hset)  # Block CXP
                     else:
                         break
         logger.debug("Chances of further enhancements: %d", possibility)

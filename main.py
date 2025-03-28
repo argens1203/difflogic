@@ -123,6 +123,8 @@ if __name__ == "__main__":
         logger.addHandler(console_handler)
         logger.addHandler(file_handler)
 
+    logging.disable(logging.DEBUG)
+
     results = get_results(args.experiment_id, args)
     # seed_all(args.seed)
     seed_all(0)
@@ -188,18 +190,18 @@ if __name__ == "__main__":
             logger.info("CXPs: %s", str(cxps))
             logger.debug("Duals: %s", str(cxp_dual))
 
-            axp_set = set()
-            for axp in axps:
-                axp_set.add(frozenset(axp))
-            cxp_set = set()
-            for cxp in cxps:
-                cxp_set.add(frozenset(cxp))
-            axp_dual_set = set()
-            for axp_d in axp_dual:
-                axp_dual_set.add(frozenset(axp_d))
-            cxp_dual_set = set()
-            for cxp_d in cxp_dual:
-                cxp_dual_set.add(frozenset(cxp_d))
+            # axp_set = set()
+            # for axp in axps:
+            #     axp_set.add(frozenset(axp))
+            # cxp_set = set()
+            # for cxp in cxps:
+            #     cxp_set.add(frozenset(cxp))
+            # axp_dual_set = set()
+            # for axp_d in axp_dual:
+            #     axp_dual_set.add(frozenset(axp_d))
+            # cxp_dual_set = set()
+            # for cxp_d in cxp_dual:
+            #     cxp_dual_set.add(frozenset(cxp_d))
 
             # TODO: does not work on adult (test set)
             # assert axp_set.difference(cxp_dual_set) == set()
