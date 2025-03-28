@@ -138,8 +138,8 @@ class Explainer:
             if self.encoding.get_truth_value(idx) is True:
                 bound -= 1  # One vote less for each defenite True in the output of the adj class
         for idx in neg_none_idxs:
-            if self.encoding.get_truth_value(idx) is True:
-                bound += 1  # One vote more is needed for each defenite True in the output of the true class
+            if self.encoding.get_truth_value(idx) is False:
+                bound -= 1  # One vote more is needed for each defenite True in the output of the true class
 
         logger.debug("Bound: %d", bound)
         return lits, bound
@@ -192,6 +192,7 @@ class Explainer:
         with Hitman(
             bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
+            itr = 0
             # computing unit-size MCSes
             for i, hypo in enumerate(inp):
                 if self.is_satisfiable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
@@ -199,7 +200,6 @@ class Explainer:
                     duals.append([hypo])  # Add unit-size MCS to duals
 
             # main loop
-            itr = 0
             while True:
                 hset = hitman.get()  # Get candidate MUS
                 itr += 1
