@@ -204,8 +204,8 @@ class Explainer:
                 hset = hitman.get()  # Get candidate MUS
                 itr += 1
 
-                logger.info("itr: %s", itr)
-                logger.debug("itr %s) cand: %s", hset)
+                # logger.info("itr: %s", itr)
+                logger.info("itr %s) cand: %s", itr, hset)
 
                 if hset == None:  # Terminates when there is no more candidate MUS
                     break
@@ -248,7 +248,7 @@ class Explainer:
                             to_hit.append(h)
                             # Partial MCS found in a reversed manner
 
-                    logger.debug("To hit: %s", to_hit)
+                    logger.info("To hit: %s", to_hit)
 
                     hitman.hit(to_hit)  # the entirity of to_hit is a MCS
 
@@ -308,9 +308,9 @@ class Explainer:
                 hset = hitman.get()
                 itr += 1
 
-                logger.info("itr: %s", itr)
+                # logger.info("itr: %s", itr)
                 # logger.debug("itr: %s", itr)
-                logger.debug("itr %s) cand: %s", hset)
+                logger.info("itr %s) cand: %s", itr, hset)
 
                 if hset == None:
                     break
@@ -329,7 +329,7 @@ class Explainer:
                         to_hit = self.get_one_axp(inp=to_hit, predicted_cls=pred_class)
                         # to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
 
-                    logger.debug("to_hit: %s", to_hit)
+                    logger.info("to_hit: %s", to_hit)
 
                     duals.append(to_hit)
                     hitman.hit(to_hit)  # Hit AXP

@@ -186,9 +186,9 @@ if __name__ == "__main__":
             cxps, cxp_dual = explainer.mhs_mcs_enumeration(feat=feat, inp=inp, xnum=10)
 
             logger.info("AXPs: %s", str(axps))
-            logger.debug("Duals: %s", str(axp_dual))
+            logger.info("Duals: %s", str(axp_dual))
             logger.info("CXPs: %s", str(cxps))
-            logger.debug("Duals: %s", str(cxp_dual))
+            logger.info("Duals: %s", str(cxp_dual))
 
             # axp_set = set()
             # for axp in axps:
