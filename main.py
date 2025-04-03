@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 from lgn.encoding import Validator, Encoding
-from lgn.explanation import Explainer
+from lgn.explanation import Explainer, Instance
 from lgn.dataset.dataset import (
     load_dataset,
     IrisDataset,
@@ -179,11 +179,11 @@ if __name__ == "__main__":
 
         explainer = Explainer(encoding)
 
-        def explain_both_and_assert(inp=None, feat=None):
-            explainer.explain(feat=feat, inp=inp)
+        def explain_both_and_assert(instance):
+            explainer.explain(instance)
 
-            axps, axp_dual = explainer.mhs_mus_enumeration(feat=feat, inp=inp)
-            cxps, cxp_dual = explainer.mhs_mcs_enumeration(feat=feat, inp=inp)
+            axps, axp_dual = explainer.mhs_mus_enumeration(instance)
+            cxps, cxp_dual = explainer.mhs_mcs_enumeration(instance)
 
             logger.info("AXPs: %s", str(axps))
             logger.info("Duals: %s", str(axp_dual))
@@ -214,24 +214,29 @@ if __name__ == "__main__":
             inp = args.explain.split(",")
             inp = [int(i) for i in inp]
             print(inp)
+            instance = Instance.from_encoding(encoding=encoding, inp=inp)
             # try:
-            explain_both_and_assert(inp=inp)
+            explain_both_and_assert(instance)
         elif args.explain_all:
             for batch, label in test_loader:
                 for feat in batch:
-                    explain_both_and_assert(feat=feat)
+                    instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                    explain_both_and_assert(instance)
             for batch, label in train_loader:
                 for feat in batch:
-                    explain_both_and_assert(feat=feat)
+                    instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                    explain_both_and_assert(instance)
         elif args.explain_one:
             batch, label = next(iter(test_loader))
             for feat in batch:
-                explain_both_and_assert(feat=feat)
+                instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                explain_both_and_assert(instance)
                 break
         else:
             for batch, label in test_loader:
                 for feat in batch:
-                    explain_both_and_assert(feat=feat)
+                    instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                    explain_both_and_assert(instance)
 
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"

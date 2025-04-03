@@ -6,8 +6,14 @@ from lgn.encoding import Encoding
 from lgn.util import feat_to_input, input_to_feat, Stat
 
 from .multiclass_solver import MulticlassSolver
+from .instance import Instance
 
 logger = logging.getLogger(__name__)
+
+
+class Session:
+    def __init__(self):
+        pass
 
 
 class Explainer:
@@ -15,17 +21,12 @@ class Explainer:
         self.encoding = encoding
         self.oracle = MulticlassSolver(encoding=encoding)
 
-    def explain(self, feat=None, inp=None):
-        if inp is None:
-            inp = feat_to_input(feat)
-        if feat is None:
-            feat = input_to_feat(inp)
+    def explain(self, instance):
+        pred_class = instance.get_predicted_class()
+        inp = instance.get_input()
 
         logger.info("\n")
         logger.info("Explaining Input: %s", inp)
-
-        class_label = self.encoding.as_model()(feat.reshape(1, -1)).item()
-        pred_class = class_label + 1
 
         logger.debug("Predicted Class - %s", pred_class)
 
@@ -35,27 +36,22 @@ class Explainer:
 
         axp = self.get_one_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
+        return axp
 
-    def mhs_mus_enumeration(self, inp=None, feat=None, xnum=1000, smallest=False):
+    def mhs_mus_enumeration(self, instance, xnum=1000, smallest=False):
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
         logger.debug("Starting mhs_mus_enumeration")
 
-        if inp is None:
-            inp = feat_to_input(feat)
+        inp = instance.get_input()
+        pred_class = instance.get_predicted_class()
 
-        class_label = self.encoding.as_model()(input_to_feat(inp).reshape(1, -1)).item()
-        pred_class = class_label + 1
-        # result
         expls = []
-
-        # just in case, let's save dual (contrastive) explanations
         duals = []
+        htype = "sorted" if smallest else "lbx"
 
-        with Hitman(
-            bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
-        ) as hitman:
+        with Hitman(bootstrap_with=[inp], htype=htype) as hitman:
             logger.info("Starting mhs_mus_enumeration")
             logger.info("Input: %s", inp)
             itr = 0
@@ -138,20 +134,18 @@ class Explainer:
 
     def mhs_mcs_enumeration(
         self,
+        instance: Instance,
         xnum=1000,
         smallest=False,
         reduce_="none",
         unit_mcs=False,
-        inp=None,
-        feat=None,
     ):
         """
         Enumerate subset- and cardinality-minimal contrastive explanations.
         """
         expls = []  # result
         duals = []  # just in case, let's save dual (abductive) explanations
-        if inp is None:
-            inp = feat_to_input(feat)
+        inp = instance.get_input()
 
         class_label = self.encoding.as_model()(input_to_feat(inp).reshape(1, -1)).item()
         pred_class = class_label + 1
@@ -216,6 +210,8 @@ class Explainer:
         )
         return expls, duals
 
+    # PRIVATE
+
     def get_one_axp(self, inp, predicted_cls):
         """
         Get one AXP for the input and predicted class
@@ -229,10 +225,7 @@ class Explainer:
         for feature in inp:
             logger.debug("Testing removal of input %d", feature)
             tmp_input.remove(feature)
-            is_uniquely_satisfied, _, __ = self.oracle.is_uniquely_satisfied_by(
-                inp=tmp_input, predicted_cls=predicted_cls
-            )
-            if is_uniquely_satisfied:
+            if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tmp_input):
                 continue
             else:
                 tmp_input.append(feature)
