@@ -1,4 +1,5 @@
 import logging
+from contextlib import contextmanager
 
 from pysat.examples.hitman import Hitman
 
@@ -10,10 +11,47 @@ from .instance import Instance
 
 logger = logging.getLogger(__name__)
 
+from typing import List
+
+Inp = List[int]
+Partial_Inp = List[int]
+Htype = str  # "sorted" or "lbx"
+
 
 class Session:
-    def __init__(self):
+    def __init__(self, instance: Instance, hitman: Hitman, oracle: MulticlassSolver):
+        self.instance = instance
+        self.hitman = hitman
+        self.duals = []
+        self.expls = []
+        self.oracle = oracle
         pass
+
+    def is_solvable_with(self, inp: Partial_Inp):
+        return self.oracle.is_solvable(self.instance.get_predicted_class(), inp=inp)
+
+    def hit(self, hypo: Partial_Inp):
+        self.hitman.hit(hypo)
+        self.duals.append(hypo)
+
+    def block(self, hypo: Partial_Inp):
+        self.hitman.block(hypo)
+        self.expls.append(hypo)
+        pass
+
+    def get(self):
+        return self.hitman.get()
+
+    @contextmanager
+    def use_context(instance: Instance, htype: Htype = "lbx"):
+        try:
+            hitman = Hitman(
+                bootstrap_with=[instance.get_input()],
+                htype=htype,
+            )
+            yield Session(instance, hitman=hitman)
+        finally:
+            hitman.delete()  # Cleanup
 
 
 class Explainer:
