@@ -17,6 +17,7 @@ from lgn.dataset.dataset import (
     input_dim_of_dataset,
     Flatten,
     num_classes_of_dataset,
+    get_attribute_ranges,
     Caltech101Dataset,
     MNISTDataset,
 )
@@ -179,7 +180,8 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-        encoding = Encoding(model, input_dim, output_dim)
+        attribute_ranges = get_attribute_ranges(args.dataset)
+        encoding = Encoding(model, input_dim, output_dim, attribute_ranges)
         encoding.print()
 
         # TODO: add test to conduct this

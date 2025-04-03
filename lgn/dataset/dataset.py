@@ -202,6 +202,15 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
     }[dataset]
 
 
+def get_attribute_ranges(dataset):
+    return {
+        "monk1": [3, 3, 2, 3, 4, 2],
+        "monk2": [3, 3, 2, 3, 4, 2],
+        "monk3": [3, 3, 2, 3, 4, 2],
+        "iris": [2, 2, 2, 2],
+    }[dataset]
+
+
 from torchvision.datasets.utils import download_url, check_integrity
 from torch.utils.data import Dataset, DataLoader
 import os

@@ -1,5 +1,6 @@
 import logging
 import torch
+from typing import List
 from contextlib import contextmanager
 
 from pysat.formula import Formula, Atom, CNF, Or
@@ -33,7 +34,9 @@ def get_formula(model, input_dim):
 
 
 class Encoding:
-    def __init__(self, model, input_dim, class_dim, fp_type=fp_type):
+    def __init__(
+        self, model, input_dim, class_dim, attribute_ranges: List[int], fp_type=fp_type
+    ):
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
@@ -61,6 +64,7 @@ class Encoding:
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
         self.class_dim = class_dim
+        self.attribute_ranges = attribute_ranges
         self.fp_type = fp_type
 
     def get_output_ids(self, class_id):
@@ -76,6 +80,9 @@ class Encoding:
 
     def get_classes(self):
         return list(range(1, self.class_dim + 1))
+
+    def get_attribute_ranges(self):
+        return self.attribute_ranges
 
     def as_model(self):
         """
