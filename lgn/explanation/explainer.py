@@ -25,10 +25,18 @@ class Session:
         self.duals = []
         self.expls = []
         self.oracle = oracle
+        self.pred_class = instance.get_predicted_class()
+        self.itr = 0
         pass
 
     def is_solvable_with(self, inp: Partial_Inp):
-        return self.oracle.is_solvable(self.instance.get_predicted_class(), inp=inp)
+        return self.oracle.is_solvable(pred_class=self.pred_class, inp=inp)
+
+    def solve(self, inp: Partial_Inp):
+        return self.oracle.solve(
+            pred_class=self.pred_class,
+            inp=inp,
+        )
 
     def hit(self, hypo: Partial_Inp):
         self.hitman.hit(hypo)
@@ -40,16 +48,19 @@ class Session:
         pass
 
     def get(self):
-        return self.hitman.get()
+        self.itr += 1
+        hset = self.hitman.get()
+        logger.info("itr %s) cand: %s", self.itr, hset)
+        return hset
 
     @contextmanager
-    def use_context(instance: Instance, htype: Htype = "lbx"):
+    def use_context(instance: Instance, htype: Htype = "lbx", oracle=None):
         try:
             hitman = Hitman(
                 bootstrap_with=[instance.get_input()],
                 htype=htype,
             )
-            yield Session(instance, hitman=hitman)
+            yield Session(instance, hitman=hitman, oracle=oracle)
         finally:
             hitman.delete()  # Cleanup
 
@@ -80,7 +91,8 @@ class Explainer:
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
-        logger.debug("Starting mhs_mus_enumeration")
+        logger.info("Starting mhs_mus_enumeration")
+        logger.info("Input: %s", instance.get_input())
 
         inp = instance.get_input()
         pred_class = instance.get_predicted_class()
@@ -89,45 +101,42 @@ class Explainer:
         duals = []
         htype = "sorted" if smallest else "lbx"
 
-        with Hitman(bootstrap_with=[inp], htype=htype) as hitman:
-            logger.info("Starting mhs_mus_enumeration")
-            logger.info("Input: %s", inp)
-            itr = 0
+        with Session.use_context(
+            instance=instance,
+            htype=htype,
+            oracle=self.oracle,
+        ) as session:
+
             # computing unit-size MCSes
+            preempt_hit = 0
             for i, hypo in enumerate(inp):
-                if self.oracle.is_solvable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
-                    itr += 1
-                    hitman.hit([hypo])  # Add unit-size MCS
-                    duals.append([hypo])  # Add unit-size MCS to duals
+                remaining = inp[:i] + inp[(i + 1) :]
+                if session.is_solvable_with(remaining):
+                    preempt_hit += 1
+                    session.hit([hypo])  # Add unit-size MCS
+
+            session.itr = preempt_hit
 
             # main loop
             while True:
-                hset = hitman.get()  # Get candidate MUS
-                itr += 1
-
-                # logger.info("itr: %s", itr)
-                logger.info("itr %s) cand: %s", itr, hset)
-
+                preempt_hit += 1
+                hset = session.get()  # Get candidate MUS
                 if hset == None:  # Terminates when there is no more candidate MUS
                     break
 
-                res = self.oracle.solve(pred_class, inp=hset)
+                res = session.solve(inp=hset)
                 model = res["model"]
-                is_satisfiable = res["solvable"]
+                solvable = res["solvable"]
 
-                logger.debug("Model: %s", model)
-                # test_sat, _ = self.is_satisfiable(inp=model)
-                # assert test_sat, "Assertion Error: " + ",".join(map(str, model))
-                if is_satisfiable:
+                if solvable:
                     logger.debug("IS satisfied %s", hset)
                     to_hit = []
-                    satisfied, unsatisfied = [], []
+                    unsatisfied = []
 
                     removed = list(
                         set(inp).difference(set(hset))
                     )  # CXP lies within removed features
 
-                    # model = self.oracle.get_model()
                     for h in removed:
                         if (
                             model[abs(h) - 1] != h
@@ -142,8 +151,8 @@ class Explainer:
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        if self.oracle.is_solvable(
-                            pred_class, inp=hset + [h]
+                        if session.is_solvable_with(
+                            inp=hset + [h]
                         ):  # Keep adding while satisfiable
                             hset.append(h)
                         else:
@@ -152,9 +161,7 @@ class Explainer:
 
                     logger.info("To hit: %s", to_hit)
 
-                    hitman.hit(to_hit)  # the entirity of to_hit is a MCS
-
-                    duals.append(to_hit)
+                    session.hit(to_hit)  # the entirity of to_hit is a MCS
                 else:
                     logger.debug("Is NOT satisfied %s", hset)
                     # print("expl:", hset)
@@ -162,11 +169,16 @@ class Explainer:
                     expls.append(hset)  # Minimum Unsatisfiable Subset found - AXP found
 
                     if len(expls) != xnum:
-                        hitman.block(hset)
+                        session.block(hset)
                     else:
                         break
-        assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
-            map(str, [itr, len(expls), len(duals)])
+            expls = session.expls
+            duals = session.duals
+            assert preempt_hit == session.itr
+        assert preempt_hit == (
+            len(expls) + len(duals) + 1
+        ), "Assertion Error: " + ",".join(
+            map(str, [preempt_hit, len(expls), len(duals)])
         )
         return expls, duals
 
