@@ -1,68 +1,16 @@
 import logging
-from contextlib import contextmanager
 
 from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
-from lgn.util import feat_to_input, input_to_feat, Stat
+from lgn.util import input_to_feat, Stat
+from lgn.util import Inp, Partial_Inp, Htype
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
+from .session import Session
 
 logger = logging.getLogger(__name__)
-
-from typing import List
-
-Inp = List[int]
-Partial_Inp = List[int]
-Htype = str  # "sorted" or "lbx"
-
-
-class Session:
-    def __init__(self, instance: Instance, hitman: Hitman, oracle: MulticlassSolver):
-        self.instance = instance
-        self.hitman = hitman
-        self.duals = []
-        self.expls = []
-        self.oracle = oracle
-        self.pred_class = instance.get_predicted_class()
-        self.itr = 0
-        pass
-
-    def is_solvable_with(self, inp: Partial_Inp):
-        return self.oracle.is_solvable(pred_class=self.pred_class, inp=inp)
-
-    def solve(self, inp: Partial_Inp):
-        return self.oracle.solve(
-            pred_class=self.pred_class,
-            inp=inp,
-        )
-
-    def hit(self, hypo: Partial_Inp):
-        self.hitman.hit(hypo)
-        self.duals.append(hypo)
-
-    def block(self, hypo: Partial_Inp):
-        self.hitman.block(hypo)
-        self.expls.append(hypo)
-        pass
-
-    def get(self):
-        self.itr += 1
-        hset = self.hitman.get()
-        logger.info("itr %s) cand: %s", self.itr, hset)
-        return hset
-
-    @contextmanager
-    def use_context(instance: Instance, htype: Htype = "lbx", oracle=None):
-        try:
-            hitman = Hitman(
-                bootstrap_with=[instance.get_input()],
-                htype=htype,
-            )
-            yield Session(instance, hitman=hitman, oracle=oracle)
-        finally:
-            hitman.delete()  # Cleanup
 
 
 class Explainer:
@@ -88,38 +36,38 @@ class Explainer:
         return axp
 
     def mhs_mus_enumeration(self, instance, xnum=1000, smallest=False):
+        logger.info("Starting mhs_mus_enumeration")
+        logger.info("Input: %s", instance.get_input())
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
-        logger.info("Starting mhs_mus_enumeration")
-        logger.info("Input: %s", instance.get_input())
 
-        inp = instance.get_input()
-        pred_class = instance.get_predicted_class()
+        session: Session
 
-        expls = []
-        duals = []
-        htype = "sorted" if smallest else "lbx"
+        def enumerate_unit_mcs(session: Session, inp: list):  # Get unit-size MCSes
+            preempt_hit = 0
+            for i, hypo in enumerate(inp):
+
+                remaining = inp[:i] + inp[(i + 1) :]
+                if session.is_solvable_with(remaining):
+                    session.hit([hypo])  # Found unit-size MCS
+                    preempt_hit += 1
+
+            return preempt_hit
 
         with Session.use_context(
             instance=instance,
-            htype=htype,
+            hit_type="sorted" if smallest else "lbx",
             oracle=self.oracle,
         ) as session:
+            inp = instance.get_input()
 
-            # computing unit-size MCSes
-            preempt_hit = 0
-            for i, hypo in enumerate(inp):
-                remaining = inp[:i] + inp[(i + 1) :]
-                if session.is_solvable_with(remaining):
-                    preempt_hit += 1
-                    session.hit([hypo])  # Add unit-size MCS
-
-            session.itr = preempt_hit
+            # Try unit-MCSes
+            preempt_hit = enumerate_unit_mcs(session, inp)
+            session.add_to_itr(preempt_hit)
 
             # main loop
             while True:
-                preempt_hit += 1
                 hset = session.get()  # Get candidate MUS
                 if hset == None:  # Terminates when there is no more candidate MUS
                     break
@@ -128,14 +76,18 @@ class Explainer:
                 model = res["model"]
                 solvable = res["solvable"]
 
-                if solvable:
+                if not solvable:
+                    logger.debug("Is NOT satisfied %s", hset)
+
+                    session.block(hset)
+                    if session.get_expls_count() > xnum:
+                        break
+                else:
                     logger.debug("IS satisfied %s", hset)
-                    to_hit = []
                     unsatisfied = []
 
-                    removed = list(
-                        set(inp).difference(set(hset))
-                    )  # CXP lies within removed features
+                    # CXP lies within removed features
+                    removed = set(inp).difference(set(hset))
 
                     for h in removed:
                         if (
@@ -149,6 +101,7 @@ class Explainer:
                     logger.debug("Unsatisfied: %s", unsatisfied)
                     logger.debug("Hset: %s", hset)
 
+                    to_hit = []
                     # computing an MCS (expensive)
                     for h in unsatisfied:
                         if session.is_solvable_with(
@@ -162,24 +115,15 @@ class Explainer:
                     logger.info("To hit: %s", to_hit)
 
                     session.hit(to_hit)  # the entirity of to_hit is a MCS
-                else:
-                    logger.debug("Is NOT satisfied %s", hset)
-                    # print("expl:", hset)
 
-                    expls.append(hset)  # Minimum Unsatisfiable Subset found - AXP found
+        expls = session.get_expls()
+        duals = session.get_duals()
+        itr = session.get_itr()
 
-                    if len(expls) != xnum:
-                        session.block(hset)
-                    else:
-                        break
-            expls = session.expls
-            duals = session.duals
-            assert preempt_hit == session.itr
-        assert preempt_hit == (
-            len(expls) + len(duals) + 1
-        ), "Assertion Error: " + ",".join(
-            map(str, [preempt_hit, len(expls), len(duals)])
-        )
+        assert itr == (
+            len(session.expls) + len(session.duals) + 1
+        ), "Assertion Error: " + ",".join(map(str, [itr, len(expls), len(duals)]))
+
         return expls, duals
 
     def mhs_mcs_enumeration(
