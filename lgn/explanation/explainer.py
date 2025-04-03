@@ -125,75 +125,61 @@ class Explainer:
         reduce_="none",
         unit_mcs=False,
     ):
-        """
-        Enumerate subset- and cardinality-minimal contrastive explanations.
-        """
         expls = []  # result
         duals = []  # just in case, let's save dual (abductive) explanations
-        inp = instance.get_input()
 
-        class_label = self.encoding.as_model()(input_to_feat(inp).reshape(1, -1)).item()
-        pred_class = class_label + 1
+        inp = instance.get_input_as_set()
 
-        with Hitman(
-            bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
-        ) as hitman:
+        session: Session
+        with Session.use_context(
+            instance=instance,
+            hit_type="sorted" if smallest else "lbx",
+            oracle=self.oracle,
+        ) as session:
+
             itr = 0
-            logger.debug("Starting mhs_mcs_enumeration")
             # computing unit-size MUSes
-            for i, hypo in enumerate(inp):
-                if not self.oracle.is_solvable(pred_class=pred_class, inp=[hypo]):
+            for hypo in inp:
+                if not session.is_solvable_with(inp={hypo}):
                     itr += 1
-                    hitman.hit([hypo])
-                    duals.append([hypo])
-                elif unit_mcs and self.oracle.is_solvable(
-                    pred_class=pred_class, inp=inp[:i] + inp[(i + 1) :]
-                ):
+                    session.hit({hypo})
+                elif unit_mcs and session.is_solvable_with(inp=inp - {hypo}):
                     itr += 1
-                    # this is a unit-size MCS => block immediately
-                    hitman.block([hypo])
-                    expls.append([hypo])
+                    session.block({hypo})
+            session.add_to_itr(itr)
 
             # main loop
             while True:
-                hset = hitman.get()
-                itr += 1
-
-                # logger.info("itr: %s", itr)
-                # logger.debug("itr: %s", itr)
-                logger.debug("itr %s) cand: %s", itr, hset)
-
+                hset = session.get()
                 if hset == None:
                     break
 
-                res = self.oracle.solve(
-                    pred_class=pred_class,
-                    inp=sorted(set(inp).difference(set(hset))),
-                )
+                res = session.solve(inp=inp - hset)
                 solvable, core = res["solvable"], res["core"]
                 if not solvable:
                     to_hit = core  # Core is a weak (non-minimal) AXP?
 
-                    if len(to_hit) > 1:
-                        to_hit = self.get_one_axp(inp=to_hit, predicted_cls=pred_class)
-                        # to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
+                    if len(list(to_hit)) > 1:
+                        to_hit = self.get_one_axp(
+                            inp=list(to_hit),
+                            predicted_cls=instance.get_predicted_class(),
+                        )
+                        to_hit = set(to_hit)
 
-                    logger.debug("to_hit: %s", to_hit)
-
-                    duals.append(to_hit)
-                    hitman.hit(to_hit)  # Hit AXP
+                    session.hit(to_hit)
                 else:
-                    logger.debug("expl: %s", hset)
-                    expls.append(hset)
+                    session.block(hset)
 
-                    if len(expls) != xnum:
-                        hitman.block(hset)  # Block CXP
-                    else:
+                    if session.get_expls_count() >= xnum:
                         break
-        assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
-            map(str, [itr, len(expls), len(duals)])
-        )
-        return expls, duals
+
+            itr = session.get_itr()
+            expls = session.get_expls()
+            duals = session.get_duals()
+            assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
+                map(str, [itr, len(expls), len(duals)])
+            )
+            return expls, duals
 
     # PRIVATE
 

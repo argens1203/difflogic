@@ -33,6 +33,9 @@ class Session:
         )
         if res["model"] is not None:
             res["model"] = set(res["model"])
+
+        if res["core"] is not None:
+            res["core"] = set(res["core"])
         return res
 
     def hit(self, hypo: Partial_Inp_Set):
