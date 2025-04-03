@@ -84,19 +84,21 @@ class Explainer:
                         break
                 else:
                     logger.debug("IS satisfied %s", hset)
-                    unsatisfied = []
 
+                    unsatisfied = []
                     # CXP lies within removed features
                     removed = set(inp).difference(set(hset))
-
                     for h in removed:
-                        if (
-                            model[abs(h) - 1] != h
-                        ):  # If a feature(hypothesis) of the input is different from that of the "solution"(model)
-                            unsatisfied.append(h)  # Add it to unsatisfied
+                        # If a feature(hypothesis) of the input is different from that of the "solution"(model)
+                        if model[abs(h) - 1] != h:
+                            # Add it to unsatisfied
+                            unsatisfied.append(h)
                         else:
-                            hset.append(h)  # Else append it to hset
-                            # How can we be sure adding h to hset keeps hset satisfiable?
+                            # Else append it to hset
+                            hset.append(h)
+
+                    # unsatisfied = sorted(unsatisfied)
+                    # hset = sorted(hset)
 
                     logger.debug("Unsatisfied: %s", unsatisfied)
                     logger.debug("Hset: %s", hset)

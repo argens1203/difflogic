@@ -114,6 +114,18 @@ if __name__ == "__main__":
         )
         file_handler.setFormatter(file_format)
 
+        # TEMP
+        if os.path.exists("main.log.i"):
+            os.remove("main.log.i")
+        info_handler = logging.FileHandler("main.log.i")
+        file_format = logging.Formatter(
+            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            "%(message)s"
+        )
+        info_handler.setFormatter(file_format)
+        info_handler.setLevel(logging.INFO)
+        # TEMP
+
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
 
@@ -122,8 +134,11 @@ if __name__ == "__main__":
 
         logger.addHandler(console_handler)
         logger.addHandler(file_handler)
+        # TEMP
+        logger.addHandler(info_handler)
+        # TEMP
 
-    logging.disable(logging.DEBUG)
+    # logging.disable(logging.DEBUG)
 
     results = get_results(args.experiment_id, args)
     # seed_all(args.seed)
