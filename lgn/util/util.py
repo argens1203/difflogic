@@ -49,3 +49,14 @@ def get_truth_table_loader(input_dim, batch_size=10):
         l = [get_one(i) for i in range(count, min(count + batch_size, 2**input_dim))]
         count += batch_size
         yield torch.tensor(l), None
+
+
+def remove_none(lst):
+    ret = []
+    indices = []
+    for idx, l in enumerate(lst):
+        if l is not None:
+            ret.append(l)
+        else:
+            indices.append(idx)
+    return ret, indices

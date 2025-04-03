@@ -1,12 +1,11 @@
 import logging
 
-from pysat.card import CardEnc, EncType
 from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
-from lgn.util import feat_to_input, input_to_feat
+from lgn.util import feat_to_input, input_to_feat, Stat
 
-from .solver import Solver
+from .multiclass_solver import MulticlassSolver
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +13,7 @@ logger = logging.getLogger(__name__)
 class Explainer:
     def __init__(self, encoding: Encoding):
         self.encoding = encoding
-
-        self.encoding = encoding
-        self.votes_per_cls = self.encoding.get_votes_per_cls()
-        self.solvers = dict()
+        self.oracle = MulticlassSolver(encoding=encoding)
 
     def explain(self, feat=None, inp=None):
         if inp is None:
@@ -33,144 +29,12 @@ class Explainer:
 
         logger.debug("Predicted Class - %s", pred_class)
 
-        is_uniquely_satisfied, _, __ = self.is_uniquely_satisfied_by(inp, pred_class)
-        assert is_uniquely_satisfied, "Assertion Error: " + ",".join(map(str, inp))
+        assert not self.oracle.is_solvable(
+            pred_class=pred_class, inp=inp
+        ), "Assertion Error: " + ",".join(map(str, inp))
 
         axp = self.get_one_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
-
-    def get_one_axp(self, inp, predicted_cls):
-        """
-        Get one AXP for the input and predicted class
-
-        :param inp: input features
-        :param predicted_cls: predicted class
-
-        :return: AXP
-        """
-        tmp_input = inp.copy()
-        for feature in inp:
-            logger.debug("Testing removal of input %d", feature)
-            tmp_input.remove(feature)
-            is_uniquely_satisfied, _, __ = self.is_uniquely_satisfied_by(
-                inp=tmp_input, predicted_cls=predicted_cls
-            )
-            if is_uniquely_satisfied:
-                continue
-            else:
-                tmp_input.append(feature)
-        return tmp_input
-
-    def is_uniquely_satisfied_by(
-        self,
-        inp,
-        predicted_cls,  # true_class as in not true class of data, but that predicted by model
-    ):  # Return true means that only the true_class can satisfy all contraints given the input
-        """
-        Check if the input is uniquely satisfied by the predicted class
-
-        :param inp: input features
-        :param predicted_cls: predicted class
-
-        :return: True if the input is uniquely satisfied by the predicted class
-        """
-        cores = []
-        for cls in self.encoding.get_classes():
-            if cls == predicted_cls:
-                continue
-            is_satisfiable, model, core = self.is_adj_class_satisfiable(
-                true_class=predicted_cls, adj_class=cls, inp=inp
-            )
-            if is_satisfiable:
-                logger.debug("Satisfied by %d", cls)
-                return False, model, None
-            else:
-                cores.append(core)
-        # print(cores)
-        # input()
-        combined_core = set()
-        for core in cores:
-            combined_core = combined_core.union(set(core))
-        # print(combined_core)
-        # input()
-        return True, None, list(combined_core)
-
-    def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
-        solver = self.get_solver(true_class, adj_class)
-        is_satisfiable = solver.solve(assumptions=inp)
-
-        logger.debug(
-            "Adj class %d having more votes than %d is %spossible with input %s",
-            adj_class,
-            true_class,
-            "" if is_satisfiable else "NOT ",
-            str(inp),
-        )
-        return is_satisfiable, solver.get_model(), solver.get_core()
-
-    def remove_none(self, lst):
-        ret = []
-        indices = []
-        for idx, l in enumerate(lst):
-            if l is not None:
-                ret.append(l)
-            else:
-                indices.append(idx)
-        return ret, indices
-
-    def get_lits_and_bound(self, true_class, adj_class):
-        pos, pos_none_idxs = self.remove_none(self.encoding.get_output_ids(adj_class))
-        neg, neg_none_idxs = self.remove_none(self.encoding.get_output_ids(true_class))
-        neg = [-a for a in neg]
-        lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
-
-        logger.debug(
-            "Lit(%d %s %d): %s",
-            adj_class,
-            ">" if true_class < adj_class else ">=",
-            true_class,
-            str(lits),
-        )
-
-        bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
-
-        for idx in pos_none_idxs:
-            if self.encoding.get_truth_value(idx) is True:
-                bound -= 1  # One vote less for each defenite True in the output of the adj class
-        for idx in neg_none_idxs:
-            if self.encoding.get_truth_value(idx) is False:
-                bound -= 1  # One vote more is needed for each defenite True in the output of the true class
-
-        logger.debug("Bound: %d", bound)
-        return lits, bound
-
-    def get_solver(self, true_class, adj_class):
-        if (true_class, adj_class) in self.solvers:
-            Stat.inc_cache_hit(Cached.SOLVER)
-            return self.solvers[(true_class, adj_class)]
-
-        Stat.inc_cache_miss(Cached.SOLVER)
-
-        lits, bound = self.get_lits_and_bound(true_class, adj_class)
-
-        solver = Solver(encoding=self.encoding)
-
-        solver.set_cardinality(lits, bound)
-
-        self.solvers[(true_class, adj_class)] = solver
-
-        return solver
-
-    def is_satisfiable(self, pred_class, inp):
-        is_satisfiable, _, __ = self.is_satisfiable_with_model_or_core(pred_class, inp)
-        return is_satisfiable
-
-    def is_satisfiable_with_model_or_core(self, pred_class, inp):
-        logger.debug("Checking satisfiability of %s", str(inp))
-        is_uniquely_satsified, model, core = self.is_uniquely_satisfied_by(
-            inp, pred_class
-        )
-        return not is_uniquely_satsified, model, core
 
     def mhs_mus_enumeration(self, inp=None, feat=None, xnum=1000, smallest=False):
         """
@@ -197,7 +61,7 @@ class Explainer:
             itr = 0
             # computing unit-size MCSes
             for i, hypo in enumerate(inp):
-                if self.is_satisfiable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
+                if self.oracle.is_solvable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
                     itr += 1
                     hitman.hit([hypo])  # Add unit-size MCS
                     duals.append([hypo])  # Add unit-size MCS to duals
@@ -213,9 +77,10 @@ class Explainer:
                 if hset == None:  # Terminates when there is no more candidate MUS
                     break
 
-                is_satisfiable, model, _ = self.is_satisfiable_with_model_or_core(
-                    pred_class, inp=hset
-                )
+                res = self.oracle.solve(pred_class, inp=hset)
+                model = res["model"]
+                is_satisfiable = res["solvable"]
+
                 logger.debug("Model: %s", model)
                 # test_sat, _ = self.is_satisfiable(inp=model)
                 # assert test_sat, "Assertion Error: " + ",".join(map(str, model))
@@ -243,7 +108,7 @@ class Explainer:
 
                     # computing an MCS (expensive)
                     for h in unsatisfied:
-                        if self.is_satisfiable(
+                        if self.oracle.is_solvable(
                             pred_class, inp=hset + [h]
                         ):  # Keep adding while satisfiable
                             hset.append(h)
@@ -271,13 +136,6 @@ class Explainer:
         )
         return expls, duals
 
-    def __del__(self):
-        for _, solver in self.solvers.items():
-            solver.delete()
-        logger.debug("Deleted all solvers")
-        logger.debug("Cache Hit: %s", str(Stat.cache_hit))
-        logger.debug("Cache Miss: %s", str(Stat.cache_miss))
-
     def mhs_mcs_enumeration(
         self,
         xnum=1000,
@@ -292,7 +150,6 @@ class Explainer:
         """
         expls = []  # result
         duals = []  # just in case, let's save dual (abductive) explanations
-        possibility = 0
         if inp is None:
             inp = feat_to_input(feat)
 
@@ -306,11 +163,11 @@ class Explainer:
             logger.info("Starting mhs_mcs_enumeration")
             # computing unit-size MUSes
             for i, hypo in enumerate(inp):
-                if not self.is_satisfiable(pred_class=pred_class, inp=[hypo]):
+                if not self.oracle.is_solvable(pred_class=pred_class, inp=[hypo]):
                     itr += 1
                     hitman.hit([hypo])
                     duals.append([hypo])
-                elif unit_mcs and self.is_satisfiable(
+                elif unit_mcs and self.oracle.is_solvable(
                     pred_class=pred_class, inp=inp[:i] + inp[(i + 1) :]
                 ):
                     itr += 1
@@ -330,15 +187,13 @@ class Explainer:
                 if hset == None:
                     break
 
-                is_satisfiable, model, core = self.is_satisfiable_with_model_or_core(
+                res = self.oracle.solve(
                     pred_class=pred_class,
                     inp=sorted(set(inp).difference(set(hset))),
                 )
-                if not is_satisfiable:
+                solvable, core = res["solvable"], res["core"]
+                if not solvable:
                     to_hit = core  # Core is a weak (non-minimal) AXP?
-
-                    if len(to_hit) > 1:
-                        possibility += 1
 
                     if len(to_hit) > 1:
                         to_hit = self.get_one_axp(inp=to_hit, predicted_cls=pred_class)
@@ -356,23 +211,33 @@ class Explainer:
                         hitman.block(hset)  # Block CXP
                     else:
                         break
-        logger.debug("Chances of further enhancements: %d", possibility)
         assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
             map(str, [itr, len(expls), len(duals)])
         )
         return expls, duals
 
+    def get_one_axp(self, inp, predicted_cls):
+        """
+        Get one AXP for the input and predicted class
 
-class Cached:
-    SOLVER = "solver"
+        :param inp: input features
+        :param predicted_cls: predicted class
 
+        :return: AXP
+        """
+        tmp_input = inp.copy()
+        for feature in inp:
+            logger.debug("Testing removal of input %d", feature)
+            tmp_input.remove(feature)
+            is_uniquely_satisfied, _, __ = self.oracle.is_uniquely_satisfied_by(
+                inp=tmp_input, predicted_cls=predicted_cls
+            )
+            if is_uniquely_satisfied:
+                continue
+            else:
+                tmp_input.append(feature)
+        return tmp_input
 
-class Stat:
-    cache_hit = {Cached.SOLVER: 0}
-    cache_miss = {Cached.SOLVER: 0}
-
-    def inc_cache_hit(flag: str):
-        Stat.cache_hit[flag] += 1
-
-    def inc_cache_miss(flag: str):
-        Stat.cache_miss[flag] += 1
+    def __del__(self):
+        logger.debug("Cache Hit: %s", str(Stat.cache_hit))
+        logger.debug("Cache Miss: %s", str(Stat.cache_miss))
