@@ -192,10 +192,13 @@ class Explainer:
         with Hitman(
             bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
+            logger.info("Starting mhs_mus_enumeration")
+            logger.info("Input: %s", inp)
             itr = 0
             # computing unit-size MCSes
             for i, hypo in enumerate(inp):
                 if self.is_satisfiable(pred_class, inp=inp[:i] + inp[(i + 1) :]):
+                    itr += 1
                     hitman.hit([hypo])  # Add unit-size MCS
                     duals.append([hypo])  # Add unit-size MCS to duals
 
@@ -263,6 +266,9 @@ class Explainer:
                         hitman.block(hset)
                     else:
                         break
+        assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
+            map(str, [itr, len(expls), len(duals)])
+        )
         return expls, duals
 
     def __del__(self):
@@ -273,7 +279,13 @@ class Explainer:
         logger.debug("Cache Miss: %s", str(Stat.cache_miss))
 
     def mhs_mcs_enumeration(
-        self, xnum, smallest=False, reduce_="none", unit_mcs=False, inp=None, feat=None
+        self,
+        xnum=1000,
+        smallest=False,
+        reduce_="none",
+        unit_mcs=False,
+        inp=None,
+        feat=None,
     ):
         """
         Enumerate subset- and cardinality-minimal contrastive explanations.
@@ -290,20 +302,23 @@ class Explainer:
         with Hitman(
             bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
+            itr = 0
+            logger.info("Starting mhs_mcs_enumeration")
             # computing unit-size MUSes
             for i, hypo in enumerate(inp):
                 if not self.is_satisfiable(pred_class=pred_class, inp=[hypo]):
+                    itr += 1
                     hitman.hit([hypo])
                     duals.append([hypo])
                 elif unit_mcs and self.is_satisfiable(
                     pred_class=pred_class, inp=inp[:i] + inp[(i + 1) :]
                 ):
+                    itr += 1
                     # this is a unit-size MCS => block immediately
                     hitman.block([hypo])
                     expls.append([hypo])
 
             # main loop
-            itr = 0
             while True:
                 hset = hitman.get()
                 itr += 1
@@ -342,6 +357,9 @@ class Explainer:
                     else:
                         break
         logger.debug("Chances of further enhancements: %d", possibility)
+        assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
+            map(str, [itr, len(expls), len(duals)])
+        )
         return expls, duals
 
 
