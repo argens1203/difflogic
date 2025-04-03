@@ -27,17 +27,20 @@ class Session:
         return self.oracle.is_solvable(pred_class=self.pred_class, inp=list(inp))
 
     def solve(self, inp: Partial_Inp_Set):
-        return self.oracle.solve(
+        res = self.oracle.solve(
             pred_class=self.pred_class,
             inp=list(inp),
         )
+        if res["model"] is not None:
+            res["model"] = set(res["model"])
+        return res
 
-    def hit(self, hypo: Partial_Inp):
-        self.hitman.hit(hypo)
+    def hit(self, hypo: Partial_Inp_Set):
+        self.hitman.hit(list(hypo))
         self.duals.append(hypo)
 
-    def block(self, hypo: Partial_Inp):
-        self.hitman.block(hypo)
+    def block(self, hypo: Partial_Inp_Set):
+        self.hitman.block(list(hypo))
         self.expls.append(hypo)
         pass
 
@@ -45,7 +48,11 @@ class Session:
         self.itr += 1
         hset = self.hitman.get()
         logger.debug("itr %s) cand: %s", self.itr, hset)
-        return hset
+
+        if hset is None:
+            return None
+
+        return set(hset)
 
     def add_to_itr(self, value: int):
         self.itr += value
@@ -54,10 +61,10 @@ class Session:
         return self.itr
 
     def get_duals(self):
-        return self.duals
+        return [list(dual) for dual in self.duals]
 
     def get_expls(self):
-        return self.expls
+        return [list(expl) for expl in self.expls]
 
     def get_expls_count(self):
         return len(self.expls)
@@ -68,7 +75,7 @@ class Session:
     ) -> Iterator["Session"]:
         try:
             hitman = Hitman(
-                bootstrap_with=[instance.get_input()],
+                bootstrap_with=[list(instance.get_input_as_set())],
                 htype=hit_type,
             )
             yield Session(instance, hitman=hitman, oracle=oracle)

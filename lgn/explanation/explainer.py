@@ -1,10 +1,11 @@
 import logging
+from typing import Set
 
 from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
 from lgn.util import input_to_feat, Stat
-from lgn.util import Inp, Partial_Inp, Htype
+from lgn.util import Inp, Partial_Inp, Htype, Partial_Inp_Set, Inp_Set
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
@@ -35,87 +36,86 @@ class Explainer:
         logger.info("One AXP: %s", axp)
         return axp
 
-    def mhs_mus_enumeration(self, instance, xnum=1000, smallest=False):
-        logger.debug("Starting mhs_mus_enumeration")
-        logger.debug("Input: %s", instance.get_input())
-        """
-        Enumerate subset- and cardinality-minimal explanations.
-        """
+    def _enumerate_unit_mcs(session: Session, inp: Inp_Set):
+        preempt_hit = 0
+        for hypo in inp:
+            if session.is_solvable_with(inp - {hypo}):
+                session.hit({hypo})  # MCS is registered here, stored in session.
+                preempt_hit += 1
 
+        return preempt_hit
+
+    def _extract_mcs(
+        session: Session, inp: Inp_Set, guess: Partial_Inp_Set, model: Inp_Set
+    ) -> Set[int]:
+        # CXP lies within unmatching features (between inp and guess)
+        uncertain_set = inp - guess - model
+        satsifiable_set = model & (inp)
+
+        # Test each hypo in uncertain_set
+
+        mcs = set()
+        for hypo in uncertain_set:
+            # Keep adding while satisfiable
+            if session.is_solvable_with(inp=satsifiable_set | {hypo}):
+                satsifiable_set.add(hypo)
+            else:
+                # Partial MCS found in a reversed manner
+                mcs.add(hypo)
+
+        logger.debug("To hit: %s", mcs)
+        # the entirity of to_hit is a MCS
+        return mcs
+
+    def mhs_mus_enumeration(self, instance: Instance, xnum=1000, smallest=False):
         session: Session
-
-        def enumerate_unit_mcs(session: Session, inp: list):  # Get unit-size MCSes
-            preempt_hit = 0
-            for i, hypo in enumerate(inp):
-
-                remaining = inp[:i] + inp[(i + 1) :]
-                if session.is_solvable_with(set(remaining)):
-                    session.hit([hypo])  # Found unit-size MCS
-                    preempt_hit += 1
-
-            return preempt_hit
+        inp = instance.get_input_as_set()
 
         with Session.use_context(
             instance=instance,
             hit_type="sorted" if smallest else "lbx",
             oracle=self.oracle,
         ) as session:
-            inp = instance.get_input()
 
             # Try unit-MCSes
-            preempt_hit = enumerate_unit_mcs(session, inp)
+            preempt_hit = Explainer._enumerate_unit_mcs(session, inp)
             session.add_to_itr(preempt_hit)
 
-            # main loop
+            # Main Loop
             while True:
-                hset = session.get()  # Get candidate MUS
-                if hset == None:  # Terminates when there is no more candidate MUS
+                # Get a guess
+                guess = session.get()
+                if guess == None:
                     break
 
-                res = session.solve(inp=set(hset))
-                model = res["model"]
-                solvable = res["solvable"]
+                # Try the guess
+                res = session.solve(inp=guess)
 
-                if not solvable:
-                    logger.debug("Is NOT satisfied %s", hset)
-
-                    session.block(hset)
+                # If guess is MUS, block it
+                if not res["solvable"]:
+                    session.block(guess)
                     if session.get_expls_count() > xnum:
                         break
-                else:
-                    logger.debug("IS satisfied %s", hset)
+                    else:
+                        continue
 
-                    # CXP lies within removed features
-                    unsatisfied = set(inp) - set(hset) - set(model)
-                    hset = set(model) & (set(inp))
+                # Else extract MCS from the guess
+                mcs = Explainer._extract_mcs(
+                    session, inp=inp, guess=guess, model=res["model"]
+                )
+                session.hit(mcs)
 
-                    logger.debug("Unsatisfied: %s", unsatisfied)
-                    logger.debug("Hset: %s", hset)
+            # Extact outputs
+            expls = session.get_expls()
+            duals = session.get_duals()
+            itr = session.get_itr()
 
-                    to_hit = []
-                    # computing an MCS (expensive)
-                    for h in unsatisfied:
-                        if session.is_solvable_with(
-                            inp=hset | {h}
-                        ):  # Keep adding while satisfiable
-                            hset.add(h)
-                        else:
-                            to_hit.append(h)
-                            # Partial MCS found in a reversed manner
+            # Check itration count
+            assert itr == (
+                len(session.expls) + len(session.duals) + 1
+            ), "Assertion Error: " + ",".join(map(str, [itr, len(expls), len(duals)]))
 
-                    logger.debug("To hit: %s", to_hit)
-
-                    session.hit(to_hit)  # the entirity of to_hit is a MCS
-
-        expls = session.get_expls()
-        duals = session.get_duals()
-        itr = session.get_itr()
-
-        assert itr == (
-            len(session.expls) + len(session.duals) + 1
-        ), "Assertion Error: " + ",".join(map(str, [itr, len(expls), len(duals)]))
-
-        return expls, duals
+            return expls, duals
 
     def mhs_mcs_enumeration(
         self,

@@ -11,6 +11,9 @@ class Instance:
     def get_input(self):
         return self.inp
 
+    def get_input_as_set(self):
+        return set(self.inp)
+
     def get_predicted_class(self):
         return self.predicted_class
 
