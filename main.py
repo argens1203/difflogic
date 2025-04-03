@@ -252,6 +252,8 @@ if __name__ == "__main__":
             assert axp_dual_set.difference(cxp_set) == set()
             assert cxp_set.difference(axp_dual_set) == set()
 
+            return len(axps) + len(axp_dual)
+
         if args.explain is not None:
             inp = args.explain.split(",")
             inp = [int(i) for i in inp]
@@ -275,10 +277,12 @@ if __name__ == "__main__":
                 explain_both_and_assert(instance)
                 break
         else:
+            test_count = 0
             for batch, label in test_loader:
                 for feat in batch:
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explain_both_and_assert(instance)
+                    test_count += explain_both_and_assert(instance)
+            print("Test Count: ", test_count)
 
 
 # First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
