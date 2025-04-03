@@ -5,7 +5,7 @@ from pysat.examples.hitman import Hitman
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
-from lgn.util import Inp, Partial_Inp, Htype
+from lgn.util import Inp, Partial_Inp, Htype, Partial_Inp_Set
 
 logger = logging.getLogger(__name__)
 

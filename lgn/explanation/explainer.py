@@ -87,19 +87,8 @@ class Explainer:
 
                     unsatisfied = []
                     # CXP lies within removed features
-                    # removed = set(inp).difference(set(hset))
                     unsatisfied = list(set(inp) - set(hset) - set(model))
-                    hset = list(set(model).intersection(set(inp)))
-                    # for h in removed:
-                    #     # If a feature(hypothesis) of the input is different from that of the "solution"(model)
-                    #     if model[abs(h) - 1] != h:
-                    #         # Add it to unsatisfied
-                    #         unsatisfied.append(h)
-                    #     else:
-                    #         # Else append it to hset
-                    #         hset.append(h)
-                    unsatisfied = sorted(unsatisfied)
-                    hset = sorted(hset)
+                    hset = list(set(model) & (set(inp)))
 
                     logger.debug("Unsatisfied: %s", unsatisfied)
                     logger.debug("Hset: %s", hset)
