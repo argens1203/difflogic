@@ -23,13 +23,13 @@ class Session:
         self.itr = 0
         pass
 
-    def is_solvable_with(self, inp: Partial_Inp):
-        return self.oracle.is_solvable(pred_class=self.pred_class, inp=inp)
+    def is_solvable_with(self, inp: Partial_Inp_Set):
+        return self.oracle.is_solvable(pred_class=self.pred_class, inp=list(inp))
 
-    def solve(self, inp: Partial_Inp):
+    def solve(self, inp: Partial_Inp_Set):
         return self.oracle.solve(
             pred_class=self.pred_class,
-            inp=inp,
+            inp=list(inp),
         )
 
     def hit(self, hypo: Partial_Inp):

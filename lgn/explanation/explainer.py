@@ -49,7 +49,7 @@ class Explainer:
             for i, hypo in enumerate(inp):
 
                 remaining = inp[:i] + inp[(i + 1) :]
-                if session.is_solvable_with(remaining):
+                if session.is_solvable_with(set(remaining)):
                     session.hit([hypo])  # Found unit-size MCS
                     preempt_hit += 1
 
@@ -72,7 +72,7 @@ class Explainer:
                 if hset == None:  # Terminates when there is no more candidate MUS
                     break
 
-                res = session.solve(inp=hset)
+                res = session.solve(inp=set(hset))
                 model = res["model"]
                 solvable = res["solvable"]
 
@@ -85,10 +85,9 @@ class Explainer:
                 else:
                     logger.debug("IS satisfied %s", hset)
 
-                    unsatisfied = []
                     # CXP lies within removed features
-                    unsatisfied = list(set(inp) - set(hset) - set(model))
-                    hset = list(set(model) & (set(inp)))
+                    unsatisfied = set(inp) - set(hset) - set(model)
+                    hset = set(model) & (set(inp))
 
                     logger.debug("Unsatisfied: %s", unsatisfied)
                     logger.debug("Hset: %s", hset)
@@ -97,9 +96,9 @@ class Explainer:
                     # computing an MCS (expensive)
                     for h in unsatisfied:
                         if session.is_solvable_with(
-                            inp=hset + [h]
+                            inp=hset | {h}
                         ):  # Keep adding while satisfiable
-                            hset.append(h)
+                            hset.add(h)
                         else:
                             to_hit.append(h)
                             # Partial MCS found in a reversed manner
