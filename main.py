@@ -194,17 +194,44 @@ if __name__ == "__main__":
 
         explainer = Explainer(encoding)
 
+        from operator import itemgetter
+
         def explain_both_and_assert(instance):
             explainer.explain(instance)
 
             axps, axp_dual = explainer.mhs_mus_enumeration(instance)
             cxps, cxp_dual = explainer.mhs_mcs_enumeration(instance)
 
-            logger.info("AXPs: %s", str(axps))
-            logger.info("Duals: %s", str(axp_dual))
-            logger.info("CXPs: %s", str(cxps))
-            logger.info("Duals: %s", str(cxp_dual))
-
+            logger.info(
+                "AXPs: %s",
+                str(
+                    [sorted(one) for one in sorted(axps, key=lambda x: (len(x), x[0]))]
+                ),
+            )
+            logger.info(
+                "Duals: %s",
+                str(
+                    [
+                        sorted(one)
+                        for one in sorted(axp_dual, key=lambda x: (len(x), x[0]))
+                    ]
+                ),
+            )
+            logger.info(
+                "CXPs: %s",
+                str(
+                    [sorted(one) for one in sorted(cxps, key=lambda x: (len(x), x[0]))]
+                ),
+            )
+            logger.info(
+                "Duals: %s",
+                str(
+                    [
+                        sorted(one)
+                        for one in sorted(cxp_dual, key=lambda x: (len(x), x[0]))
+                    ]
+                ),
+            )
             axp_set = set()
             for axp in axps:
                 axp_set.add(frozenset(axp))

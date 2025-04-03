@@ -44,7 +44,7 @@ class Session:
     def get(self):
         self.itr += 1
         hset = self.hitman.get()
-        logger.info("itr %s) cand: %s", self.itr, hset)
+        logger.debug("itr %s) cand: %s", self.itr, hset)
         return hset
 
     def add_to_itr(self, value: int):

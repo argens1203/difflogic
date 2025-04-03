@@ -36,8 +36,8 @@ class Explainer:
         return axp
 
     def mhs_mus_enumeration(self, instance, xnum=1000, smallest=False):
-        logger.info("Starting mhs_mus_enumeration")
-        logger.info("Input: %s", instance.get_input())
+        logger.debug("Starting mhs_mus_enumeration")
+        logger.debug("Input: %s", instance.get_input())
         """
         Enumerate subset- and cardinality-minimal explanations.
         """
@@ -104,7 +104,7 @@ class Explainer:
                             to_hit.append(h)
                             # Partial MCS found in a reversed manner
 
-                    logger.info("To hit: %s", to_hit)
+                    logger.debug("To hit: %s", to_hit)
 
                     session.hit(to_hit)  # the entirity of to_hit is a MCS
 
@@ -140,7 +140,7 @@ class Explainer:
             bootstrap_with=[inp], htype="sorted" if smallest else "lbx"
         ) as hitman:
             itr = 0
-            logger.info("Starting mhs_mcs_enumeration")
+            logger.debug("Starting mhs_mcs_enumeration")
             # computing unit-size MUSes
             for i, hypo in enumerate(inp):
                 if not self.oracle.is_solvable(pred_class=pred_class, inp=[hypo]):
@@ -162,7 +162,7 @@ class Explainer:
 
                 # logger.info("itr: %s", itr)
                 # logger.debug("itr: %s", itr)
-                logger.info("itr %s) cand: %s", itr, hset)
+                logger.debug("itr %s) cand: %s", itr, hset)
 
                 if hset == None:
                     break
@@ -179,7 +179,7 @@ class Explainer:
                         to_hit = self.get_one_axp(inp=to_hit, predicted_cls=pred_class)
                         # to_hit = self.extract_mus(reduce_=reduce_, start_from=to_hit)
 
-                    logger.info("to_hit: %s", to_hit)
+                    logger.debug("to_hit: %s", to_hit)
 
                     duals.append(to_hit)
                     hitman.hit(to_hit)  # Hit AXP
