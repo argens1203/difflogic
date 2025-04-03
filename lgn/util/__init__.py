@@ -1,2 +1,4 @@
 from .args import get_args
-from .util import get_results, get_truth_table_loader, feat_to_input, input_to_feat
+from .util import *
+from .stat import Stat, Cached
+from .types import *
