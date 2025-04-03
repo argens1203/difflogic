@@ -32,18 +32,18 @@ class Explainer:
             pred_class=pred_class, inp=inp
         ), "Assertion Error: " + ",".join(map(str, inp))
 
-        axp = self.get_one_axp(inp, pred_class)
+        axp = self.reduce_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
         return axp
 
     def _enumerate_unit_mcs(session: Session, inp: Inp_Set):
-        preempt_hit = 0
+        counter = 0
         for hypo in inp:
             if session.is_solvable_with(inp - {hypo}):
                 session.hit({hypo})  # MCS is registered here, stored in session.
-                preempt_hit += 1
+                counter += 1
 
-        return preempt_hit
+        return counter
 
     def _extract_mcs(
         session: Session, inp: Inp_Set, guess: Partial_Inp_Set, model: Inp_Set
@@ -117,65 +117,73 @@ class Explainer:
 
             return expls, duals
 
+    def _enumerate_unit_mus(session: Session, inp: Inp_Set):
+        itr = 0
+
+        for hypo in inp:
+            # Unit-size MUS
+            if not session.is_solvable_with(inp={hypo}):
+                session.hit({hypo})
+                itr += 1
+
+            # Unit-size MCS
+            if session.is_solvable_with(inp=inp - {hypo}):
+                session.block({hypo})
+                itr += 1
+
+        return itr
+
     def mhs_mcs_enumeration(
         self,
         instance: Instance,
         xnum=1000,
         smallest=False,
-        reduce_="none",
-        unit_mcs=False,
     ):
-        expls = []  # result
-        duals = []  # just in case, let's save dual (abductive) explanations
-
         inp = instance.get_input_as_set()
-
         session: Session
+
         with Session.use_context(
             instance=instance,
             hit_type="sorted" if smallest else "lbx",
             oracle=self.oracle,
         ) as session:
 
-            itr = 0
-            # computing unit-size MUSes
-            for hypo in inp:
-                if not session.is_solvable_with(inp={hypo}):
-                    itr += 1
-                    session.hit({hypo})
-                elif unit_mcs and session.is_solvable_with(inp=inp - {hypo}):
-                    itr += 1
-                    session.block({hypo})
-            session.add_to_itr(itr)
+            counter = Explainer._enumerate_unit_mus(session=session, inp=inp)
+            session.add_to_itr(counter)
 
-            # main loop
+            # Main Loop
             while True:
+                # Get a guess
                 hset = session.get()
                 if hset == None:
                     break
 
+                # Try the guess
                 res = session.solve(inp=inp - hset)
-                solvable, core = res["solvable"], res["core"]
-                if not solvable:
-                    to_hit = core  # Core is a weak (non-minimal) AXP?
 
-                    if len(list(to_hit)) > 1:
-                        to_hit = self.get_one_axp(
-                            inp=list(to_hit),
-                            predicted_cls=instance.get_predicted_class(),
-                        )
-                        to_hit = set(to_hit)
-
-                    session.hit(to_hit)
-                else:
+                # If guess is MCS, block it
+                if res["solvable"]:
                     session.block(hset)
-
                     if session.get_expls_count() >= xnum:
                         break
+                    else:
+                        continue
 
+                # Else extract MUS from the guess
+                to_hit = self.reduce_axp(
+                    inp=list(res["core"]),
+                    predicted_cls=instance.get_predicted_class(),
+                )
+                to_hit = set(to_hit)
+
+                session.hit(to_hit)
+
+            # Extract outputs
             itr = session.get_itr()
             expls = session.get_expls()
             duals = session.get_duals()
+
+            # Check iteration count
             assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
                 map(str, [itr, len(expls), len(duals)])
             )
@@ -183,7 +191,7 @@ class Explainer:
 
     # PRIVATE
 
-    def get_one_axp(self, inp, predicted_cls):
+    def reduce_axp(self, inp, predicted_cls):
         """
         Get one AXP for the input and predicted class
 
