@@ -24,6 +24,7 @@ def get_args():
             "mnist20x20",
             "cifar-10-3-thresholds",
             "cifar-10-31-thresholds",
+            "caltech101",
         ],
         required=True,
         help="the dataset to use",
@@ -124,6 +125,22 @@ def get_args():
     parser.add_argument(
         "--load_model", action="store_true", default=False, help="Load the model"
     )
+
+    parser.add_argument(
+        "--explain",
+        type=str,
+        default=None,
+        help="Explain the prediction for a given input",
+    )
+
+    parser.add_argument(
+        "--explain_all",
+        action="store_true",
+        default=False,
+        help="Explain all predictions (Default: Explain only on test set)",
+    )
+
+    parser.add_argument("--explain_one", action="store_true", default=False)
 
     args = parser.parse_args()
 

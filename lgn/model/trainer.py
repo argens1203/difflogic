@@ -24,7 +24,7 @@ def eval(model, loader, mode):
         model.train(mode=mode)
         res = np.mean(
             [
-                (model(x.to(device).round()).argmax(-1) == y.to(device))
+                (model(x.float().to(device).round()).argmax(-1) == y.float().to(device))
                 .to(torch.float32)
                 .mean()
                 .item()
@@ -44,10 +44,10 @@ def packbits_eval(model, loader):
                 (
                     model(
                         PackBitsTensor(
-                            x.to("cuda").reshape(x.shape[0], -1).round().bool()
+                            x.float().to("cuda").reshape(x.shape[0], -1).round().bool()
                         )
                     ).argmax(-1)
-                    == y.to("cuda")
+                    == y.float().to("cuda")
                 )
                 .to(torch.float32)
                 .mean()

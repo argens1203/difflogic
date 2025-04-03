@@ -1,0 +1,3505 @@
+Checking model with truth table
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Lit: [5, 5, -2, 10]
+Bound: 2
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [10, 23], [-2, 23], [-2, 10, 24], [5, 21], [5, 21], [5, 5, 22], [-19]]
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Lit: [-11, -13, -2, 10]
+Bound: 2
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [10, 23], [-2, 23], [-2, 10, 24], [-13, 21], [-11, 21], [-11, -13, 22], [-19]]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Lit: [5, 5, 11, 13]
+Bound: 2
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [13, 23], [11, 23], [11, 13, 24], [5, 21], [5, 21], [5, 5, 22], [-19]]
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Lit: [2, -10, 11, 13]
+Bound: 3
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [13, 23], [11, 23], [11, 13, 24], [-10, 21], [2, 21], [2, -10, 22], [-18]]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Lit: [-11, -13, -5, -5]
+Bound: 3
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [-5, 23], [-5, 23], [-5, -5, 24], [-13, 21], [-11, 21], [-11, -13, 22], [-18]]
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Lit: [2, -10, -5, -5]
+Bound: 3
+Clauses: [[-23, 17], [-24, 18], [-21, 17], [-22, 18], [-21, -23, 18], [-21, -24, 19], [-22, -23, 19], [-22, -24, 20], [-5, 23], [-5, 23], [-5, -5, 24], [-10, 21], [2, 21], [2, -10, 22], [-18]]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -1
+Adj class 1 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [1, -2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [1, -2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 3 is NOT possible with input [-2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -1
+Adj class 1 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, -7, 8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is possible with input [-2, 3, -4, -5, 6, -7, 8]
+Satisfied by 1
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, -7, 8, 1]
+Adj class 3 having more votes than 2 is possible with input [3, -4, -5, 6, -7, 8, 1]
+Satisfied by 3
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, -7, 8, 1, -2]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is possible with input [-5, 6, -7, 8, 1, -2]
+Satisfied by 1
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, -7, 8, 1, -2, -4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-7, 8, 1, -2, -4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [8, 1, -2, -4, -5]
+Testing removal of input 8
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, -4, -5]
+One AXP: [1, -2, -4, -5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-1, 2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -1
+Adj class 1 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, -5, 6, 7, -8]
+Class Label: 1
+Predicted Class - 2
+Adj class 1 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [1, -2, 3, -4, -5, 6, 7, -8]
+Testing removal of input 1
+Adj class 1 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-2, 3, -4, -5, 6, 7, -8]
+Testing removal of input -2
+Adj class 1 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [3, -4, -5, 6, 7, -8]
+Testing removal of input 3
+Adj class 1 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-4, -5, 6, 7, -8]
+Testing removal of input -4
+Adj class 1 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Adj class 3 having more votes than 2 is NOT possible with input [-5, 6, 7, -8]
+Testing removal of input -5
+Adj class 1 having more votes than 2 is possible with input [6, 7, -8]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 2 is NOT possible with input [7, -8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [7, -8, -5]
+Testing removal of input 7
+Adj class 1 having more votes than 2 is NOT possible with input [-8, -5]
+Adj class 3 having more votes than 2 is NOT possible with input [-8, -5]
+Testing removal of input -8
+Adj class 1 having more votes than 2 is possible with input [-5]
+Satisfied by 1
+One AXP: [-5, -8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [-1, 2, -3, 4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, -3, 4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, -3, 4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-3, 4, -5, 6, -7, 8]
+Testing removal of input -3
+Adj class 1 having more votes than 3 is NOT possible with input [4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, -3]
+Adj class 2 having more votes than 3 is possible with input [-5, 6, -7, 8, -3]
+Satisfied by 2
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, -3, 4]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, -3, 4, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is possible with input [8, -3, 4, -5]
+Satisfied by 1
+Testing removal of input 8
+Adj class 1 having more votes than 3 is possible with input [-3, 4, -5, -7]
+Satisfied by 1
+One AXP: [-3, 4, -5, -7, 8]
+
+
+Explaining Input: [-1, 2, 3, -4, -5, 6, -7, 8]
+Class Label: 2
+Predicted Class - 3
+Adj class 1 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [-1, 2, 3, -4, -5, 6, -7, 8]
+Testing removal of input -1
+Adj class 1 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is NOT possible with input [2, 3, -4, -5, 6, -7, 8]
+Testing removal of input 2
+Adj class 1 having more votes than 3 is NOT possible with input [3, -4, -5, 6, -7, 8]
+Adj class 2 having more votes than 3 is possible with input [3, -4, -5, 6, -7, 8]
+Satisfied by 2
+Testing removal of input 3
+Adj class 1 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-4, -5, 6, -7, 8, 2]
+Testing removal of input -4
+Adj class 1 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Adj class 2 having more votes than 3 is NOT possible with input [-5, 6, -7, 8, 2]
+Testing removal of input -5
+Adj class 1 having more votes than 3 is possible with input [6, -7, 8, 2]
+Satisfied by 1
+Testing removal of input 6
+Adj class 1 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Adj class 2 having more votes than 3 is NOT possible with input [-7, 8, 2, -5]
+Testing removal of input -7
+Adj class 1 having more votes than 3 is NOT possible with input [8, 2, -5]
+Adj class 2 having more votes than 3 is possible with input [8, 2, -5]
+Satisfied by 2
+Testing removal of input 8
+Adj class 1 having more votes than 3 is NOT possible with input [2, -5, -7]
+Adj class 2 having more votes than 3 is possible with input [2, -5, -7]
+Satisfied by 2
+One AXP: [2, -5, -7, 8]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, 3, -4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, 3, -4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, 3, -4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [3, -4, 5, -6, 7, -8]
+Testing removal of input 3
+Adj class 2 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-4, 5, -6, 7, -8]
+Testing removal of input -4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+
+
+Explaining Input: [1, -2, -3, 4, 5, -6, 7, -8]
+Class Label: 0
+Predicted Class - 1
+Adj class 2 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [1, -2, -3, 4, 5, -6, 7, -8]
+Testing removal of input 1
+Adj class 2 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-2, -3, 4, 5, -6, 7, -8]
+Testing removal of input -2
+Adj class 2 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [-3, 4, 5, -6, 7, -8]
+Testing removal of input -3
+Adj class 2 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [4, 5, -6, 7, -8]
+Testing removal of input 4
+Adj class 2 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Adj class 3 having more votes than 1 is NOT possible with input [5, -6, 7, -8]
+Testing removal of input 5
+Adj class 2 having more votes than 1 is possible with input [-6, 7, -8]
+Satisfied by 2
+Testing removal of input -6
+Adj class 2 having more votes than 1 is NOT possible with input [7, -8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [7, -8, 5]
+Testing removal of input 7
+Adj class 2 having more votes than 1 is NOT possible with input [-8, 5]
+Adj class 3 having more votes than 1 is NOT possible with input [-8, 5]
+Testing removal of input -8
+Adj class 2 having more votes than 1 is NOT possible with input [5]
+Adj class 3 having more votes than 1 is NOT possible with input [5]
+One AXP: [5]
+Deleted all solvers
+Cache Hit: {'solver': 1731}
+Cache Miss: {'solver': 6}

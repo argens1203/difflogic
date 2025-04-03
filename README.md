@@ -210,6 +210,9 @@ python setup.py install && python main.py  -bs 100 --dataset iris -ni 2000 -ef 1
 # Logic Gate Retreivals
 python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model
 
+# Explaining Single Instance
+python main.py --dataset iris --load_model --explain=-1,2,3,-4,-5,6,-7,8
+
 # Library Updates
 python setup.py install
 ```

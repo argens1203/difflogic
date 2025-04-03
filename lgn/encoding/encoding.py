@@ -2,7 +2,7 @@ import logging
 import torch
 from contextlib import contextmanager
 
-from pysat.formula import Formula, Atom, CNF
+from pysat.formula import Formula, Atom, CNF, Or
 from difflogic import LogicLayer, GroupSum
 
 from constant import device
@@ -28,6 +28,7 @@ def get_formula(model, input_dim):
         for o in x:
             all.add(o)
 
+    x[0] = Atom(False)
     return x, inputs
 
 
@@ -38,16 +39,25 @@ class Encoding:
             self.input_ids = [vpool.id(h) for h in self.input_handles]
             self.cnf = CNF()
             self.output_ids = []
-
-            for f in self.formula:
-                f.clausify()
-                # adding the clauses to a global CNF
-            for f in self.formula:
+            self.special = dict()
+            # adding the clauses to a global CNF
+            for f in [
+                Or(Atom(False), f.simplified()) for f in self.formula
+            ]:  # TODO: Confirm this:
                 f.clausify()
                 self.cnf.extend(list(f)[:-1])
-                self.output_ids.append(f.clauses[-1][0])
-            # self.output_ids = [vpool.id(f) for f in self.formula]
-            # TODO/REMARK: formula represents output from second last layer
+                logger.debug("Formula: %s", f)
+                logger.debug("CNF Clauses: %s", f.clauses)
+                logger.debug("Simplified: %s", f.simplified())
+                idx = 0
+                if f.clauses[-1][1] is None:
+                    self.special[idx] = f.simplified()
+                self.output_ids.append(f.clauses[-1][1])
+                idx += 1
+
+                logger.debug("Modified formulas: %s", list(f))
+            logger.debug("CNF Clauses: %s", self.cnf.clauses)
+            # REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
         self.input_dim = input_dim
         self.class_dim = class_dim
@@ -57,6 +67,9 @@ class Encoding:
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
         return self.output_ids[start : start + step]
+
+    def get_truth_value(self, idx):
+        return self.special.get(idx, None)
 
     def get_votes_per_cls(self):
         return len(self.output_ids) // self.class_dim
@@ -91,7 +104,7 @@ class Encoding:
             for f in self.formula:
                 print(
                     (str(vpool.id(f)) + ")").ljust(4),
-                    f,
+                    f.simplified(),
                     # f.simplified(), "...", f.clauses, "...", f.encoded, "...",
                 )
 
