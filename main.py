@@ -194,6 +194,12 @@ if __name__ == "__main__":
 
         # Explainer(encoding).explain(feat)
 
+        # NEW
+        print(encoding.input_ids)
+        print(encoding.input_handles)
+        print(encoding.get_attribute_ranges())
+        # NEW
+
         explainer = Explainer(encoding)
 
         from operator import itemgetter

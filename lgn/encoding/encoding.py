@@ -67,20 +67,23 @@ class Encoding:
 
         # NEW
         self.eq_constraints = CNF()
+        self.parts = []
         with self.use_context() as vpool:
             start = 0
             logger.debug("full_input_ids: %s", self.input_ids)
             for step in attribute_ranges:
                 logger.debug("Step: %d", step)
                 logger.debug("input_ids: %s", self.input_ids[start : start + step])
+                part = self.input_ids[start : start + step]
                 self.eq_constraints.extend(
                     CardEnc.equals(
-                        lits=self.input_ids[start : start + step],
+                        lits=part,
                         vpool=vpool,
                         encoding=EncType.totalizer,
                     )
                 )
                 start += step
+                self.parts.append(part)
         logger.debug("eq_constraints: %s", self.eq_constraints.clauses)
         # NEW
 

@@ -66,7 +66,13 @@ class Solver:
     # NEW
 
     def get_core(self):
-        return self.solver.get_core()
+        core = self.solver.get_core()
+
+        # NEW
+        print("core", core)
+        # NEW
+
+        return core
 
     def _append_formula(self, clauses=[]):
         self.solver.append_formula(clauses)

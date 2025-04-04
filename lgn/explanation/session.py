@@ -27,6 +27,10 @@ class Session:
         return self.oracle.is_solvable(pred_class=self.pred_class, inp=list(inp))
 
     def solve(self, inp: Partial_Inp_Set):
+        # NEW
+        print()
+        print("solve - inp: ", inp)
+        # NEW
         res = self.oracle.solve(
             pred_class=self.pred_class,
             inp=list(inp),
