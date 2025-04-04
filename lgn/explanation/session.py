@@ -78,7 +78,7 @@ class Session:
     ) -> Iterator["Session"]:
         try:
             hitman = Hitman(
-                bootstrap_with=[list(instance.get_input_as_set())],
+                bootstrap_with=[list(instance.get_input())],
                 htype=hit_type,
             )
             yield Session(instance, hitman=hitman, oracle=oracle)

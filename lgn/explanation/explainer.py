@@ -21,7 +21,7 @@ class Explainer:
 
     def explain(self, instance):
         pred_class = instance.get_predicted_class()
-        inp = instance.get_input()
+        inp = list(instance.get_input())
 
         logger.info("\n")
         logger.info("Explaining Input: %s", inp)
@@ -69,7 +69,7 @@ class Explainer:
 
     def mhs_mus_enumeration(self, instance: Instance, xnum=1000, smallest=False):
         session: Session
-        inp = instance.get_input_as_set()
+        inp = instance.get_input()
 
         with Session.use_context(
             instance=instance,
@@ -139,7 +139,7 @@ class Explainer:
         xnum=1000,
         smallest=False,
     ):
-        inp = instance.get_input_as_set()
+        inp = instance.get_input()
         session: Session
 
         with Session.use_context(
