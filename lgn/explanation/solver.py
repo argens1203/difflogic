@@ -69,7 +69,7 @@ class Solver:
         core = self.solver.get_core()
 
         # NEW
-        print("core", core)
+        # print("core", core)
         # NEW
 
         return core

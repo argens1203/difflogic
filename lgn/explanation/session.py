@@ -64,21 +64,32 @@ class Session:
         overlap = actual_inp & self.instance.get_input()
         ret = set()
         for set_, translation in self.raw2inp_new.items():
-            print(translation, set_)
+            # print(translation, set_)
             if set_ - overlap == set():
                 ret.add(translation)
             else:
                 ret.add(-translation)
         return ret
 
+    def translate_core(self, actual_inp: Partial_Inp_Set):
+        overlap = actual_inp & self.instance.get_input()
+        ret = set()
+        for set_, translation in self.raw2inp_new.items():
+            if set_ & overlap != set():
+                ret.add(translation)
+        return ret
+
     def solve_opt(self, inp: Transformed_Partial_Inp_Set):
+        # print("--- solve opt ---")
+        # print("inp", inp)
         res = self.solve(
             inp=self.transformed_set_to_raw(inp),
         )
+        # print("--- end solve opt ---")
         if res["model"] is not None:
             res["model"] = self.translate(res["model"])
         if res["core"] is not None:
-            res["core"] = self.translate(res["core"])
+            res["core"] = self.translate_core(res["core"])
         return res
 
     def get_duals_opt(self):
@@ -93,8 +104,8 @@ class Session:
 
     def solve(self, inp: Partial_Inp_Set):
         # NEW
-        print()
-        print("solve - inp: ", inp)
+        # print()
+        # print("solve - inp: ", inp)
         # NEW
         res = self.oracle.solve(
             pred_class=self.pred_class,
