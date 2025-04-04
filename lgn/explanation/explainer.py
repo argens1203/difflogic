@@ -21,7 +21,7 @@ class Explainer:
 
     def explain(self, instance):
         pred_class = instance.get_predicted_class()
-        inp = list(instance.get_input())
+        inp = instance.get_input()
 
         logger.info("\n")
         logger.info("Explaining Input: %s", inp)
@@ -30,7 +30,7 @@ class Explainer:
 
         assert not self.oracle.is_solvable(
             pred_class=pred_class, inp=inp
-        ), "Assertion Error: " + ",".join(map(str, inp))
+        ), "Assertion Error: " + str(inp)
 
         axp = self.reduce_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
@@ -191,7 +191,7 @@ class Explainer:
 
     # PRIVATE
 
-    def reduce_axp(self, inp, predicted_cls):
+    def reduce_axp(self, inp: Partial_Inp_Set, predicted_cls: int):
         """
         Get one AXP for the input and predicted class
 
@@ -201,14 +201,25 @@ class Explainer:
         :return: AXP
         """
         tmp_input = inp.copy()
-        for feature in inp:
-            logger.debug("Testing removal of input %d", feature)
-            tmp_input.remove(feature)
-            if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tmp_input):
-                continue
+        for part in self.encoding.parts:
+            logger.debug("Testing removal of input %s", part)
+            tt_input = Explainer.remove_part(tmp_input, part)
+            # tmp_input.remove(feature)
+            if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tt_input):
+                tmp_input = tt_input
             else:
-                tmp_input.append(feature)
+                continue
         return tmp_input
+
+    # NEW
+    def remove_part(inp, part):
+        to_remove = set()
+        for i in part:
+            to_remove.add(i)
+            to_remove.add(-i)
+        return inp - to_remove
+
+    # NEW
 
     def __del__(self):
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
