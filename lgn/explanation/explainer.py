@@ -121,8 +121,8 @@ class Explainer:
                 session.hit(mcs)
 
             # Extact outputs
-            expls = session.get_expls_opt()
-            duals = session.get_duals_opt()
+            expls = session.get_expls()
+            duals = session.get_duals()
             itr = session.get_itr()
 
             # Check itration count
@@ -199,8 +199,8 @@ class Explainer:
 
             # Extract outputs
             itr = session.get_itr()
-            expls = session.get_expls_opt()
-            duals = session.get_duals_opt()
+            expls = session.get_expls()
+            duals = session.get_duals()
 
             # Check iteration count
             assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
