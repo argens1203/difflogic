@@ -4,6 +4,8 @@ from typing import List
 from contextlib import contextmanager
 
 from pysat.formula import Formula, Atom, CNF, Or
+from pysat.card import CardEnc, EncType
+
 from difflogic import LogicLayer, GroupSum
 
 from constant import device
@@ -62,6 +64,26 @@ class Encoding:
             logger.debug("CNF Clauses: %s", self.cnf.clauses)
             # REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number
+
+        # NEW
+        self.eq_constraints = CNF()
+        with self.use_context() as vpool:
+            start = 0
+            logger.debug("full_input_ids: %s", self.input_ids)
+            for step in attribute_ranges:
+                logger.debug("Step: %d", step)
+                logger.debug("input_ids: %s", self.input_ids[start : start + step])
+                self.eq_constraints.extend(
+                    CardEnc.equals(
+                        lits=self.input_ids[start : start + step],
+                        vpool=vpool,
+                        encoding=EncType.totalizer,
+                    )
+                )
+                start += step
+        logger.debug("eq_constraints: %s", self.eq_constraints.clauses)
+        # NEW
+
         self.input_dim = input_dim
         self.class_dim = class_dim
         self.attribute_ranges = attribute_ranges
