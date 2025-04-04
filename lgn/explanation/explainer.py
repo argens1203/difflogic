@@ -5,7 +5,14 @@ from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
 from lgn.util import input_to_feat, Stat
-from lgn.util import Inp, Partial_Inp, Htype, Partial_Inp_Set, Inp_Set
+from lgn.util import (
+    Inp,
+    Partial_Inp,
+    Htype,
+    Partial_Inp_Set,
+    Inp_Set,
+    Transformed_Partial_Inp_Set,
+)
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
@@ -36,19 +43,31 @@ class Explainer:
         logger.info("One AXP: %s", axp)
         return axp
 
-    def _enumerate_unit_mcs(session: Session, inp: Inp_Set):
+    def _enumerate_unit_mcs(session: Session):
+        options = set(session.options)
         counter = 0
-        for hypo in inp:
-            if session.is_solvable_with(inp - {hypo}):
+        for hypo in options:
+            if session.is_solvable_with_opt(options - {hypo}):
                 session.hit({hypo})  # MCS is registered here, stored in session.
                 counter += 1
 
         return counter
 
     def _extract_mcs(
-        session: Session, inp: Inp_Set, guess: Partial_Inp_Set, model: Inp_Set
+        session: Session,
+        inp: Inp_Set,
+        guess: Transformed_Partial_Inp_Set,
+        model: Transformed_Partial_Inp_Set,
     ) -> Set[int]:
         # CXP lies within unmatching features (between inp and guess)
+        inp = set(session.options)
+        print("model", model)
+        print("inp", inp)
+        print("guess", guess)
+        # exit()
+
+        assert inp - guess - model == inp - model
+
         uncertain_set = inp - guess - model
         satsifiable_set = model & (inp)
 
@@ -57,7 +76,7 @@ class Explainer:
         mcs = set()
         for hypo in uncertain_set:
             # Keep adding while satisfiable
-            if session.is_solvable_with(inp=satsifiable_set | {hypo}):
+            if session.is_solvable_with_opt(inp=satsifiable_set | {hypo}):
                 satsifiable_set.add(hypo)
             else:
                 # Partial MCS found in a reversed manner
@@ -78,7 +97,7 @@ class Explainer:
         ) as session:
 
             # Try unit-MCSes
-            preempt_hit = Explainer._enumerate_unit_mcs(session, inp)
+            preempt_hit = Explainer._enumerate_unit_mcs(session)
             session.add_to_itr(preempt_hit)
 
             # Main Loop
@@ -89,7 +108,7 @@ class Explainer:
                     break
 
                 # Try the guess
-                res = session.solve(inp=guess)
+                res = session.solve_opt(inp=guess)
 
                 # If guess is MUS, block it
                 if not res["solvable"]:
@@ -106,8 +125,8 @@ class Explainer:
                 session.hit(mcs)
 
             # Extact outputs
-            expls = session.get_expls()
-            duals = session.get_duals()
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
             itr = session.get_itr()
 
             # Check itration count

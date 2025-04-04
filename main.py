@@ -210,6 +210,7 @@ if __name__ == "__main__":
             axps, axp_dual = explainer.mhs_mus_enumeration(instance)
             cxps, cxp_dual = explainer.mhs_mcs_enumeration(instance)
 
+            logger.info("Input: %s", instance.get_input())
             logger.info(
                 "AXPs: %s",
                 str(
