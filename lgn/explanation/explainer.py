@@ -238,3 +238,51 @@ class Explainer:
     def __del__(self):
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
         logger.debug("Cache Miss: %s", str(Stat.cache_miss))
+
+    def explain_both_and_assert(self, instance):
+        self.explain(instance)
+
+        axps, axp_dual = self.mhs_mus_enumeration(instance)
+        cxps, cxp_dual = self.mhs_mcs_enumeration(instance)
+
+        logger.info("Input: %s", instance.get_input())
+        logger.info(
+            "AXPs: %s",
+            str([sorted(one) for one in sorted(axps, key=lambda x: (len(x), x[0]))]),
+        )
+        logger.info(
+            "Duals: %s",
+            str(
+                [sorted(one) for one in sorted(axp_dual, key=lambda x: (len(x), x[0]))]
+            ),
+        )
+        logger.info(
+            "CXPs: %s",
+            str([sorted(one) for one in sorted(cxps, key=lambda x: (len(x), x[0]))]),
+        )
+        logger.info(
+            "Duals: %s",
+            str(
+                [sorted(one) for one in sorted(cxp_dual, key=lambda x: (len(x), x[0]))]
+            ),
+        )
+        axp_set = set()
+        for axp in axps:
+            axp_set.add(frozenset(axp))
+        cxp_set = set()
+        for cxp in cxps:
+            cxp_set.add(frozenset(cxp))
+        axp_dual_set = set()
+        for axp_d in axp_dual:
+            axp_dual_set.add(frozenset(axp_d))
+        cxp_dual_set = set()
+        for cxp_d in cxp_dual:
+            cxp_dual_set.add(frozenset(cxp_d))
+
+        assert axp_set.difference(cxp_dual_set) == set()
+        assert cxp_dual_set.difference(axp_set) == set()
+
+        assert axp_dual_set.difference(cxp_set) == set()
+        assert cxp_set.difference(axp_dual_set) == set()
+
+        return len(axps) + len(axp_dual)
