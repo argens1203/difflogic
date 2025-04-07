@@ -11,3 +11,5 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
     32: torch.float32,
     64: torch.float64,
 }
+
+DEBUG = True

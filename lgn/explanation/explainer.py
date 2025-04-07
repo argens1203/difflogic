@@ -1,16 +1,10 @@
 import logging
 from typing import Set
 
-from pysat.examples.hitman import Hitman
-
 from lgn.encoding import Encoding
-from lgn.util import input_to_feat, Stat
+from lgn.util import Stat
 from lgn.util import (
-    Inp,
-    Partial_Inp,
-    Htype,
     Partial_Inp_Set,
-    Inp_Set,
     Transformed_Partial_Inp_Set,
 )
 
@@ -60,10 +54,6 @@ class Explainer:
     ) -> Set[int]:
         # CXP lies within unmatching features (between inp and guess)
         inp = set(session.options)
-        # print("model", model)
-        # print("inp", inp)
-        # print("guess", guess)
-        # exit()
 
         assert inp - guess - model == inp - model
 
@@ -164,7 +154,6 @@ class Explainer:
         ) as session:
 
             inp = set(session.options)
-            # print("options", inp)
             counter = Explainer._enumerate_unit_mus(session=session)
             session.add_to_itr(counter)
 
@@ -178,7 +167,6 @@ class Explainer:
 
                 # Try the guess
                 res = session.solve_opt(inp=inp - hset)
-                # print("res 179  ", res)
 
                 # If guess is MCS, block it
                 if res["solvable"]:
@@ -211,10 +199,8 @@ class Explainer:
     # PRIVATE
 
     def reduce_axp_opt(self, inp: Transformed_Partial_Inp_Set, session: Session):
-        # print("inp", inp)
         tmp_inp = inp.copy()
         for hypo in inp:
-            # print("reduced", tmp_inp - {hypo})
             if not session.is_solvable_with_opt(inp=tmp_inp - {hypo}):
                 tmp_inp = tmp_inp - {hypo}
 

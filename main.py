@@ -1,21 +1,16 @@
 import random
 import logging
-import os
 
 import numpy as np
 import torch
 
-from lgn.encoding import Validator, Encoding
+from lgn.encoding import Encoding
 from lgn.explanation import Explainer, Instance
+from lgn.dataset import Binarizer
 from lgn.dataset.dataset import (
     load_dataset,
     IrisDataset,
-    AdultDataset,
-    MonkDataset,
-    BreastCancerDataset,
-    Binarizer,
     input_dim_of_dataset,
-    Flatten,
     num_classes_of_dataset,
     get_attribute_ranges,
     Caltech101Dataset,
@@ -24,21 +19,9 @@ from lgn.dataset.dataset import (
 from lgn.model import get_model, compile_model
 from lgn.model import train_eval
 from lgn.util import get_args
-from lgn.util import get_results
-
-import torchvision.datasets
-from torchvision import transforms
+from lgn.util import get_results, setup_logger
 
 torch.set_num_threads(1)  # ???
-
-console_handler = logging.StreamHandler()
-console_format = logging.Formatter(
-    # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    "%(message)s"
-)
-console_handler.setFormatter(console_format)
-
-LOG_FILE_PATH = "main.log"
 
 
 def seed_all(seed):
@@ -60,10 +43,7 @@ def new_load_dataset(args):
         return load_dataset(args)
     elif args.dataset == "mnist":
         dataset = MNISTDataset()
-        # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
 
-    print(dataset[0][0].shape)
-    print(dataset[0][0])
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(
         train_set, batch_size=args.batch_size, shuffle=True
@@ -79,10 +59,8 @@ if __name__ == "__main__":
     args = get_args()
     args.model_path = args.dataset + "_" + args.model_path
     args.batch_size = 100
-    # args.dataset = "iris"
     args.num_iterations = 2000
     args.eval_freq = 1000
-    # args.num_neurons = 6
     args.num_layers = 2
     args.get_formula = True
 
@@ -99,45 +77,8 @@ if __name__ == "__main__":
     elif args.dataset == "mnist":
         args.num_neurons = 400  # >= 400, div 10
 
-    if args.verbose:
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
-
-        console_handler.setLevel(logging.DEBUG)
-        logger.addHandler(console_handler)
-    else:
-        if os.path.exists(LOG_FILE_PATH):
-            os.remove(LOG_FILE_PATH)
-        file_handler = logging.FileHandler(LOG_FILE_PATH)
-        file_format = logging.Formatter(
-            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            "%(message)s"
-        )
-        file_handler.setFormatter(file_format)
-
-        # TEMP
-        if os.path.exists("main.log.i"):
-            os.remove("main.log.i")
-        info_handler = logging.FileHandler("main.log.i")
-        file_format = logging.Formatter(
-            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            "%(message)s"
-        )
-        info_handler.setFormatter(file_format)
-        info_handler.setLevel(logging.INFO)
-        # TEMP
-
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
-
-        console_handler.setLevel(logging.INFO)
-        file_handler.setLevel(logging.DEBUG)
-
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        # TEMP
-        logger.addHandler(info_handler)
-        # TEMP
+    setup_logger(args)
+    logger = logging.getLogger()
 
     # logging.disable(logging.DEBUG)
 
