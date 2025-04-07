@@ -70,6 +70,9 @@ class MulticlassSolver:
         return not is_uniquely_satsified, model, core
 
     def solve(self, pred_class, inp):
+        # NEW
+        self.assert_input_correctness(inp)
+        # NEW
         solvable, model, core = self.is_satisfiable_with_model_or_core(pred_class, inp)
         return {
             "solvable": solvable,
@@ -78,7 +81,27 @@ class MulticlassSolver:
         }
 
     def is_solvable(self, pred_class, inp):
+        # NEW
+        self.assert_input_correctness(inp)
+        # NEW
         return self.is_satisfiable(pred_class, inp)
+
+    # # NEW
+    def assert_input_correctness(self, inp):
+        for part in self.encoding.parts:
+            part_inp = list(filter(lambda x: x in part or -x in part, inp))
+            # Skip / Allow if the entire part is not in the input
+            if len(part_inp) == 0:
+                continue
+
+            filtered = list(filter(lambda x: x > 0, part_inp))
+            # print("inp", inp)
+            # print("part", part)
+            # print("part_inp", part_inp)
+            # print(filtered)
+            assert len(filtered) == 1
+
+    # # NEW
 
     ## -- Private -- #
     def get_solver(self, true_class, adj_class):

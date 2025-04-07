@@ -194,6 +194,12 @@ if __name__ == "__main__":
 
         # Explainer(encoding).explain(feat)
 
+        # NEW
+        print(encoding.input_ids)
+        print(encoding.input_handles)
+        print(encoding.get_attribute_ranges())
+        # NEW
+
         explainer = Explainer(encoding)
 
         from operator import itemgetter
@@ -204,6 +210,7 @@ if __name__ == "__main__":
             axps, axp_dual = explainer.mhs_mus_enumeration(instance)
             cxps, cxp_dual = explainer.mhs_mcs_enumeration(instance)
 
+            logger.info("Input: %s", instance.get_input())
             logger.info(
                 "AXPs: %s",
                 str(

@@ -5,7 +5,14 @@ from pysat.examples.hitman import Hitman
 
 from lgn.encoding import Encoding
 from lgn.util import input_to_feat, Stat
-from lgn.util import Inp, Partial_Inp, Htype, Partial_Inp_Set, Inp_Set
+from lgn.util import (
+    Inp,
+    Partial_Inp,
+    Htype,
+    Partial_Inp_Set,
+    Inp_Set,
+    Transformed_Partial_Inp_Set,
+)
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
@@ -21,7 +28,7 @@ class Explainer:
 
     def explain(self, instance):
         pred_class = instance.get_predicted_class()
-        inp = list(instance.get_input())
+        inp = instance.get_input()
 
         logger.info("\n")
         logger.info("Explaining Input: %s", inp)
@@ -30,25 +37,36 @@ class Explainer:
 
         assert not self.oracle.is_solvable(
             pred_class=pred_class, inp=inp
-        ), "Assertion Error: " + ",".join(map(str, inp))
+        ), "Assertion Error: " + str(inp)
 
         axp = self.reduce_axp(inp, pred_class)
         logger.info("One AXP: %s", axp)
         return axp
 
-    def _enumerate_unit_mcs(session: Session, inp: Inp_Set):
+    def _enumerate_unit_mcs(session: Session):
+        options = set(session.options)
         counter = 0
-        for hypo in inp:
-            if session.is_solvable_with(inp - {hypo}):
+        for hypo in options:
+            if session.is_solvable_with_opt(options - {hypo}):
                 session.hit({hypo})  # MCS is registered here, stored in session.
                 counter += 1
 
         return counter
 
     def _extract_mcs(
-        session: Session, inp: Inp_Set, guess: Partial_Inp_Set, model: Inp_Set
+        session: Session,
+        guess: Transformed_Partial_Inp_Set,
+        model: Transformed_Partial_Inp_Set,
     ) -> Set[int]:
         # CXP lies within unmatching features (between inp and guess)
+        inp = set(session.options)
+        # print("model", model)
+        # print("inp", inp)
+        # print("guess", guess)
+        # exit()
+
+        assert inp - guess - model == inp - model
+
         uncertain_set = inp - guess - model
         satsifiable_set = model & (inp)
 
@@ -57,7 +75,7 @@ class Explainer:
         mcs = set()
         for hypo in uncertain_set:
             # Keep adding while satisfiable
-            if session.is_solvable_with(inp=satsifiable_set | {hypo}):
+            if session.is_solvable_with_opt(inp=satsifiable_set | {hypo}):
                 satsifiable_set.add(hypo)
             else:
                 # Partial MCS found in a reversed manner
@@ -69,7 +87,6 @@ class Explainer:
 
     def mhs_mus_enumeration(self, instance: Instance, xnum=1000, smallest=False):
         session: Session
-        inp = instance.get_input()
 
         with Session.use_context(
             instance=instance,
@@ -78,7 +95,7 @@ class Explainer:
         ) as session:
 
             # Try unit-MCSes
-            preempt_hit = Explainer._enumerate_unit_mcs(session, inp)
+            preempt_hit = Explainer._enumerate_unit_mcs(session)
             session.add_to_itr(preempt_hit)
 
             # Main Loop
@@ -89,7 +106,7 @@ class Explainer:
                     break
 
                 # Try the guess
-                res = session.solve(inp=guess)
+                res = session.solve_opt(inp=guess)
 
                 # If guess is MUS, block it
                 if not res["solvable"]:
@@ -100,9 +117,7 @@ class Explainer:
                         continue
 
                 # Else extract MCS from the guess
-                mcs = Explainer._extract_mcs(
-                    session, inp=inp, guess=guess, model=res["model"]
-                )
+                mcs = Explainer._extract_mcs(session, guess=guess, model=res["model"])
                 session.hit(mcs)
 
             # Extact outputs
@@ -117,17 +132,18 @@ class Explainer:
 
             return expls, duals
 
-    def _enumerate_unit_mus(session: Session, inp: Inp_Set):
+    def _enumerate_unit_mus(session: Session):
+        options = set(session.options)
         itr = 0
 
-        for hypo in inp:
+        for hypo in options:
             # Unit-size MUS
-            if not session.is_solvable_with(inp={hypo}):
+            if not session.is_solvable_with_opt(inp={hypo}):
                 session.hit({hypo})
                 itr += 1
 
             # Unit-size MCS
-            if session.is_solvable_with(inp=inp - {hypo}):
+            if session.is_solvable_with_opt(inp=options - {hypo}):
                 session.block({hypo})
                 itr += 1
 
@@ -139,7 +155,6 @@ class Explainer:
         xnum=1000,
         smallest=False,
     ):
-        inp = instance.get_input()
         session: Session
 
         with Session.use_context(
@@ -148,18 +163,22 @@ class Explainer:
             oracle=self.oracle,
         ) as session:
 
-            counter = Explainer._enumerate_unit_mus(session=session, inp=inp)
+            inp = set(session.options)
+            # print("options", inp)
+            counter = Explainer._enumerate_unit_mus(session=session)
             session.add_to_itr(counter)
 
             # Main Loop
             while True:
                 # Get a guess
                 hset = session.get()
+                # print("guess", hset)
                 if hset == None:
                     break
 
                 # Try the guess
-                res = session.solve(inp=inp - hset)
+                res = session.solve_opt(inp=inp - hset)
+                # print("res 179  ", res)
 
                 # If guess is MCS, block it
                 if res["solvable"]:
@@ -170,9 +189,9 @@ class Explainer:
                         continue
 
                 # Else extract MUS from the guess
-                to_hit = self.reduce_axp(
-                    inp=list(res["core"]),
-                    predicted_cls=instance.get_predicted_class(),
+                to_hit = self.reduce_axp_opt(
+                    inp=res["core"],
+                    session=session,
                 )
                 to_hit = set(to_hit)
 
@@ -191,7 +210,17 @@ class Explainer:
 
     # PRIVATE
 
-    def reduce_axp(self, inp, predicted_cls):
+    def reduce_axp_opt(self, inp: Transformed_Partial_Inp_Set, session: Session):
+        # print("inp", inp)
+        tmp_inp = inp.copy()
+        for hypo in inp:
+            # print("reduced", tmp_inp - {hypo})
+            if not session.is_solvable_with_opt(inp=tmp_inp - {hypo}):
+                tmp_inp = tmp_inp - {hypo}
+
+        return tmp_inp
+
+    def reduce_axp(self, inp: Partial_Inp_Set, predicted_cls: int):
         """
         Get one AXP for the input and predicted class
 
@@ -201,14 +230,24 @@ class Explainer:
         :return: AXP
         """
         tmp_input = inp.copy()
-        for feature in inp:
-            logger.debug("Testing removal of input %d", feature)
-            tmp_input.remove(feature)
-            if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tmp_input):
-                continue
+        for part in self.encoding.parts:
+            logger.debug("Testing removal of input %s", part)
+            tt_input = Explainer.remove_part(tmp_input, part)
+            if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tt_input):
+                tmp_input = tt_input
             else:
-                tmp_input.append(feature)
+                continue
         return tmp_input
+
+    # NEW
+    def remove_part(inp, part):
+        to_remove = set()
+        for i in part:
+            to_remove.add(i)
+            to_remove.add(-i)
+        return inp - to_remove
+
+    # NEW
 
     def __del__(self):
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
