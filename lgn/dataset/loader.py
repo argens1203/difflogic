@@ -12,10 +12,8 @@ from .breast_cancer import BreastCancerDataset
 
 def new_load_dataset(args):
     if args.dataset == "adult":
-        train_set = AdultDataset(
-            "./data-uci", split="train", download=True, with_val=False
-        )
-        test_set = AdultDataset("./data-uci", split="test", with_val=False)
+        train_set = AdultDataset("./data-uci", split="train")
+        test_set = AdultDataset("./data-uci", split="test")
         train_loader = torch.utils.data.DataLoader(
             train_set, batch_size=args.batch_size, shuffle=True
         )

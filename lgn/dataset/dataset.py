@@ -93,17 +93,22 @@ class CustomDataset(Dataset, ABC):
     def get_all(self):
         return self.features, self.labels
 
-    def read_raw_data(self, filepath, delimiter=","):
+    def read_raw_data(self, filepath, delimiter=",", select=lambda x: True):
         with open(filepath, "r") as f:
             data = f.readlines()
 
         for i in range(len(data)):
-            if len(data[i]) <= 2:
+            if len(data[i]) <= 2 or not select(data[i]):
                 data[i] = None
             else:
                 data[i] = data[i].strip("\n").strip().split(delimiter)
                 data[i] = [d.strip() for d in data[i]]
         data = list(filter(lambda x: x is not None, data))
+        lengths = list(map(len, data))
+        print(lengths)
+        print(set(lengths))
+        print(data[lengths.index(max(lengths))])
+        print(data[lengths.index(min(lengths))])
         return np.array(data)
 
     @abstractmethod
