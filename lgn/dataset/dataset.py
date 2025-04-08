@@ -5,6 +5,7 @@ import torchvision
 
 from .binarizer import Binarizer
 from .adult import AdultDataset
+from .monk import MonkDataset
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +23,11 @@ def load_n(loader, n):
 def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
     if dataset == "adult":
         return AdultDataset.get_input_dim()
+    if dataset in ["monk1", "monk2", "monk3"]:
+        return MonkDataset.get_input_dim()
     return {
         "breast_cancer": 51,
         "iris": 4 * 2,
-        "monk1": 17,
-        "monk2": 17,
-        "monk3": 17,
         "mnist": 400 * 2,
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
@@ -55,10 +55,9 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
 def get_attribute_ranges(dataset):
     if dataset == "adult":
         return AdultDataset.get_attribute_ranges()
+    if dataset in ["monk1", "monk2", "monk3"]:
+        return MonkDataset.get_attribute_ranges()
     return {
-        "monk1": [3, 3, 2, 3, 4, 2],
-        "monk2": [3, 3, 2, 3, 4, 2],
-        "monk3": [3, 3, 2, 3, 4, 2],
         "iris": [2, 2, 2, 2],
         "breast_cancer": [9, 3, 12, 13, 2, 3, 2, 5, 2],
     }[dataset]

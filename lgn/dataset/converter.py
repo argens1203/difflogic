@@ -7,7 +7,7 @@ class Converter:
         attributes,
         continuous_attributes=None,
         discrete_attributes=None,
-        bin_sizes=None,
+        bin_sizes=dict(),
     ):
         self.attributes = attributes
         self.continuous_attributes = continuous_attributes

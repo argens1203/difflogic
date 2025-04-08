@@ -1,10 +1,13 @@
-import torch
-
 from .custom_dataset import CustomDataset
+from .converter import Converter
+from sklearn.preprocessing import LabelEncoder
 
 
 class MonkDataset(CustomDataset):
-    attribute_ranges = [3, 3, 2, 3, 4, 2]
+    attributes = [f"attribute_{i}" for i in range(1, 7)]
+    continuous_attributes = set()
+    converter = None
+    label_encoder = None
 
     def __init__(self, root=None, split="train", transform=None):
         self.url = self.train_url if split == "train" else self.test_url
@@ -13,33 +16,42 @@ class MonkDataset(CustomDataset):
         super(MonkDataset, self).__init__(transform=transform, root=root)
 
     def load_data(self):
-
-        def to_one_hot(features):
-            # -1 since F.one_hot expects 0-indexed values
-            features = torch.tensor(features) - 1
-
-            # one_hot_features = torch.nn.functional.one_hot(features, num_classes=-1)
-            # This take the largest value + 1 in all dimension as number of classes, which does not work for our uneven attribute ranges
-
-            return torch.cat(
-                [
-                    torch.nn.functional.one_hot(features[:, i], num_classes=-1)
-                    for i in range(len(self.attribute_ranges))
-                ],
-                dim=1,
-            )
-
-        def parse(sample):
-            # Remove instance id
-            sample = sample[:, :-1]
-
-            # First column is the label
-            features, labels = sample[:, 1:].astype(int), sample[:, 0].astype(int)
-
-            return to_one_hot(features), torch.tensor(labels)
-
         raw_data = self.read_raw_data(self._get_fpath(), delimiter=" ")
-        self.features, self.labels = parse(raw_data)
+        raw_data = raw_data[:, :-1]  # Remove instance id
+        labels, features = raw_data[:, 0], raw_data[:, 1:]
+
+        self.features = self.transform_feature(features)
+        self.labels = self.transform_label(labels)
+
+    def transform_label(self, labels):
+        if MonkDataset.label_encoder is None:
+            MonkDataset.label_encoder = LabelEncoder()
+            MonkDataset.label_encoder.fit(labels)
+
+        return MonkDataset.label_encoder.transform(labels)
+
+    def transform_feature(self, features):
+        if MonkDataset.converter is None:
+            MonkDataset.converter = Converter(
+                attributes=MonkDataset.attributes,
+                continuous_attributes=MonkDataset.continuous_attributes,
+            )
+            MonkDataset.converter.fit(features)
+
+        return MonkDataset.converter.transform(features)
+
+    def inverse_transform_feature(self, features):
+        return MonkDataset.converter.inverse_transform(features)
+
+    def inverse_transform_label(self, labels):
+        return MonkDataset.label_encoder.inverse_transform(labels)
+
+    # -- Getters -- #
+    def get_attribute_ranges():
+        return MonkDataset.converter.get_n_classes()
+
+    def get_input_dim():
+        return sum(MonkDataset.converter.get_n_classes())
 
 
 class Monk1Dataset(MonkDataset):
