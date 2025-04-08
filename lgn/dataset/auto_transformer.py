@@ -40,3 +40,7 @@ class AutoTransformer:
     @classmethod
     def get_input_dim(cls):
         return sum(cls.converter.get_n_classes())
+
+    @classmethod
+    def get_num_of_classes(cls):
+        return len(cls.label_encoder.classes_)

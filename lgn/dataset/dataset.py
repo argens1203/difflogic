@@ -32,7 +32,6 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
     if dataset == "breast_cancer":
         return BreastCancerDataset.get_input_dim()
     return {
-        "breast_cancer": 51,
         "mnist": 400 * 2,
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
@@ -42,13 +41,15 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
 
 
 def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
+    if dataset == "adult":
+        return AdultDataset.get_num_of_classes()
+    if dataset in ["monk1", "monk2", "monk3"]:
+        return MonkDataset.get_num_of_classes()
+    if dataset == "iris":
+        return IrisDataset.get_num_of_classes()
+    if dataset == "breast_cancer":
+        return BreastCancerDataset.get_num_of_classes()
     return {
-        "adult": 2,
-        "breast_cancer": 2,
-        "iris": 3,
-        "monk1": 2,
-        "monk2": 2,
-        "monk3": 2,
         "mnist": 10,
         "mnist20x20": 10,
         "cifar-10-3-thresholds": 10,
