@@ -1,11 +1,13 @@
 import torch
 from .dataset import (
-    load_dataset,
     IrisDataset,
     Caltech101Dataset,
     MNISTDataset,
 )
 from .binarizer import Binarizer
+from .adult import AdultDataset
+from .monk import MONKsDataset
+from .breast_cancer import BreastCancerDataset
 
 
 def new_load_dataset(args):
@@ -14,11 +16,41 @@ def new_load_dataset(args):
     elif args.dataset == "caltech101":
         dataset = Caltech101Dataset()
     elif args.dataset == "adult":
-        return load_dataset(args)
+        train_set = AdultDataset(
+            "./data-uci", split="train", download=True, with_val=False
+        )
+        test_set = AdultDataset("./data-uci", split="test", with_val=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True
+        )
+        test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=int(1e6), shuffle=False
+        )
+        return train_loader, None, test_loader
     elif args.dataset in ["monk1", "monk2", "monk3"]:
-        return load_dataset(args)
+        style = int(args.dataset[4])
+        train_set = MONKsDataset(
+            "./data-uci", style, split="train", download=True, with_val=False
+        )
+        test_set = MONKsDataset("./data-uci", style, split="test", with_val=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True
+        )
+        test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=int(1e6), shuffle=False
+        )
+        return train_loader, None, test_loader
     elif args.dataset == "breast_cancer":
-        return load_dataset(args)
+        train_set = BreastCancerDataset(
+            "./data-uci", split="train", download=True, with_val=False
+        )
+        test_set = BreastCancerDataset("./data-uci", split="test", with_val=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=args.batch_size, shuffle=True
+        )
+        test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=int(1e6), shuffle=False
+        )
     elif args.dataset == "mnist":
         dataset = MNISTDataset()
 

@@ -95,10 +95,6 @@ class MulticlassSolver:
                 continue
 
             filtered = list(filter(lambda x: x > 0, part_inp))
-            # print("inp", inp)
-            # print("part", part)
-            # print("part_inp", part_inp)
-            # print(filtered)
             assert len(filtered) == 1
 
     # # NEW
