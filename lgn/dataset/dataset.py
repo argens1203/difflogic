@@ -1,10 +1,8 @@
 import logging
-import experiments.mnist_dataset as mnist_dataset
-import experiments.uci_datasets as uci_datasets
 import torch
-import math
 import torchvision
-import torchvision.transforms as T
+
+from abc import ABC, abstractmethod
 
 from .binarizer import Binarizer
 
@@ -68,8 +66,10 @@ from torchvision.datasets.utils import download_url, check_integrity
 from torch.utils.data import Dataset, DataLoader
 import os
 
+import numpy as np
 
-class CustomDataset(Dataset):
+
+class CustomDataset(Dataset, ABC):
     root = "data-uci"
 
     def __init__(self, transform=None, root=None):
@@ -93,7 +93,7 @@ class CustomDataset(Dataset):
     def get_all(self):
         return self.features, self.labels
 
-    def read_raw_data(self, filepath):
+    def read_raw_data(self, filepath, delimiter=","):
         with open(filepath, "r") as f:
             data = f.readlines()
 
@@ -101,11 +101,17 @@ class CustomDataset(Dataset):
             if len(data[i]) <= 2:
                 data[i] = None
             else:
-                data[i] = data[i].strip("\n").strip().split(",")
+                data[i] = data[i].strip("\n").strip().split(delimiter)
                 data[i] = [d.strip() for d in data[i]]
-
         data = list(filter(lambda x: x is not None, data))
-        return data
+        return np.array(data)
+
+    @abstractmethod
+    def load_data(self):
+        pass
+
+    def _get_fpath(self):
+        return self.fpath
 
 
 class IrisDataset(CustomDataset):
@@ -168,23 +174,6 @@ class AdultDataset(CustomDataset):
 
         raw_data = self.read_raw_data(self.fpath)
         self.features, self.labels = parse(raw_data)
-
-
-class MonkDataset(CustomDataset):
-    file_list = [
-        (
-            "https://archive.ics.uci.edu/ml/machine-learning-databases/monks-problems/monks-1.train",
-            "fc1fc3a673e00908325c67cf16283335",
-        ),
-        (
-            "https://archive.ics.uci.edu/ml/machine-learning-databases/monks-problems/monks-1.test",
-            "de4255acb72fb29be5125a7c874e28a0",
-        ),
-    ]
-
-    def __init__(self, train=True, transform=None):
-        self.url, self.md5 = self.file_list[0] if train else self.file_list[1]
-        CustomDataset.__init__(self, transform)
 
 
 class BreastCancerDataset(CustomDataset):
