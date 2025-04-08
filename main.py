@@ -116,9 +116,9 @@ if __name__ == "__main__":
                 return get_test_raw(index)
 
         if args.explain is not None:
-            inp = args.explain.split(",")
-            inp = [int(i) for i in inp]
-            instance = Instance.from_encoding(encoding=encoding, inp=inp)
+            raw = args.explain.split(",")
+            logger.info("Raw: %s\n", raw)
+            instance = Instance.from_encoding(encoding=encoding, raw=raw)
             explainer.explain_both_and_assert(instance)
         elif args.explain_all:
             for batch, label, idx in test_loader:

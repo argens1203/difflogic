@@ -6,6 +6,8 @@ from lgn.dataset import AutoTransformer
 
 from sklearn.preprocessing import KBinsDiscretizer, LabelEncoder
 
+import numpy as np
+
 
 class Instance:
     def __init__(
@@ -75,8 +77,10 @@ class Instance:
 
     # Class Methods
 
-    def from_encoding(encoding: Encoding, feat=None, grouped_inp=None):
-        raw_inp, feat = Instance.fill_missing(inp=grouped_inp, feat=feat)
+    def from_encoding(encoding: Encoding, feat=None, raw=None, inp=None):
+        if feat is None:
+            feat = encoding.Dataset.transform_feature(np.array([raw]))[0]
+        raw_inp, feat = Instance.fill_missing(inp=inp, feat=feat)
 
         grouped_inp = set()
         idx = 0
