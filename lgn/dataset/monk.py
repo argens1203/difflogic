@@ -1,8 +1,8 @@
 from .custom_dataset import CustomDataset
-from .auto_transformer import Autotransformer
+from .auto_transformer import AutoTransformer
 
 
-class MonkDataset(CustomDataset, Autotransformer):
+class MonkDataset(CustomDataset, AutoTransformer):
     attributes = [f"attribute_{i}" for i in range(1, 7)]
     continuous_attributes = set()  # No continuous attributes in Monk datasets
     bin_sizes = dict()  # No bin sizes since no continuous attributes

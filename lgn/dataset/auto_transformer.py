@@ -2,7 +2,7 @@ from .converter import Converter
 from sklearn.preprocessing import LabelEncoder
 
 
-class Autotransformer:
+class AutoTransformer:
     @classmethod
     def transform_label(cls, labels):
         if cls.label_encoder is None:

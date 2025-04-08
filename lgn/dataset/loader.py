@@ -58,7 +58,7 @@ def new_load_dataset(args):
         return train_loader, None, test_loader
 
     if args.dataset == "iris":
-        dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
+        dataset = IrisDataset()
     elif args.dataset == "caltech101":
         dataset = Caltech101Dataset()
     elif args.dataset == "mnist":
