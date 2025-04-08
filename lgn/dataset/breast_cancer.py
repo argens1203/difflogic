@@ -29,7 +29,7 @@ class BreastCancerDataset(CustomDataset, AutoTransformer):
         raw_data = self.read_raw_data(select=lambda x: "?" not in x)
         labels, features = raw_data[:, 0], raw_data[:, 1:]
 
-        self.raw_features = features
+        self.raw_features = features.copy()
 
         self.features = BreastCancerDataset.transform_feature(features)
         self.labels = BreastCancerDataset.transform_label(labels)

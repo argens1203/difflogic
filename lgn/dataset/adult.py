@@ -70,7 +70,7 @@ class AdultDataset(CustomDataset, AutoTransformer):
         # Cast as strings
         features, labels = raw_data[:, :-1].astype(str), raw_data[:, -1].astype(str)
 
-        self.raw_features = features
+        self.raw_features = features.copy()
         # Remove fnlwgt and education-num
         features = np.delete(features, [2, 4], axis=1)
 

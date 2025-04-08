@@ -67,7 +67,7 @@ class Instance:
         if attr in self.Dataset.continuous_attributes:
             return self.explain_continuous(attr_idx_offset, attr, converter)
         else:
-            return self.explain_discrete(attr_idx_offset, converter)
+            return self.explain_discrete(attr_idx_offset, attr, converter)
 
     def verbose(self, explanation: Partial_Inp):
         positives = filter(lambda x: x > 0, explanation)
