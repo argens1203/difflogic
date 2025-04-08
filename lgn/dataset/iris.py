@@ -20,5 +20,7 @@ class IrisDataset(CustomDataset, AutoTransformer):
         raw_data = self.read_raw_data(self.fpath)
         features, labels = raw_data[:, :-1], raw_data[:, -1]
 
+        self.raw_features = features.copy()
+
         self.features = IrisDataset.transform_feature(features)
         self.labels = IrisDataset.transform_label(labels)

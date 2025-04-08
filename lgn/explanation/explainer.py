@@ -24,7 +24,6 @@ class Explainer:
         pred_class = instance.get_predicted_class()
         inp = instance.get_input()
 
-        logger.info("\n")
         logger.info("Explaining Input: %s", inp)
 
         logger.debug("Predicted Class - %s", pred_class)
@@ -293,5 +292,6 @@ class Explainer:
             logger.info("CXP #%d: %s", i, cxp)
         # logger.info("AXPs: %s", str(axps))
         # logger.info("CXPs: %s", str(cxps))
+        logger.info("\n")
 
         return len(axps) + len(axp_dual)

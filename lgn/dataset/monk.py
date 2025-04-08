@@ -22,6 +22,8 @@ class MonkDataset(CustomDataset, AutoTransformer):
         raw_data = raw_data[:, :-1]  # Remove instance id
         labels, features = raw_data[:, 0], raw_data[:, 1:]
 
+        self.raw_features = features
+
         self.features = MonkDataset.transform_feature(features)
         self.labels = MonkDataset.transform_label(labels)
 

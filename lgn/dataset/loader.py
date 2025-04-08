@@ -10,6 +10,13 @@ from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
 
 
+def get_raw(dataset):
+    def get_raw_data(index: int):
+        return dataset.raw_features[index]
+
+    return get_raw_data
+
+
 def new_load_dataset(args):
     if args.dataset == "adult":
         train_set = AdultDataset(split="train")
@@ -20,7 +27,15 @@ def new_load_dataset(args):
         test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=int(1e6), shuffle=False
         )
-        return train_loader, test_loader, train_set, test_set
+        return (
+            train_loader,
+            test_loader,
+            train_set,
+            test_set,
+            None,
+            get_raw(train_set),
+            get_raw(test_set),
+        )
 
     if args.dataset in ["monk1", "monk2", "monk3"]:
         style = int(args.dataset[4])
@@ -42,7 +57,15 @@ def new_load_dataset(args):
         test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=int(1e6), shuffle=False
         )
-        return train_loader, test_loader, train_set, test_set
+        return (
+            train_loader,
+            test_loader,
+            train_set,
+            test_set,
+            None,
+            get_raw(train_set),
+            get_raw(test_set),
+        )
 
     if args.dataset == "iris":
         dataset = IrisDataset()
@@ -61,4 +84,4 @@ def new_load_dataset(args):
         test_set, batch_size=int(1e6), shuffle=False
     )
     validation_loader = None
-    return train_loader, test_loader, train_set, test_set
+    return train_loader, test_loader, train_set, test_set, get_raw(dataset), None, None

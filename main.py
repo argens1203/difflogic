@@ -57,7 +57,15 @@ if __name__ == "__main__":
 
     ####################################################################################################################
 
-    train_loader, test_loader, train_set, test_set = new_load_dataset(args)
+    (
+        train_loader,
+        test_loader,
+        train_set,
+        test_set,
+        get_raw,
+        get_train_raw,
+        get_test_raw,
+    ) = new_load_dataset(args)
 
     model, loss_fn, optim = get_model(args, results)
 
@@ -90,6 +98,7 @@ if __name__ == "__main__":
         dataset = get_attribute_ranges(args.dataset)
         encoding = Encoding(model, input_dim, output_dim, dataset)
         encoding.print()
+        logger.info("\n")
 
         # TODO: add test to conduct this
         # Validator.validate_with_truth_table(encoding=encoding, model=model)
@@ -98,30 +107,54 @@ if __name__ == "__main__":
 
         explainer = Explainer(encoding)
 
+        def get(index, train=True):
+            if get_raw is not None:
+                return get_raw(index)
+            if train:
+                return get_train_raw(index)
+            else:
+                return get_test_raw(index)
+
         if args.explain is not None:
             inp = args.explain.split(",")
             inp = [int(i) for i in inp]
             instance = Instance.from_encoding(encoding=encoding, inp=inp)
             explainer.explain_both_and_assert(instance)
         elif args.explain_all:
-            for batch, label in test_loader:
-                for feat in batch:
+            for batch, label, idx in test_loader:
+                for feat, i in zip(batch, idx):
+                    raw = get(i, train=False)
+                    logger.info("Raw: %s\n", raw)
+
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
                     explainer.explain_both_and_assert(instance)
-            for batch, label in train_loader:
-                for feat in batch:
+
+            for batch, label, idx in train_loader:
+                for feat, i in zip(batch, idx):
+                    raw = get(i, train=True)
+                    logger.info("Raw: %s\n", raw)
+
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
                     explainer.explain_both_and_assert(instance)
+
         elif args.explain_one:
-            batch, label = next(iter(test_loader))
-            for feat in batch:
+            batch, label, idx = next(iter(test_loader))
+            for feat, index in zip(batch, idx):
+
+                raw = get(index, train=False)
+                logger.info("Raw: %s\n", raw)
+
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
                 explainer.explain_both_and_assert(instance)
+
                 break
         else:
             test_count = 0
-            for batch, label in test_loader:
-                for feat in batch:
+            for batch, label, idx in test_loader:
+                for feat, index in zip(batch, idx):
+
+                    raw = get(index, train=False)
+                    logger.info("Raw: %s\n", raw)
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
                     test_count += explainer.explain_both_and_assert(instance)
             print("Test Count: ", test_count)

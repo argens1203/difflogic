@@ -24,9 +24,10 @@ class CustomDataset(Dataset, ABC):
 
     def __getitem__(self, index):
         feature, label = self.features[index], self.labels[index]
+
         if self.transform is not None:
             feature = self.transform(feature)
-        return feature, label
+        return feature, label, index
 
     def get_all(self):
         return self.features, self.labels

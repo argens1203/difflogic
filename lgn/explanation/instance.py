@@ -52,7 +52,7 @@ class Instance:
         if offset == 0:
             return f"{attr} smaller than {bin_edges[1]:.2f}"
 
-        if offset == len(bin_edges) - 1:
+        if offset == len(bin_edges) - 2:
             return f"{attr} larger than {bin_edges[-2]:.2f}"
 
         return f"{attr} between {bin_edges[offset - 1]:.2f} and {bin_edges[offset]:.2f}"
