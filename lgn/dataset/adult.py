@@ -1,6 +1,6 @@
 import numpy as np
 
-from .dataset import CustomDataset
+from .custom_dataset import CustomDataset
 
 from sklearn.preprocessing import LabelEncoder
 from .converter import Converter
@@ -99,3 +99,10 @@ class AdultDataset(CustomDataset):
 
     def inverse_transform_label(self, labels):
         return AdultDataset.label_encoder.inverse_transform(labels)
+
+    # -- Getters -- #
+    def get_attribute_ranges():
+        return AdultDataset.converter.get_n_classes()
+
+    def get_input_dim():
+        return sum(AdultDataset.converter.get_n_classes())

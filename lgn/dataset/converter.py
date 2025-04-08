@@ -108,3 +108,7 @@ class Converter:
     def fit_transform(self, data):
         self.fit(data)
         return self.transform(data)
+
+    # -- Getters -- #
+    def get_n_classes(self):
+        return self.n_classes

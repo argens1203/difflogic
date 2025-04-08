@@ -1,6 +1,6 @@
 import torch
 
-from .dataset import CustomDataset
+from .custom_dataset import CustomDataset
 
 
 class MonkDataset(CustomDataset):
