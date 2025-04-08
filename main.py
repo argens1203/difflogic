@@ -1,91 +1,31 @@
 import random
 import logging
-import os
 
 import numpy as np
 import torch
 
-from lgn.encoding import Validator, Encoding
+from lgn.encoding import Encoding
 from lgn.explanation import Explainer, Instance
-from lgn.dataset.dataset import (
-    load_dataset,
-    IrisDataset,
-    AdultDataset,
-    MonkDataset,
-    BreastCancerDataset,
-    Binarizer,
+from lgn.dataset import (
     input_dim_of_dataset,
-    Flatten,
     num_classes_of_dataset,
     get_attribute_ranges,
-    Caltech101Dataset,
-    MNISTDataset,
+    new_load_dataset,
 )
-from lgn.model import get_model, compile_model
-from lgn.model import train_eval
-from lgn.util import get_args
-from lgn.util import get_results
-
-import torchvision.datasets
-from torchvision import transforms
+from lgn.model import get_model, compile_model, train_eval
+from lgn.util import get_args, get_results, setup_logger
+from pysat.card import EncType
 
 torch.set_num_threads(1)  # ???
 
-console_handler = logging.StreamHandler()
-console_format = logging.Formatter(
-    # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    "%(message)s"
-)
-console_handler.setFormatter(console_format)
 
-LOG_FILE_PATH = "main.log"
-
-
-def seed_all(seed):
+def seed_all(seed=0):
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
 
 
-def new_load_dataset(args):
-    if args.dataset == "iris":
-        dataset = IrisDataset(transform=Binarizer(IrisDataset(), 2))
-    elif args.dataset == "caltech101":
-        dataset = Caltech101Dataset()
-    elif args.dataset == "adult":
-        return load_dataset(args)
-    elif args.dataset in ["monk1", "monk2", "monk3"]:
-        return load_dataset(args)
-    elif args.dataset == "breast_cancer":
-        return load_dataset(args)
-    elif args.dataset == "mnist":
-        dataset = MNISTDataset()
-        # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
-
-    print(dataset[0][0].shape)
-    print(dataset[0][0])
-    train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
-    train_loader = torch.utils.data.DataLoader(
-        train_set, batch_size=args.batch_size, shuffle=True
-    )
-    test_loader = torch.utils.data.DataLoader(
-        test_set, batch_size=int(1e6), shuffle=False
-    )
-    validation_loader = None
-    return train_loader, validation_loader, test_loader
-
-
-if __name__ == "__main__":
-    args = get_args()
-    args.model_path = args.dataset + "_" + args.model_path
-    args.batch_size = 100
-    # args.dataset = "iris"
-    args.num_iterations = 2000
-    args.eval_freq = 1000
-    # args.num_neurons = 6
-    args.num_layers = 2
-    args.get_formula = True
-
+def setup_neurons(args):
     if args.dataset == "iris":
         args.num_neurons = 6  # >= 4, div 3
     elif args.dataset == "caltech101":
@@ -99,58 +39,45 @@ if __name__ == "__main__":
     elif args.dataset == "mnist":
         args.num_neurons = 400  # >= 400, div 10
 
-    if args.verbose:
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
 
-        console_handler.setLevel(logging.DEBUG)
-        logger.addHandler(console_handler)
-    else:
-        if os.path.exists(LOG_FILE_PATH):
-            os.remove(LOG_FILE_PATH)
-        file_handler = logging.FileHandler(LOG_FILE_PATH)
-        file_format = logging.Formatter(
-            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            "%(message)s"
-        )
-        file_handler.setFormatter(file_format)
+if __name__ == "__main__":
+    args = get_args()
+    args.model_path = args.dataset + "_" + args.model_path
+    args.batch_size = 100
+    args.num_iterations = 2000
+    args.eval_freq = 1000
+    args.num_layers = 2
+    args.get_formula = True
 
-        # TEMP
-        if os.path.exists("main.log.i"):
-            os.remove("main.log.i")
-        info_handler = logging.FileHandler("main.log.i")
-        file_format = logging.Formatter(
-            # "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            "%(message)s"
-        )
-        info_handler.setFormatter(file_format)
-        info_handler.setLevel(logging.INFO)
-        # TEMP
+    def get_enc_type(args):
+        return {
+            "pw": EncType.pairwise,
+            "seqc": EncType.seqcounter,
+            "cardn": EncType.cardnetwrk,
+            "sortn": EncType.sortnetwrk,
+            "tot": EncType.totalizer,
+            "mtot": EncType.mtotalizer,
+            "kmtot": EncType.kmtotalizer,
+        }[args.enc_type]
 
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
+    setup_neurons(args)
+    setup_logger(args)
+    seed_all(args.seed)
 
-        console_handler.setLevel(logging.INFO)
-        file_handler.setLevel(logging.DEBUG)
-
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        # TEMP
-        logger.addHandler(info_handler)
-        # TEMP
-
-    # logging.disable(logging.DEBUG)
-
+    logger = logging.getLogger()
     results = get_results(args.experiment_id, args)
-    # seed_all(args.seed)
-    seed_all(0)
 
     ####################################################################################################################
 
-    # dataset = AdultDataset(transform=Binarizer(AdultDataset(), 2))
-    train_loader, validation_loader, test_loader = new_load_dataset(args)
-
-    # train_loader, validation_loader, test_loader = load_dataset(args)
+    (
+        train_loader,
+        test_loader,
+        train_set,
+        test_set,
+        get_raw,
+        get_train_raw,
+        get_test_raw,
+    ) = new_load_dataset(args)
 
     model, loss_fn, optim = get_model(args, results)
 
@@ -161,7 +88,7 @@ if __name__ == "__main__":
         train_eval(
             args,
             train_loader,
-            validation_loader,
+            None,
             test_loader,
             model,
             loss_fn,
@@ -180,119 +107,70 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-        attribute_ranges = get_attribute_ranges(args.dataset)
-        encoding = Encoding(model, input_dim, output_dim, attribute_ranges)
+        dataset = get_attribute_ranges(args.dataset)
+        encoding = Encoding(
+            model, input_dim, output_dim, dataset, enc_type=get_enc_type(args)
+        )
         encoding.print()
+        logger.info("\n")
 
         # TODO: add test to conduct this
         # Validator.validate_with_truth_table(encoding=encoding, model=model)
 
         # ============= ============= ============= ============= ============= ============= ============= =============
 
-        # instance = train_loader.dataset[0]
-        # feat, label = instance
-
-        # Explainer(encoding).explain(feat)
-
-        # NEW
-        print(encoding.input_ids)
-        print(encoding.input_handles)
-        print(encoding.get_attribute_ranges())
-        # NEW
-
         explainer = Explainer(encoding)
 
-        from operator import itemgetter
-
-        def explain_both_and_assert(instance):
-            explainer.explain(instance)
-
-            axps, axp_dual = explainer.mhs_mus_enumeration(instance)
-            cxps, cxp_dual = explainer.mhs_mcs_enumeration(instance)
-
-            logger.info("Input: %s", instance.get_input())
-            logger.info(
-                "AXPs: %s",
-                str(
-                    [sorted(one) for one in sorted(axps, key=lambda x: (len(x), x[0]))]
-                ),
-            )
-            logger.info(
-                "Duals: %s",
-                str(
-                    [
-                        sorted(one)
-                        for one in sorted(axp_dual, key=lambda x: (len(x), x[0]))
-                    ]
-                ),
-            )
-            logger.info(
-                "CXPs: %s",
-                str(
-                    [sorted(one) for one in sorted(cxps, key=lambda x: (len(x), x[0]))]
-                ),
-            )
-            logger.info(
-                "Duals: %s",
-                str(
-                    [
-                        sorted(one)
-                        for one in sorted(cxp_dual, key=lambda x: (len(x), x[0]))
-                    ]
-                ),
-            )
-            axp_set = set()
-            for axp in axps:
-                axp_set.add(frozenset(axp))
-            cxp_set = set()
-            for cxp in cxps:
-                cxp_set.add(frozenset(cxp))
-            axp_dual_set = set()
-            for axp_d in axp_dual:
-                axp_dual_set.add(frozenset(axp_d))
-            cxp_dual_set = set()
-            for cxp_d in cxp_dual:
-                cxp_dual_set.add(frozenset(cxp_d))
-
-            # TODO: does not work on adult (test set)
-            assert axp_set.difference(cxp_dual_set) == set()
-            assert cxp_dual_set.difference(axp_set) == set()
-
-            assert axp_dual_set.difference(cxp_set) == set()
-            assert cxp_set.difference(axp_dual_set) == set()
-
-            return len(axps) + len(axp_dual)
+        def get(index, train=True):
+            if get_raw is not None:
+                return get_raw(index)
+            if train:
+                return get_train_raw(index)
+            else:
+                return get_test_raw(index)
 
         if args.explain is not None:
-            inp = args.explain.split(",")
-            inp = [int(i) for i in inp]
-            print(inp)
-            instance = Instance.from_encoding(encoding=encoding, inp=inp)
-            # try:
-            explain_both_and_assert(instance)
+            raw = args.explain.split(",")
+            logger.info("Raw: %s\n", raw)
+            instance = Instance.from_encoding(encoding=encoding, raw=raw)
+            explainer.explain_both_and_assert(instance, xnum=args.xnum)
         elif args.explain_all:
-            for batch, label in test_loader:
-                for feat in batch:
+            for batch, label, idx in test_loader:
+                for feat, i in zip(batch, idx):
+                    raw = get(i, train=False)
+                    logger.info("Raw: %s\n", raw)
+
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explain_both_and_assert(instance)
-            for batch, label in train_loader:
-                for feat in batch:
+                    explainer.explain_both_and_assert(instance, xnum=args.xnum)
+
+            for batch, label, idx in train_loader:
+                for feat, i in zip(batch, idx):
+                    raw = get(i, train=True)
+                    logger.info("Raw: %s\n", raw)
+
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explain_both_and_assert(instance)
+                    explainer.explain_both_and_assert(instance, xnum=args.xnum)
+
         elif args.explain_one:
-            batch, label = next(iter(test_loader))
-            for feat in batch:
+            batch, label, idx = next(iter(test_loader))
+            for feat, index in zip(batch, idx):
+
+                raw = get(index, train=False)
+                logger.info("Raw: %s\n", raw)
+
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                explain_both_and_assert(instance)
+                explainer.explain_both_and_assert(instance, xnum=args.xnum)
+
                 break
         else:
             test_count = 0
-            for batch, label in test_loader:
-                for feat in batch:
+            for batch, label, idx in test_loader:
+                for feat, index in zip(batch, idx):
+
+                    raw = get(index, train=False)
+                    logger.info("Raw: %s\n", raw)
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    test_count += explain_both_and_assert(instance)
+                    test_count += explainer.explain_both_and_assert(
+                        instance, xnum=args.xnum
+                    )
             print("Test Count: ", test_count)
-
-
-# First Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --save_model"
-# Subsequent Run "python main.py  -bs 100 --dataset iris -ni 2000 -ef 1_000 -k 6 -l 2 --get_formula --load_model"

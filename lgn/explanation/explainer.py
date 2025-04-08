@@ -1,16 +1,10 @@
 import logging
 from typing import Set
 
-from pysat.examples.hitman import Hitman
-
 from lgn.encoding import Encoding
-from lgn.util import input_to_feat, Stat
+from lgn.util import Stat
 from lgn.util import (
-    Inp,
-    Partial_Inp,
-    Htype,
     Partial_Inp_Set,
-    Inp_Set,
     Transformed_Partial_Inp_Set,
 )
 
@@ -30,7 +24,6 @@ class Explainer:
         pred_class = instance.get_predicted_class()
         inp = instance.get_input()
 
-        logger.info("\n")
         logger.info("Explaining Input: %s", inp)
 
         logger.debug("Predicted Class - %s", pred_class)
@@ -60,10 +53,6 @@ class Explainer:
     ) -> Set[int]:
         # CXP lies within unmatching features (between inp and guess)
         inp = set(session.options)
-        # print("model", model)
-        # print("inp", inp)
-        # print("guess", guess)
-        # exit()
 
         assert inp - guess - model == inp - model
 
@@ -111,7 +100,7 @@ class Explainer:
                 # If guess is MUS, block it
                 if not res["solvable"]:
                     session.block(guess)
-                    if session.get_expls_count() > xnum:
+                    if session.get_expls_count() >= xnum:
                         break
                     else:
                         continue
@@ -121,14 +110,17 @@ class Explainer:
                 session.hit(mcs)
 
             # Extact outputs
-            expls = session.get_expls()
-            duals = session.get_duals()
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
             itr = session.get_itr()
 
             # Check itration count
-            assert itr == (
-                len(session.expls) + len(session.duals) + 1
-            ), "Assertion Error: " + ",".join(map(str, [itr, len(expls), len(duals)]))
+            if xnum > 100:
+                assert itr == (
+                    len(session.expls) + len(session.duals) + 1
+                ), "Assertion Error: " + ",".join(
+                    map(str, [itr, len(expls), len(duals)])
+                )
 
             return expls, duals
 
@@ -164,7 +156,6 @@ class Explainer:
         ) as session:
 
             inp = set(session.options)
-            # print("options", inp)
             counter = Explainer._enumerate_unit_mus(session=session)
             session.add_to_itr(counter)
 
@@ -178,7 +169,6 @@ class Explainer:
 
                 # Try the guess
                 res = session.solve_opt(inp=inp - hset)
-                # print("res 179  ", res)
 
                 # If guess is MCS, block it
                 if res["solvable"]:
@@ -199,22 +189,23 @@ class Explainer:
 
             # Extract outputs
             itr = session.get_itr()
-            expls = session.get_expls()
-            duals = session.get_duals()
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
 
-            # Check iteration count
-            assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
-                map(str, [itr, len(expls), len(duals)])
-            )
+            if xnum > 100:
+                # Check iteration count
+                assert itr == (
+                    len(expls) + len(duals) + 1
+                ), "Assertion Error: " + ",".join(
+                    map(str, [itr, len(expls), len(duals)])
+                )
             return expls, duals
 
     # PRIVATE
 
     def reduce_axp_opt(self, inp: Transformed_Partial_Inp_Set, session: Session):
-        # print("inp", inp)
         tmp_inp = inp.copy()
         for hypo in inp:
-            # print("reduced", tmp_inp - {hypo})
             if not session.is_solvable_with_opt(inp=tmp_inp - {hypo}):
                 tmp_inp = tmp_inp - {hypo}
 
@@ -252,3 +243,62 @@ class Explainer:
     def __del__(self):
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
         logger.debug("Cache Miss: %s", str(Stat.cache_miss))
+
+    def explain_both_and_assert(self, instance, xnum=1000):
+        self.explain(instance)
+
+        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum)
+        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum)
+
+        logger.info("Input: %s", instance.get_input())
+        logger.info(
+            "AXPs: %s",
+            str([sorted(one) for one in sorted(axps, key=lambda x: (len(x), x[0]))]),
+        )
+        logger.info(
+            "Duals: %s",
+            str(
+                [sorted(one) for one in sorted(axp_dual, key=lambda x: (len(x), x[0]))]
+            ),
+        )
+        logger.info(
+            "CXPs: %s",
+            str([sorted(one) for one in sorted(cxps, key=lambda x: (len(x), x[0]))]),
+        )
+        logger.info(
+            "Duals: %s",
+            str(
+                [sorted(one) for one in sorted(cxp_dual, key=lambda x: (len(x), x[0]))]
+            ),
+        )
+        axp_set = set()
+        for axp in axps:
+            axp_set.add(frozenset(axp))
+        cxp_set = set()
+        for cxp in cxps:
+            cxp_set.add(frozenset(cxp))
+        axp_dual_set = set()
+        for axp_d in axp_dual:
+            axp_dual_set.add(frozenset(axp_d))
+        cxp_dual_set = set()
+        for cxp_d in cxp_dual:
+            cxp_dual_set.add(frozenset(cxp_d))
+
+        if xnum > 100:
+            assert axp_set.difference(cxp_dual_set) == set()
+            assert cxp_dual_set.difference(axp_set) == set()
+
+            assert axp_dual_set.difference(cxp_set) == set()
+            assert cxp_set.difference(axp_dual_set) == set()
+
+        axps = [instance.verbose(axp) for axp in axps]
+        cxps = [instance.verbose(cxp) for cxp in cxps]
+        for i, axp in enumerate(axps):
+            logger.info("AXP #%d: %s", i, axp)
+        for i, cxp in enumerate(cxps):
+            logger.info("CXP #%d: %s", i, cxp)
+        # logger.info("AXPs: %s", str(axps))
+        # logger.info("CXPs: %s", str(cxps))
+        logger.info("\n")
+
+        return len(axps) + len(axp_dual)

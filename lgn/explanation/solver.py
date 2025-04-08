@@ -20,12 +20,14 @@ class Solver:
         # NEW
         Formula.attach_vpool(self._copy_vpool(encoding), id(self))
 
+        self.enc_type = encoding.get_enc_type()
+
     def set_cardinality(self, lits, bound):
         with self.use_context() as vpool:
             comp = CardEnc.atleast(
                 lits=lits,
                 bound=bound,
-                encoding=EncType.totalizer,
+                encoding=self.enc_type,
                 vpool=vpool,
             )
             clauses = comp.clauses
@@ -46,31 +48,20 @@ class Solver:
     # NEW
     def assert_model_correctness(self, model):
         def ensure_one_positive(part):
-            # print(list(filter(lambda x: x > 0, part)))
             assert len(list(filter(lambda x: x > 0, part))) == 1
 
         if model is None:
             return
 
-        # print(self.encoding.input_ids)
-        # print(self.encoding.input_handles)
-        # print(model)
-        # print(self.encoding.get_attribute_ranges())
-
         itr = 0
         for step in self.encoding.get_attribute_ranges():
             ensure_one_positive(model[itr : itr + step])
             itr += step
-        # exit()
 
     # NEW
 
     def get_core(self):
         core = self.solver.get_core()
-
-        # NEW
-        # print("core", core)
-        # NEW
 
         return core
 

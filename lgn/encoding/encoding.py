@@ -10,6 +10,8 @@ from difflogic import LogicLayer, GroupSum
 
 from constant import device
 
+from lgn.dataset import AutoTransformer
+
 fp_type = torch.float32
 
 logger = logging.getLogger(__name__)
@@ -37,8 +39,16 @@ def get_formula(model, input_dim):
 
 class Encoding:
     def __init__(
-        self, model, input_dim, class_dim, attribute_ranges: List[int], fp_type=fp_type
+        self,
+        model,
+        input_dim,
+        class_dim,
+        Dataset: AutoTransformer,
+        fp_type=fp_type,
+        **kwargs,
     ):
+        self.enc_type = kwargs.get("enc_type", EncType.totalizer)
+
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
@@ -71,7 +81,7 @@ class Encoding:
         with self.use_context() as vpool:
             start = 0
             logger.debug("full_input_ids: %s", self.input_ids)
-            for step in attribute_ranges:
+            for step in Dataset.get_attribute_ranges():
                 logger.debug("Step: %d", step)
                 logger.debug("input_ids: %s", self.input_ids[start : start + step])
                 part = self.input_ids[start : start + step]
@@ -79,7 +89,7 @@ class Encoding:
                     CardEnc.equals(
                         lits=part,
                         vpool=vpool,
-                        encoding=EncType.totalizer,
+                        encoding=self.enc_type,
                     )
                 )
                 start += step
@@ -89,8 +99,9 @@ class Encoding:
 
         self.input_dim = input_dim
         self.class_dim = class_dim
-        self.attribute_ranges = attribute_ranges
         self.fp_type = fp_type
+
+        self.Dataset = Dataset
 
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
@@ -107,7 +118,7 @@ class Encoding:
         return list(range(1, self.class_dim + 1))
 
     def get_attribute_ranges(self):
-        return self.attribute_ranges
+        return self.Dataset.get_attribute_ranges()
 
     def as_model(self):
         """
@@ -150,6 +161,9 @@ class Encoding:
                 print("==== IDPool ====")
                 for f, id in vpool.obj2id.items():
                     print(id, f)
+
+    def get_enc_type(self):
+        return self.enc_type
 
     @contextmanager
     def use_context(self):

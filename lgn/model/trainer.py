@@ -28,7 +28,7 @@ def eval(model, loader, mode):
                 .to(torch.float32)
                 .mean()
                 .item()
-                for x, y in loader
+                for x, y, _ in loader
             ]
         )
         model.train(mode=orig_mode)
@@ -52,7 +52,7 @@ def packbits_eval(model, loader):
                 .to(torch.float32)
                 .mean()
                 .item()
-                for x, y in loader
+                for x, y, _ in loader
             ]
         )
         model.train(mode=orig_mode)
@@ -125,7 +125,7 @@ def train_eval(
     optim,
     results=None,
 ):
-    for i, (x, y) in tqdm(
+    for i, (x, y, _) in tqdm(
         enumerate(load_n(train_loader, args.num_iterations)),
         desc="iteration",
         total=args.num_iterations,

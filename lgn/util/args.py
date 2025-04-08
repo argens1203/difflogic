@@ -142,6 +142,16 @@ def get_args():
 
     parser.add_argument("--explain_one", action="store_true", default=False)
 
+    parser.add_argument("--xnum", type=int, default=1000)
+
+    parser.add_argument(
+        "--enc_type",
+        type=str,
+        default="tot",
+        choices=["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"],
+        help="Encoding type for the model",
+    )
+
     args = parser.parse_args()
 
     if args.verbose:
