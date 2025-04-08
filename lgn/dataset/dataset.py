@@ -21,7 +21,7 @@ def load_n(loader, n):
 
 def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
     return {
-        "adult": 116,
+        "adult": 115,
         "breast_cancer": 51,
         "iris": 4 * 2,
         "monk1": 17,
@@ -58,7 +58,7 @@ def get_attribute_ranges(dataset):
         "monk3": [3, 3, 2, 3, 4, 2],
         "iris": [2, 2, 2, 2],
         "breast_cancer": [9, 3, 12, 13, 2, 3, 2, 5, 2],
-        "adult": [5, 8, 16, 7, 14, 6, 5, 2, 3, 3, 6, 41],
+        "adult": [5, 7, 16, 7, 14, 6, 5, 2, 3, 3, 6, 41],
     }[dataset]
 
 

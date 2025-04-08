@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from .uci import UCIDataset
 from lgn.dataset import get_attribute_ranges
 
+from sklearn.preprocessing import LabelEncoder, KBinsDiscretizer, OneHotEncoder
+
 attributes = [
     "age",
     "workclass",
@@ -333,13 +335,267 @@ class AdultDataset(UCIDataset):
         data = read_raw_data(data_file_name)
         data = discard_missing_data(data)
 
-        feat = convert_data_to_feature_vectors(data)
-        labels = get_labels(data)
+        # feat = convert_data_to_feature_vectors(data)
+        # labels = get_labels(data)
+        # print(feat[0])
+        # print(labels[0])
+        print("-------ddd-------------")
+        f2, l2 = AdultDataset.new_convert(data)
+        return f2, l2
+        assert feat == f2, feat
+        assert labels == l2, labels
 
         return feat, labels
+
+    def new_convert(data):
+
+        data = np.array(data).astype(str)
+        feature, label = data[:, :-1], data[:, -1]
+        feature = np.delete(feature, [2, 4], axis=1)
+
+        attributes = [
+            "age",
+            "workclass",
+            # "fnlwgt",
+            "education",
+            # "education-num",
+            "marital-status",
+            "occupation",
+            "relationship",
+            "race",
+            "sex",
+            "capital-gain",
+            "capital-loss",
+            "hours-per-week",
+            "native-country",
+            # "label",
+        ]
+        continuous_attributes = {
+            "age",
+            "capital-gain",
+            "capital-loss",
+            "hours-per-week",
+        }
+        bin_sizes = {
+            "age": 5,
+            "capital-gain": 3,
+            "capital-loss": 3,
+            "hours-per-week": 6,
+        }
+        converter = Converter(
+            attributes=attributes,
+            continuous_attributes=continuous_attributes,
+            bin_sizes=bin_sizes,
+        )
+        le = LabelEncoder()
+
+        feature = converter.fit_transform(feature)
+        label = le.fit_transform(label)
+
+        return feature, label
 
     def translate(inp):
         """
         Translate the input to the original feature space.
         """
         return [idx_to_attributes[abs(i) - 1] for i in inp]
+
+
+class Converter:
+    def __init__(
+        self,
+        attributes,
+        continuous_attributes=None,
+        discrete_attributes=None,
+        bin_sizes=None,
+    ):
+        print("converter")
+        print(attributes)
+        print(continuous_attributes)
+        print(discrete_attributes)
+        print(bin_sizes)
+        self.attributes = attributes
+        self.continuous_attributes = continuous_attributes
+        self.discrete_attributes = discrete_attributes
+        self.bin_sizes = bin_sizes
+
+        if continuous_attributes is None:
+            self.continuous_attributes = set(attributes) - discrete_attributes
+        if discrete_attributes is None:
+            self.discrete_attributes = set(attributes) - continuous_attributes
+
+        self.convertors = dict()
+        self.setup_convertors()
+
+        self.ohe = None  # Note: OneHotEncoder is not initialized until fit is called
+        self.n_classes = []
+
+    def setup_convertors(self):
+        for attr in self.attributes:
+            if attr in self.continuous_attributes:
+                self.convertors[attr] = KBinsDiscretizer(
+                    n_bins=self.bin_sizes[attr], encode="ordinal", strategy="kmeans"
+                )
+            elif attr in self.discrete_attributes:
+                self.convertors[attr] = LabelEncoder()
+            else:
+                raise ValueError(f"Unknown attribute {attr}")
+
+    def transform_attr(self, data, attr):
+        if attr in self.continuous_attributes:
+            return (
+                self.convertors[attr]
+                .transform(data.astype(float).reshape(-1, 1))
+                .reshape(-1)
+            )
+        elif attr in self.discrete_attributes:
+            return self.convertors[attr].transform(data)
+        else:
+            raise ValueError(f"Unknown attribute {attr}")
+
+    def fit_attr(self, data, attr):
+        converter = self.convertors[attr]
+
+        if attr in self.continuous_attributes:
+            data = data.astype(float).reshape(-1, 1)
+            converter.fit(data)
+            return converter.n_bins_[0].item()
+
+        if attr in self.discrete_attributes:
+            converter.fit(data)
+            return len(converter.classes_)
+
+        raise ValueError(f"Unknown attribute {attr}")
+
+    def inverse_transform_attr(self, data, attr):
+        converter = self.convertors[attr]
+
+        if attr in self.continuous_attributes:
+            data = data.reshape(-1, 1)
+            return converter.inverse_transform(data).reshape(-1)
+
+        if attr in self.discrete_attributes:
+            return converter.inverse_transform(data)
+
+        raise ValueError(f"Unknown attribute {attr}")
+
+    def transform(self, data):
+        for i, attr in enumerate(self.attributes):
+            data[:, i] = self.transform_attr(data[:, i], attr)
+
+        data = data.astype(float).astype(int)
+        data = self.ohe.fit_transform(data)
+
+        return data
+
+    def inverse_transform(self, data):
+        data = self.ohe.inverse_transform(data)
+        data = data.astype(str)
+        for i, attr in enumerate(self.attributes):
+            data[:, i] = self.inverse_transform_attr(data[:, i].astype(int), attr)
+        return data
+
+    def fit(self, data):
+        n_classes = []
+
+        for i, attr in enumerate(self.attributes):
+            n = self.fit_attr(data[:, i], attr)
+            n_classes.append(n)
+
+        print("n_classes", n_classes)
+        self.ohe = OneHotEncoder(
+            sparse_output=False,
+        )
+        self.n_classes = n_classes
+
+    def fit_transform(self, data):
+        self.fit(data)
+        return self.transform(data)
+
+    # def new_convert(data):
+    #     le = LabelEncoder()
+    #     attributes = [
+    #         "age",
+    #         "workclass",
+    #         # "fnlwgt",
+    #         "education",
+    #         # "education-num",
+    #         "marital-status",
+    #         "occupation",
+    #         "relationship",
+    #         "race",
+    #         "sex",
+    #         "capital-gain",
+    #         "capital-loss",
+    #         "hours-per-week",
+    #         "native-country",
+    #     ]
+    #     continuous_attributes = {
+    #         "age": ["minor", "very-young", "young", "middle-aged", "senior"],
+    #         # 'fnlwgt': 'Final-Weight',
+    #         # 'education-num': 'Education-Num',
+    #         "capital-gain": ["no-gain", "small-gain", "large-gain"],
+    #         "capital-loss": ["no-loss", "small-loss", "large-loss"],  # 5k
+    #         "hours-per-week": [
+    #             "no-hours",
+    #             "mini-hours",
+    #             "half-hours",
+    #             "full-hours",
+    #             "more-hours",
+    #             "most-hours",
+    #         ],
+    #     }
+
+    #     le_dict = dict()
+
+    #     data = np.array(data)
+
+    #     # print(data.shape)
+    #     # print(data[0])
+
+    #     label = data[:, -1]
+    #     continuous_data = np.concat((data[:, 0], data[:, 10:13]), axis=1).astype(int)
+    #     discrete_data = np.concat(
+    #         (data[:, 1], data[:, 3], data[:, 5:10], data[13]), axis=1
+    #     )
+    #     continuous_dict = {
+    #         "age": KBinsDiscretizer(n_bins=5),
+    #         "capital-gain": KBinsDiscretizer(n_bins=3),
+    #         "capital-loss": KBinsDiscretizer(n_bins=3),
+    #         "hours-per-week": KBinsDiscretizer(n_bins=6),
+    #     }
+    #     print(continuous_data)
+    #     print(continuous_data[0])
+    #     for i, attr in enumerate(continuous_attributes):
+    #         print(attr)
+    #         continuous_dict[attr].fit(continuous_data[:, i])
+    #     print(np.concat([cont]))
+
+    #     data = np.concat((data[:, :2], data[:, 3], data[:, 5:-1]), axis=1)
+    #     # print(data.shape)
+    #     print(data[0])
+    #     for i, attr in enumerate(attributes):
+    #         # print(attr)
+    #         if attr not in continuous_attributes:
+    #             print("added to dict", attr)
+    #             le_dict[attr] = LabelEncoder()
+    #             le_dict[attr].fit(data[:, i])
+    #             print(data[0, i])
+    #             data[:, i] = le_dict[attr].transform(data[:, i])
+    #             print(data[0, i])
+
+    #     print(data[0])
+
+    #     data = data.astype(int)
+    #     # print(data.shape)
+
+    #     # print(label.shape)
+    #     # print(label[0])
+
+    #     cp = data.copy().astype(str)
+    #     for i, value in enumerate(data[0]):
+    #         if attributes[i] not in continuous_attributes:
+    #             print("from dict", attributes[i])
+    #             cp[0, i] = le_dict[attributes[i]].inverse_transform([value])[0]
+    #     print(cp[0])
+    #     exit()
