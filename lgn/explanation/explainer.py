@@ -111,8 +111,8 @@ class Explainer:
                 session.hit(mcs)
 
             # Extact outputs
-            expls = session.get_expls()
-            duals = session.get_duals()
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
             itr = session.get_itr()
 
             # Check itration count
@@ -187,8 +187,8 @@ class Explainer:
 
             # Extract outputs
             itr = session.get_itr()
-            expls = session.get_expls()
-            duals = session.get_duals()
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
 
             # Check iteration count
             assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
@@ -284,5 +284,14 @@ class Explainer:
 
         assert axp_dual_set.difference(cxp_set) == set()
         assert cxp_set.difference(axp_dual_set) == set()
+
+        axps = [instance.verbose(axp) for axp in axps]
+        cxps = [instance.verbose(cxp) for cxp in cxps]
+        for i, axp in enumerate(axps):
+            logger.info("AXP #%d: %s", i, axp)
+        for i, cxp in enumerate(cxps):
+            logger.info("CXP #%d: %s", i, cxp)
+        # logger.info("AXPs: %s", str(axps))
+        # logger.info("CXPs: %s", str(cxps))
 
         return len(axps) + len(axp_dual)

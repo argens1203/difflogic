@@ -20,7 +20,7 @@ def new_load_dataset(args):
         test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=int(1e6), shuffle=False
         )
-        return train_loader, None, test_loader
+        return train_loader, test_loader, train_set, test_set
 
     if args.dataset in ["monk1", "monk2", "monk3"]:
         style = int(args.dataset[4])
@@ -42,7 +42,7 @@ def new_load_dataset(args):
         test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=int(1e6), shuffle=False
         )
-        return train_loader, None, test_loader
+        return train_loader, test_loader, train_set, test_set
 
     if args.dataset == "iris":
         dataset = IrisDataset()
@@ -61,4 +61,4 @@ def new_load_dataset(args):
         test_set, batch_size=int(1e6), shuffle=False
     )
     validation_loader = None
-    return train_loader, validation_loader, test_loader
+    return train_loader, test_loader, train_set, test_set

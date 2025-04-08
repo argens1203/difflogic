@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     ####################################################################################################################
 
-    train_loader, validation_loader, test_loader = new_load_dataset(args)
+    train_loader, test_loader, train_set, test_set = new_load_dataset(args)
 
     model, loss_fn, optim = get_model(args, results)
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         train_eval(
             args,
             train_loader,
-            validation_loader,
+            None,
             test_loader,
             model,
             loss_fn,
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     if args.get_formula:
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
-        attribute_ranges = get_attribute_ranges(args.dataset)
-        encoding = Encoding(model, input_dim, output_dim, attribute_ranges)
+        dataset = get_attribute_ranges(args.dataset)
+        encoding = Encoding(model, input_dim, output_dim, dataset)
         encoding.print()
 
         # TODO: add test to conduct this

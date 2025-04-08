@@ -60,13 +60,13 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
 
 def get_attribute_ranges(dataset):
     if dataset == "adult":
-        return AdultDataset.get_attribute_ranges()
+        return AdultDataset
     if dataset in ["monk1", "monk2", "monk3"]:
-        return MonkDataset.get_attribute_ranges()
+        return MonkDataset
     if dataset == "iris":
-        return IrisDataset.get_attribute_ranges()
+        return IrisDataset
     if dataset == "breast_cancer":
-        return BreastCancerDataset.get_attribute_ranges()
+        return BreastCancerDataset
 
 
 class Flatten:
