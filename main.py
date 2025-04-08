@@ -14,6 +14,7 @@ from lgn.dataset import (
 )
 from lgn.model import get_model, compile_model, train_eval
 from lgn.util import get_args, get_results, setup_logger
+from pysat.card import EncType
 
 torch.set_num_threads(1)  # ???
 
@@ -47,6 +48,17 @@ if __name__ == "__main__":
     args.eval_freq = 1000
     args.num_layers = 2
     args.get_formula = True
+
+    def get_enc_type(args):
+        return {
+            "pw": EncType.pairwise,
+            "seqc": EncType.seqcounter,
+            "cardn": EncType.cardnetwrk,
+            "sortn": EncType.sortnetwrk,
+            "tot": EncType.totalizer,
+            "mtot": EncType.mtotalizer,
+            "kmtot": EncType.kmtotalizer,
+        }[args.enc_type]
 
     setup_neurons(args)
     setup_logger(args)
@@ -96,7 +108,9 @@ if __name__ == "__main__":
         input_dim = input_dim_of_dataset(args.dataset)
         output_dim = num_classes_of_dataset(args.dataset)
         dataset = get_attribute_ranges(args.dataset)
-        encoding = Encoding(model, input_dim, output_dim, dataset)
+        encoding = Encoding(
+            model, input_dim, output_dim, dataset, enc_type=get_enc_type(args)
+        )
         encoding.print()
         logger.info("\n")
 
@@ -119,7 +133,7 @@ if __name__ == "__main__":
             raw = args.explain.split(",")
             logger.info("Raw: %s\n", raw)
             instance = Instance.from_encoding(encoding=encoding, raw=raw)
-            explainer.explain_both_and_assert(instance)
+            explainer.explain_both_and_assert(instance, xnum=args.xnum)
         elif args.explain_all:
             for batch, label, idx in test_loader:
                 for feat, i in zip(batch, idx):
@@ -127,7 +141,7 @@ if __name__ == "__main__":
                     logger.info("Raw: %s\n", raw)
 
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explainer.explain_both_and_assert(instance)
+                    explainer.explain_both_and_assert(instance, xnum=args.xnum)
 
             for batch, label, idx in train_loader:
                 for feat, i in zip(batch, idx):
@@ -135,7 +149,7 @@ if __name__ == "__main__":
                     logger.info("Raw: %s\n", raw)
 
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explainer.explain_both_and_assert(instance)
+                    explainer.explain_both_and_assert(instance, xnum=args.xnum)
 
         elif args.explain_one:
             batch, label, idx = next(iter(test_loader))
@@ -145,7 +159,7 @@ if __name__ == "__main__":
                 logger.info("Raw: %s\n", raw)
 
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                explainer.explain_both_and_assert(instance)
+                explainer.explain_both_and_assert(instance, xnum=args.xnum)
 
                 break
         else:
@@ -156,5 +170,7 @@ if __name__ == "__main__":
                     raw = get(index, train=False)
                     logger.info("Raw: %s\n", raw)
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    test_count += explainer.explain_both_and_assert(instance)
+                    test_count += explainer.explain_both_and_assert(
+                        instance, xnum=args.xnum
+                    )
             print("Test Count: ", test_count)

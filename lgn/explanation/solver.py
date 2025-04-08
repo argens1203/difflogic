@@ -20,12 +20,14 @@ class Solver:
         # NEW
         Formula.attach_vpool(self._copy_vpool(encoding), id(self))
 
+        self.enc_type = encoding.get_enc_type()
+
     def set_cardinality(self, lits, bound):
         with self.use_context() as vpool:
             comp = CardEnc.atleast(
                 lits=lits,
                 bound=bound,
-                encoding=EncType.totalizer,
+                encoding=self.enc_type,
                 vpool=vpool,
             )
             clauses = comp.clauses

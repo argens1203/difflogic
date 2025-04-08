@@ -39,8 +39,16 @@ def get_formula(model, input_dim):
 
 class Encoding:
     def __init__(
-        self, model, input_dim, class_dim, Dataset: AutoTransformer, fp_type=fp_type
+        self,
+        model,
+        input_dim,
+        class_dim,
+        Dataset: AutoTransformer,
+        fp_type=fp_type,
+        **kwargs,
     ):
+        self.enc_type = kwargs.get("enc_type", EncType.totalizer)
+
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
@@ -81,7 +89,7 @@ class Encoding:
                     CardEnc.equals(
                         lits=part,
                         vpool=vpool,
-                        encoding=EncType.totalizer,
+                        encoding=self.enc_type,
                     )
                 )
                 start += step
@@ -153,6 +161,9 @@ class Encoding:
                 print("==== IDPool ====")
                 for f, id in vpool.obj2id.items():
                     print(id, f)
+
+    def get_enc_type(self):
+        return self.enc_type
 
     @contextmanager
     def use_context(self):

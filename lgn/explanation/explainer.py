@@ -100,7 +100,7 @@ class Explainer:
                 # If guess is MUS, block it
                 if not res["solvable"]:
                     session.block(guess)
-                    if session.get_expls_count() > xnum:
+                    if session.get_expls_count() >= xnum:
                         break
                     else:
                         continue
@@ -115,9 +115,12 @@ class Explainer:
             itr = session.get_itr()
 
             # Check itration count
-            assert itr == (
-                len(session.expls) + len(session.duals) + 1
-            ), "Assertion Error: " + ",".join(map(str, [itr, len(expls), len(duals)]))
+            if xnum > 100:
+                assert itr == (
+                    len(session.expls) + len(session.duals) + 1
+                ), "Assertion Error: " + ",".join(
+                    map(str, [itr, len(expls), len(duals)])
+                )
 
             return expls, duals
 
@@ -189,10 +192,13 @@ class Explainer:
             expls = session.get_expls_opt()
             duals = session.get_duals_opt()
 
-            # Check iteration count
-            assert itr == (len(expls) + len(duals) + 1), "Assertion Error: " + ",".join(
-                map(str, [itr, len(expls), len(duals)])
-            )
+            if xnum > 100:
+                # Check iteration count
+                assert itr == (
+                    len(expls) + len(duals) + 1
+                ), "Assertion Error: " + ",".join(
+                    map(str, [itr, len(expls), len(duals)])
+                )
             return expls, duals
 
     # PRIVATE
@@ -238,11 +244,11 @@ class Explainer:
         logger.debug("Cache Hit: %s", str(Stat.cache_hit))
         logger.debug("Cache Miss: %s", str(Stat.cache_miss))
 
-    def explain_both_and_assert(self, instance):
+    def explain_both_and_assert(self, instance, xnum=1000):
         self.explain(instance)
 
-        axps, axp_dual = self.mhs_mus_enumeration(instance)
-        cxps, cxp_dual = self.mhs_mcs_enumeration(instance)
+        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum)
+        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum)
 
         logger.info("Input: %s", instance.get_input())
         logger.info(
@@ -278,11 +284,12 @@ class Explainer:
         for cxp_d in cxp_dual:
             cxp_dual_set.add(frozenset(cxp_d))
 
-        assert axp_set.difference(cxp_dual_set) == set()
-        assert cxp_dual_set.difference(axp_set) == set()
+        if xnum > 100:
+            assert axp_set.difference(cxp_dual_set) == set()
+            assert cxp_dual_set.difference(axp_set) == set()
 
-        assert axp_dual_set.difference(cxp_set) == set()
-        assert cxp_set.difference(axp_dual_set) == set()
+            assert axp_dual_set.difference(cxp_set) == set()
+            assert cxp_set.difference(axp_dual_set) == set()
 
         axps = [instance.verbose(axp) for axp in axps]
         cxps = [instance.verbose(cxp) for cxp in cxps]
