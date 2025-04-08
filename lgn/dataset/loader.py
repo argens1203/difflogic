@@ -1,8 +1,6 @@
 import torch
-from .dataset import (
-    Caltech101Dataset,
-    MNISTDataset,
-)
+from .dataset import Caltech101Dataset
+from .mnist import MNISTDataset
 from .binarizer import Binarizer
 from .adult import AdultDataset
 from .monk import Monk1Dataset, Monk2Dataset, Monk3Dataset
@@ -83,5 +81,4 @@ def new_load_dataset(args):
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=int(1e6), shuffle=False
     )
-    validation_loader = None
     return train_loader, test_loader, train_set, test_set, get_raw(dataset), None, None

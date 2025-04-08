@@ -8,6 +8,7 @@ from .adult import AdultDataset
 from .monk import MonkDataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
+from .mnist import MNISTDataset
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,8 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
         return IrisDataset.get_input_dim()
     if dataset == "breast_cancer":
         return BreastCancerDataset.get_input_dim()
+    if dataset == "mnist":
+        return MNISTDataset.get_input_dim()
     return {
         "mnist": 400 * 2,
         "mnist20x20": 400,
@@ -49,8 +52,9 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
         return IrisDataset.get_num_of_classes()
     if dataset == "breast_cancer":
         return BreastCancerDataset.get_num_of_classes()
+    if dataset == "mnist":
+        return MNISTDataset.get_num_of_classes()
     return {
-        "mnist": 10,
         "mnist20x20": 10,
         "cifar-10-3-thresholds": 10,
         "cifar-10-31-thresholds": 10,
@@ -67,6 +71,8 @@ def get_attribute_ranges(dataset):
         return IrisDataset
     if dataset == "breast_cancer":
         return BreastCancerDataset
+    if dataset == "mnist":
+        return MNISTDataset
 
 
 class Flatten:
@@ -99,41 +105,6 @@ class Caltech101Dataset:
                 transforms.ToTensor(),
                 transforms.Resize((64, 64)),
                 transforms.Grayscale(),
-                Flatten(),
-                Binarizer(dataset, 2),
-            ]
-        ),
-    )
-
-    def __call__(self):
-        return self.dataset
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, index):
-        return self.dataset[index]
-
-
-class MNISTDataset:
-    dataset = torchvision.datasets.MNIST(
-        "data-uci",
-        download=True,
-        transform=transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Resize((20, 20)),
-                Flatten(),
-            ]
-        ),
-    )
-    dataset = torchvision.datasets.MNIST(
-        "data-uci",
-        download=True,
-        transform=transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Resize((20, 20)),
                 Flatten(),
                 Binarizer(dataset, 2),
             ]
