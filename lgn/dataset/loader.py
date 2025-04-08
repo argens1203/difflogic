@@ -51,6 +51,7 @@ def new_load_dataset(args):
         test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=int(1e6), shuffle=False
         )
+        return train_loader, None, test_loader
     elif args.dataset == "mnist":
         dataset = MNISTDataset()
 
