@@ -141,41 +141,6 @@ class IrisDataset(CustomDataset):
         self.features, self.labels = parse(raw_data)
 
 
-class AdultDataset(CustomDataset):
-    file_list = [
-        (
-            "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
-            "5d7c39d7b8804f071cdd1f2a7c460872",
-        ),
-        (
-            "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
-            "35238206dfdf7f1fe215bbb874adecdc",
-        ),
-    ]
-    label_dict = {"<=50K": 0, ">50K": 1}
-
-    def __init__(self, train=True, transform=None):
-        self.url, self.md5 = self.file_list[0] if train else self.file_list[1]
-        CustomDataset.__init__(self, transform)
-
-    def load_data(self):
-        def parse_feature(features):
-            return [float(f) for f in features]
-
-        def parse(data):
-            features = [parse_feature(sample[:-1]) for sample in data]
-            labels = [self.label_dict[sample[-1]] for sample in data]
-            features, labels = (
-                torch.tensor(features).float(),
-                torch.tensor(labels).float(),
-            )
-
-            return features, labels
-
-        raw_data = self.read_raw_data(self.fpath)
-        self.features, self.labels = parse(raw_data)
-
-
 class BreastCancerDataset(CustomDataset):
     url, md5 = (
         "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer/breast-cancer.data",

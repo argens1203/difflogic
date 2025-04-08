@@ -2,7 +2,7 @@ import numpy as np
 
 from .dataset import CustomDataset
 
-from sklearn.preprocessing import LabelEncoder, KBinsDiscretizer, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 from .converter import Converter
 
 
@@ -15,6 +15,9 @@ class AdultDataset(CustomDataset):
         "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
         "35238206dfdf7f1fe215bbb874adecdc",
     )
+
+    converter = None
+    label_encoder = None
 
     attributes = [
         "age",
@@ -51,13 +54,9 @@ class AdultDataset(CustomDataset):
         root=None,
         split="train",
         transform=None,
-        converter=None,
-        label_encoder=None,
     ):
         self.url = self.train_url if split == "train" else self.test_url
         self.md5 = self.train_md5 if split == "train" else self.test_md5
-        self.converter = converter
-        self.label_encoder = label_encoder
 
         super(AdultDataset, self).__init__(transform=transform, root=root)
 
@@ -68,26 +67,35 @@ class AdultDataset(CustomDataset):
             select=lambda x: "?" not in x and "|" not in x,
         )
 
-        self.features, self.labels = self.binarize(raw_data)
+        # Cast as strings
+        features, labels = raw_data[:, :-1].astype(str), raw_data[:, -1].astype(str)
 
-    def binarize(self, data):
-        data = np.array(data).astype(str)
-        feature, label = data[:, :-1], data[:, -1]
-        feature = np.delete(feature, [2, 4], axis=1)
+        # Remove fnlwgt and education-num
+        features = np.delete(features, [2, 4], axis=1)
 
-        if self.converter is None:
-            self.converter = Converter(
+        self.features = self.transform_feature(features)
+        self.labels = self.transform_label(labels)
+
+    def transform_label(self, labels):
+        if AdultDataset.label_encoder is None:
+            AdultDataset.label_encoder = LabelEncoder()
+            AdultDataset.label_encoder.fit(labels)
+
+        return AdultDataset.label_encoder.transform(labels)
+
+    def transform_feature(self, features):
+        if AdultDataset.converter is None:
+            AdultDataset.converter = Converter(
                 attributes=AdultDataset.attributes,
                 continuous_attributes=AdultDataset.continuous_attributes,
                 bin_sizes=AdultDataset.bin_sizes,
             )
-            self.converter.fit(feature)
+            AdultDataset.converter.fit(features)
 
-        if self.label_encoder is None:
-            self.label_encoder = LabelEncoder()
-            self.label_encoder.fit(label)
+        return AdultDataset.converter.transform(features)
 
-        feature = self.converter.transform(feature)
-        label = self.label_encoder.transform(label)
+    def inverse_transform_feature(self, features):
+        return AdultDataset.converter.inverse_transform(features)
 
-        return feature, label
+    def inverse_transform_label(self, labels):
+        return AdultDataset.label_encoder.inverse_transform(labels)
