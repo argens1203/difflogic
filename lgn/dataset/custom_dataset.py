@@ -31,7 +31,10 @@ class CustomDataset(Dataset, ABC):
     def get_all(self):
         return self.features, self.labels
 
-    def read_raw_data(self, filepath, delimiter=",", select=lambda x: True):
+    def read_raw_data(self, filepath=None, delimiter=",", select=lambda x: True):
+        if filepath is None:
+            filepath = self.fpath
+
         with open(filepath, "r") as f:
             data = f.readlines()
 

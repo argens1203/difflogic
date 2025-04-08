@@ -44,21 +44,10 @@ def new_load_dataset(args):
         )
         return train_loader, None, test_loader
 
-    if args.dataset == "breast_cancer":
-        train_set = BreastCancerDataset(
-            "./data-uci", split="train", download=True, with_val=False
-        )
-        test_set = BreastCancerDataset("./data-uci", split="test", with_val=False)
-        train_loader = torch.utils.data.DataLoader(
-            train_set, batch_size=args.batch_size, shuffle=True
-        )
-        test_loader = torch.utils.data.DataLoader(
-            test_set, batch_size=int(1e6), shuffle=False
-        )
-        return train_loader, None, test_loader
-
     if args.dataset == "iris":
         dataset = IrisDataset()
+    elif args.dataset == "breast_cancer":
+        dataset = BreastCancerDataset()
     elif args.dataset == "caltech101":
         dataset = Caltech101Dataset()
     elif args.dataset == "mnist":

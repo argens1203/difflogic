@@ -7,6 +7,7 @@ from .binarizer import Binarizer
 from .adult import AdultDataset
 from .monk import MonkDataset
 from .iris import IrisDataset
+from .breast_cancer import BreastCancerDataset
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
         return MonkDataset.get_input_dim()
     if dataset == "iris":
         return IrisDataset.get_input_dim()
+    if dataset == "breast_cancer":
+        return BreastCancerDataset.get_input_dim()
     return {
         "breast_cancer": 51,
         "mnist": 400 * 2,
@@ -61,9 +64,8 @@ def get_attribute_ranges(dataset):
         return MonkDataset.get_attribute_ranges()
     if dataset == "iris":
         return IrisDataset.get_attribute_ranges()
-    return {
-        "breast_cancer": [9, 3, 12, 13, 2, 3, 2, 5, 2],
-    }[dataset]
+    if dataset == "breast_cancer":
+        return BreastCancerDataset.get_attribute_ranges()
 
 
 class Flatten:
