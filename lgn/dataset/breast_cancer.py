@@ -1,13 +1,5 @@
-import logging
-import torch
-import numpy as np
-from torch.utils.data import Dataset
-from torchvision.datasets.utils import download_url, check_integrity
-import os
-from sklearn.model_selection import train_test_split
 from .custom_dataset import CustomDataset
 from .auto_transformer import AutoTransformer
-from .uci import UCIDataset
 
 
 class BreastCancerDataset(CustomDataset, AutoTransformer):
