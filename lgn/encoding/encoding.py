@@ -8,19 +8,28 @@ from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
 
-from constant import device
+from constant import device, Args
 
 from lgn.dataset import AutoTransformer
+from .bdd import BDDSolver
 
 fp_type = torch.float32
 
 logger = logging.getLogger(__name__)
 
 
-def get_formula(model, input_dim):
+def get_formula(model, input_dim, Dataset: AutoTransformer):
     # x = [Atom() for i in range(input_dim)]
     x = [Atom(i + 1) for i in range(input_dim)]
     inputs = x
+
+    if Args["Deduplicate"]:
+        print("Deduplicating...")
+        solver = BDDSolver.from_inputs(inputs=x)
+        solver.set_ohe(Dataset.get_attribute_ranges())
+    else:
+        print("Not deduplicating...")
+
     all = set()
     for i in x:
         all.add(i)
@@ -30,6 +39,8 @@ def get_formula(model, input_dim):
         if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
             continue
         x = layer.get_formula(x)
+        if Args["Deduplicate"]:
+            x = solver.deduplicate(x)
         for o in x:
             all.add(o)
 
@@ -50,7 +61,7 @@ class Encoding:
         self.enc_type = kwargs.get("enc_type", EncType.totalizer)
 
         with self.use_context() as vpool:
-            self.formula, self.input_handles = get_formula(model, input_dim)
+            self.formula, self.input_handles = get_formula(model, input_dim, Dataset)
             self.input_ids = [vpool.id(h) for h in self.input_handles]
             self.cnf = CNF()
             self.output_ids = []
@@ -64,13 +75,14 @@ class Encoding:
                 logger.debug("Formula: %s", f)
                 logger.debug("CNF Clauses: %s", f.clauses)
                 logger.debug("Simplified: %s", f.simplified())
+                logger.debug("CNF Clauses: %s", self.cnf.clauses)
                 idx = 0
                 if f.clauses[-1][1] is None:
                     self.special[idx] = f.simplified()
                 self.output_ids.append(f.clauses[-1][1])
                 idx += 1
 
-                logger.debug("Modified formulas: %s", list(f))
+                logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", self.cnf.clauses)
             # REMARK: formula represents output from second last layer
             # ie.: dimension is neuron_number, not class number

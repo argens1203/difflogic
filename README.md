@@ -234,6 +234,8 @@ python main.py --dataset=monk3 --load_model --explain=1,1,1,1,4,1
 python main.py --dataset=breast_cancer --load_model --explain=60-69,ge40,20-24,0-2,no,3,right,left_low,no
 
 # More Commands
+brew install graphviz
+
 python main.py --dataset=iris --load_model --explain=5.1,3.3,1.7,0.5 --enc_type=tot
 
 python main.py --dataset=mnist --load_model --explain_one --xnum=1 --verbose

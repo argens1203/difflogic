@@ -152,6 +152,8 @@ def get_args():
         help="Encoding type for the model",
     )
 
+    parser.add_argument("--deduplicate", action="store_true", default=False)
+
     args = parser.parse_args()
 
     if args.verbose:

@@ -30,10 +30,10 @@ def setup_logger(args=None):
     file_handler = setup_file_logger_and_remove_log(LOG_FILE_PATH)
     file_handler.setFormatter(default_formatter)
     file_handler.setLevel(logging.DEBUG)
-    # logger.addHandler(file_handler)
+    logger.addHandler(file_handler)
 
     if DEBUG:
         info_file_handler = setup_file_logger_and_remove_log(INFO_LOG_FILE_PATH)
         info_file_handler.setFormatter(default_formatter)
         info_file_handler.setLevel(logging.INFO)
-        # logger.addHandler(info_file_handler)
+        logger.addHandler(info_file_handler)
