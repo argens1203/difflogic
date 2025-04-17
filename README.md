@@ -234,10 +234,18 @@ python main.py --dataset=monk3 --load_model --explain=1,1,1,1,4,1
 python main.py --dataset=breast_cancer --load_model --explain=60-69,ge40,20-24,0-2,no,3,right,left_low,no
 
 # More Commands
-brew install graphviz
 
 python main.py --dataset=iris --load_model --explain=5.1,3.3,1.7,0.5 --enc_type=tot
 
 python main.py --dataset=mnist --load_model --explain_one --xnum=1 --verbose
+
+# BDD (Binary Decision Diagram)
+
+brew install graphviz
+### iris num_neurons doubled from 6 to 12
+
+python main.py --dataset=iris --explain_one --save_model && python main.py --dataset=iris --explain_one --load_model --deduplcate
+
+
 # TODO:
 1. fixing file structure of lgn/dataset
