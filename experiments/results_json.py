@@ -18,6 +18,16 @@ class ResultsJSON(object):
 
         self.server_name = socket.gethostname().split(".")[0]
 
+    def store_encoding(self, encoding):
+        self.cnf_size = encoding.stats["cnf_size"]
+        self.eq_size = encoding.stats["eq_size"]
+        self.formulas = [str(f.simplified()) for f in encoding.formula]
+        self.encoding_time = time.time()
+        self.encoding_time_taken = self.encoding_time - self.model_complete_time
+
+    def store_custom(self, key: str, val):
+        setattr(self, key, val)
+
     def store_args(self, args):
 
         self.args = vars(args)
@@ -41,7 +51,7 @@ class ResultsJSON(object):
         self.save_time = time.time()
         self.total_time = self.save_time - self.init_time
 
-        json_str = json.dumps(self.__dict__)
+        json_str = json.dumps(self.__dict__, indent=4, sort_keys=True)
 
         with open(
             os.path.join(self.path, "{:08d}.json".format(self.eid)), mode="w"

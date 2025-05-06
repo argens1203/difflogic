@@ -2,6 +2,8 @@ from typing import List, Set
 from pysat.formula import Formula, Atom, Or, And, Neg, Implies, XOr
 from dd.autoref import BDD, Function
 
+from constant import Stats
+
 
 def xor(a: Function, b: Function) -> Function:
     return (a | b) & ~(a & b)
@@ -106,6 +108,7 @@ class BDDSolver:
         for p in previous:
             if self.is_equiv(transformed, self.transform(p)):
                 if len(str(f)) >= len(str(p)):
+                    Stats["deduplication"] += 1
                     return p
                 else:
                     return f

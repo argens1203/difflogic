@@ -8,7 +8,7 @@ from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
 
-from constant import device, Args
+from constant import device, Args, Stats
 
 from lgn.dataset import AutoTransformer
 from .bdd import BDDSolver
@@ -24,16 +24,17 @@ def get_formula(model, input_dim, Dataset: AutoTransformer):
     inputs = x
 
     if Args["Deduplicate"]:
-        print("Deduplicating...")
+        logger.debug("Deduplicating...")
         solver = BDDSolver.from_inputs(inputs=x)
         solver.set_ohe(Dataset.get_attribute_ranges())
     else:
-        print("Not deduplicating...")
+        logger.debug("Not deduplicating...")
 
     if Args["Deduplicate"]:
         all = set()
         for i in x:
             all.add(i)
+        Stats["deduplication"] = 0
 
     for layer in model:
         assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
@@ -115,6 +116,12 @@ class Encoding:
         self.fp_type = fp_type
 
         self.Dataset = Dataset
+
+        # STATS
+        self.stats = {
+            "cnf_size": len(self.cnf.clauses),
+            "eq_size": len(self.eq_constraints.clauses),
+        }
 
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim

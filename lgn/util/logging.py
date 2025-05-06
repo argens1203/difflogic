@@ -18,6 +18,8 @@ def setup_file_logger_and_remove_log(file_path):
 
 
 def setup_logger(args=None):
+    if not args.verbose:
+        return
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
