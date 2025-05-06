@@ -244,7 +244,7 @@ python main.py --dataset=mnist --load_model --explain_one --xnum=1 --verbose
 brew install graphviz
 ### iris num_neurons doubled from 6 to 12
 
-python main.py --dataset=iris --explain_one --save_model && python main.py --dataset=iris --explain_one --load_model --deduplcate
+python main.py --dataset=iris --explain_one --save_model && python main.py --dataset=iris --explain_one --load_model --deduplicate
 
 
 # TODO:

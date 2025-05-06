@@ -1,6 +1,5 @@
-from typing import List
+from typing import List, Set
 from pysat.formula import Formula, Atom, Or, And, Neg, Implies, XOr
-
 from dd.autoref import BDD, Function
 
 
@@ -102,15 +101,15 @@ class BDDSolver:
         else:
             raise ValueError(f"Unsupported formula type: {type(formula)}")
 
-    def deduplicate(self, formulas: List[Formula]):
-        transformed = [self.transform(f) for f in formulas]
-
-        for t_idx in range(1, len(formulas)):
-            for p_idx in range(0, t_idx):
-                if self.is_equiv(transformed[t_idx], transformed[p_idx]):
-                    formulas[t_idx] = formulas[p_idx]
-                    break
-        return formulas
+    def deduplicate(self, f: Formula, previous: Set[Formula]):
+        transformed = self.transform(f)
+        for p in previous:
+            if self.is_equiv(transformed, self.transform(p)):
+                if len(str(f)) >= len(str(p)):
+                    return p
+                else:
+                    return f
+        return f
 
     @staticmethod
     def from_inputs(inputs: List[Atom]):

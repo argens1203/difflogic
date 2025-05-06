@@ -30,9 +30,10 @@ def get_formula(model, input_dim, Dataset: AutoTransformer):
     else:
         print("Not deduplicating...")
 
-    all = set()
-    for i in x:
-        all.add(i)
+    if Args["Deduplicate"]:
+        all = set()
+        for i in x:
+            all.add(i)
 
     for layer in model:
         assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
@@ -40,9 +41,9 @@ def get_formula(model, input_dim, Dataset: AutoTransformer):
             continue
         x = layer.get_formula(x)
         if Args["Deduplicate"]:
-            x = solver.deduplicate(x)
-        for o in x:
-            all.add(o)
+            for idx in range(len(x)):
+                x[idx] = solver.deduplicate(x[idx], all)
+                all.add(x[idx])
 
     x[0] = Atom(False)
     return x, inputs
