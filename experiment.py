@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 import torch
 import json
-
+from tqdm import tqdm
 from lgn.encoding import Encoding
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
@@ -231,7 +231,7 @@ class Experiment:
         self.run(args)
 
     def experiment(self):
-        datasets = ["iris", "adult", "breast_cancer", "monk1", "monk2", "monk3"]
+        datasets = ["iris", "monk1", "monk2", "monk3", "adult", "breast_cancer"]
         # datasets = ["adult", "breast_cancer", "monk1", "monk2", "monk3"]
         experiment_ids = list(range(1, 7))
         # experiment_ids = list(range(1, 6))
@@ -250,10 +250,11 @@ class Experiment:
                 "explain_all": True,
                 "deduplicate": True,
                 "verbose": False,
+                "xnum": 30,
                 # 'explain_timeout': 100,
                 # TODO: add timeout
             }
-            args = {**default_args, **exp_args, **dataset_args}
+            args = {**default_args, **exp_args, **dataset_args, **{"dataset": dataset}}
             args["experiment_id"] = experiment_id
             results = self.run(args)
             all_res.append(
@@ -401,9 +402,9 @@ class Experiment:
                 all_times = 0
                 exp_count = 0
                 count = 0
-                for batch, label, idx in test_loader:
+                for batch, label, idx in tqdm(test_loader):
                     start = time.time()
-                    for feat, i in zip(batch, idx):
+                    for feat, i in tqdm(zip(batch, idx)):
                         raw = get(i, train=False)
                         logger.info("Raw: %s\n", raw)
 
@@ -414,10 +415,14 @@ class Experiment:
                         exp_count += exp_count_axp_plus_cxp
                     all_times += time.time() - start
                     count += len(batch)
+                    # if count > 1000:
+                    #     break
 
-                for batch, label, idx in train_loader:
+                for batch, label, idx in tqdm(train_loader):
+                    # if count > 1000:
+                    #     break
                     start = time.time()
-                    for feat, i in zip(batch, idx):
+                    for feat, i in tqdm(zip(batch, idx)):
                         raw = get(i, train=True)
                         logger.info("Raw: %s\n", raw)
 
