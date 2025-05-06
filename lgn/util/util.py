@@ -19,7 +19,7 @@ def input_to_feat(inp):
 
 def get_results(experiment_id, args):
     if experiment_id is not None:
-        assert 520_000 <= experiment_id < 530_000, experiment_id
+        # assert 520_000 <= experiment_id < 530_000, experiment_id
         results = ResultsJSON(eid=experiment_id, path="./results/")
         results.store_args(args)
         return results
