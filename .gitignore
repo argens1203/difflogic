@@ -13,3 +13,4 @@ main.log
 main.log.info
 main.log.i
 *.png
+*.pth

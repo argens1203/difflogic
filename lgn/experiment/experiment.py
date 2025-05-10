@@ -330,17 +330,6 @@ class Experiment:
         if args.load_model:
             print("Loading Model...")
             model.load_state_dict(torch.load(args.model_path))
-        # else:
-        #     train_eval(
-        #         args,
-        #         train_loader,
-        #         None,
-        #         test_loader,
-        #         model,
-        #         loss_fn,
-        #         optim,
-        #         results,
-        #     )
 
         ####################################################################################################################
         if results is not None:
@@ -404,12 +393,8 @@ class Experiment:
                         exp_count += exp_count_axp_plus_cxp
                     all_times += time.time() - start
                     count += len(batch)
-                    # if count > 1000:
-                    #     break
 
                 for batch, label, idx in tqdm(train_loader):
-                    # if count > 1000:
-                    #     break
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
                         raw = get(i, train=True)
