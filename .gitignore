@@ -10,4 +10,6 @@ difflogic.egg-infomain.log
 difflogic.egg-info
 main.log
 .DS_Store
+main.log.info
 main.log.i
+*.png

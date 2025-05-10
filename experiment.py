@@ -230,11 +230,7 @@ class Experiment:
         args = {**vars(args), **default_args, **exp_args, **dataset_args}
         self.run(args)
 
-    def experiment(self):
-        datasets = ["iris", "monk1", "monk2", "monk3", "adult", "breast_cancer"]
-        # datasets = ["adult", "breast_cancer", "monk1", "monk2", "monk3"]
-        experiment_ids = list(range(1, 7))
-        # experiment_ids = list(range(1, 6))
+    def experiment(self, datasets=None, experiment_ids=None):
         all_res = []
         for dataset, experiment_id in zip(datasets, experiment_ids):
             dataset_args = Settings.get_settings(
