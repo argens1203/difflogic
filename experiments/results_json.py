@@ -18,16 +18,6 @@ class ResultsJSON(object):
 
         self.server_name = socket.gethostname().split(".")[0]
 
-    def store_encoding(self, encoding):
-        self.cnf_size = encoding.stats["cnf_size"]
-        self.eq_size = encoding.stats["eq_size"]
-        self.formulas = [str(f.simplified()) for f in encoding.formula]
-        self.encoding_time = time.time()
-        self.encoding_time_taken = self.encoding_time - self.model_complete_time
-
-    def store_custom(self, key: str, val):
-        setattr(self, key, val)
-
     def store_args(self, args):
 
         self.args = vars(args)
@@ -72,6 +62,26 @@ class ResultsJSON(object):
         assert eid == self.eid
 
         return self
+
+    # ---- ADD ONs ---- #
+
+    def store_encoding(self, encoding):
+        self.cnf_size = encoding.stats["cnf_size"]
+        self.eq_size = encoding.stats["eq_size"]
+        self.formulas = [str(f.simplified()) for f in encoding.formula]
+        self.encoding_time = time.time()
+        self.encoding_time_taken = self.encoding_time - self.model_complete_time
+
+    def store_explanation_stat(self, mean_explain_count, deduplication):
+        self.mean_explain_count = mean_explain_count
+        self.deduplication = deduplication
+
+    def store_resource_usage(self, mean_explain_time, memory_usage):
+        self.mean_explain_time = mean_explain_time
+        self.memory_usage = memory_usage
+
+    def store_custom(self, key: str, val):
+        setattr(self, key, val)
 
 
 if __name__ == "__main__":

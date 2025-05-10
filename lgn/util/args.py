@@ -157,3 +157,79 @@ def get_args():
     ), f"iteration count ({args.num_iterations}) has to be divisible by evaluation frequency ({args.eval_freq})"
 
     return args
+
+
+# --- --- --- --- ---
+from dataclasses import dataclass
+
+
+@dataclass
+class DatasetArgs:
+    num_neurons: int = None
+    num_layers: int = None
+
+
+@dataclass
+class ModelArgs:
+    connections: str = "unique"
+
+
+@dataclass
+class TrainingArgs:
+    tau: int = 10
+    learning_rate: float = 0.01
+    grad_factor: float = 1.0
+    batch_size: int = 128
+    training_bit_count: int = 32  # Torch floating point precision
+
+
+@dataclass
+class ExplainerArgs:
+    enc_type: str = "tot"
+    deduplicate: bool = False
+    xnum: int = 1000
+
+
+@dataclass
+class ExperimentArgs:
+    experiment_id: int = None
+    dataset: str = "iris"
+
+
+@dataclass
+class PresentationArgs:
+    verbose: bool = False
+    save_model: bool = False
+    load_model: bool = False
+    model_path: str = "model.pth"
+
+
+@dataclass
+class CmdSandboxArgs:
+    explain: str = None
+    explain_all: bool = False
+    explain_one: bool = False
+
+
+@dataclass
+class SettingsArgs:
+    seed: int = 0
+    eval_freq: int = 2000
+    num_iterations: int = 100_000
+    packbits_eval: bool = False
+    compile_model: bool = False
+    implementation: str = "cuda"
+
+
+@dataclass
+class DefaultArgs(
+    DatasetArgs,
+    ModelArgs,
+    TrainingArgs,
+    ExplainerArgs,
+    ExperimentArgs,
+    PresentationArgs,
+    CmdSandboxArgs,
+    SettingsArgs,
+):
+    pass
