@@ -382,7 +382,15 @@ class Experiment:
         logger = logging.getLogger()
         results = get_results(args.experiment_id, args)
 
-        train_loader, test_loader, get_raw = load_dataset(args)
+        train_loader, test_loader, get_raw, get_train, get_test = load_dataset(args)
+
+        def get(idx, train=True):
+            if get_raw is not None:
+                return get_raw(idx)
+            elif train:
+                return get_train(idx)
+            else:
+                return get_test(idx)
 
         model = self.train_model(args, results, train_loader, test_loader)
 
@@ -420,7 +428,7 @@ class Experiment:
                 for batch, label, idx in tqdm(test_loader):
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
-                        raw = get_raw(i)
+                        raw = get(i, test=True)
                         logger.info("Raw: %s\n", raw)
 
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -434,7 +442,7 @@ class Experiment:
                 for batch, label, idx in tqdm(train_loader):
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
-                        raw = get_raw(i)
+                        raw = get(i, train=True)
                         logger.info("Raw: %s\n", raw)
 
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -452,7 +460,7 @@ class Experiment:
                 batch, label, idx = next(iter(test_loader))
                 for feat, index in zip(batch, idx):
 
-                    raw = get_raw(index)
+                    raw = get(index, test=True)
                     logger.info("Raw: %s\n", raw)
 
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -464,7 +472,7 @@ class Experiment:
                 for batch, label, idx in test_loader:
                     for feat, index in zip(batch, idx):
 
-                        raw = get_raw(index)
+                        raw = get(index, test=True)
                         logger.info("Raw: %s\n", raw)
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
                         test_count += explainer.explain_both_and_assert(
