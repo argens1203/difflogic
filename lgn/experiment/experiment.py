@@ -227,6 +227,54 @@ class Experiment:
         args = {**vars(args), **default_args, **exp_args, **dataset_args}
         self.run(args)
 
+    def f(self):
+        experiment_id = 1
+        all_res = []
+
+        for datasets in ["monk1", "monk2", "monk3"]:
+            dataset_args = Settings.get_settings(
+                dataset_name=datasets, paper=True, minimal=True
+            )
+            exp_args = {
+                "eval_freq": 1000,
+                "get_formula": True,
+                "model_path": datasets + "_" + "model.pth",
+                "explain_all": True,
+                "verbose": False,
+                "xnum": 1000,
+            }
+            args = {**default_args, **exp_args, **dataset_args, **{"dataset": datasets}}
+            for dedup in [True, False]:
+                args["deduplicate"] = dedup
+                args["experiment_id"] = experiment_id
+                results = self.run(args)
+                all_res.append(
+                    {
+                        "dataset": datasets,
+                        "experiment_id": experiment_id,
+                        "training_acc": results.train_acc_eval_mode[-1],
+                        "test_acc": results.test_acc_eval_mode[-1],
+                        # "formulas": results.formulas,
+                        "deduplication": dedup,
+                        "model": {
+                            "num_neurons": results.args["num_neurons"],
+                            "num_layers": results.args["num_layers"],
+                        },
+                        "encoding": {
+                            "encoding_time": results.encoding_time_taken,
+                            "cnf_size": results.cnf_size,
+                            "eq_size": results.eq_size,
+                            "deduplication": results.deduplication,
+                        },
+                        "xnum": results.args["xnum"],
+                        "mean_explain_time": results.mean_explain_time,
+                        "mean_explain_count": results.mean_explain_count,
+                    }
+                )
+                experiment_id += 1
+            with open("allres.txt", mode="w") as f:
+                f.write(json.dumps(all_res, indent=4))
+
     def experiment(self, datasets=None, experiment_ids=None):
         all_res = []
         for dataset, experiment_id in zip(datasets, experiment_ids):
@@ -278,34 +326,14 @@ class Experiment:
 
     ####################################################################################################################
 
-    def run(self, args):
-        args = argparse.Namespace(**args)
-
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
-        setup_logger(args)
-        seed_all(args.seed)
-
-        logger = logging.getLogger()
-        results = get_results(args.experiment_id, args)
-
-        (
-            train_loader,
-            test_loader,
-            train_set,
-            test_set,
-            get_raw,
-            get_train_raw,
-            get_test_raw,
-        ) = load_dataset(args)
-
+    def train_model(self, args, results, train_loader, test_loader):
         model, loss_fn, optim = get_model(args, results)
 
         if not args.save_model and not args.load_model:
             try:
                 model.load_state_dict(torch.load(args.model_path))
             except Exception as e:
-                # print(e)
+                print(e)
                 train_eval(
                     args,
                     train_loader,
@@ -341,6 +369,23 @@ class Experiment:
         if args.compile_model:
             compile_model(args, model, test_loader)
 
+        return model
+
+    def run(self, args):
+        args = argparse.Namespace(**args)
+
+        if args.deduplicate:
+            Args["Deduplicate"] = True  # TODO: find ways to store global args
+        setup_logger(args)
+        seed_all(args.seed)
+
+        logger = logging.getLogger()
+        results = get_results(args.experiment_id, args)
+
+        train_loader, test_loader, get_raw = load_dataset(args)
+
+        model = self.train_model(args, results, train_loader, test_loader)
+
         Stat.start_memory_usage()
         if args.get_formula:
             dataset = get_dataset(args.dataset)
@@ -363,14 +408,6 @@ class Experiment:
 
             explainer = Explainer(encoding)
 
-            def get(index, train=True):
-                if get_raw is not None:
-                    return get_raw(index)
-                if train:
-                    return get_train_raw(index)
-                else:
-                    return get_test_raw(index)
-
             if args.explain is not None:
                 raw = args.explain.split(",")
                 logger.info("Raw: %s\n", raw)
@@ -383,7 +420,7 @@ class Experiment:
                 for batch, label, idx in tqdm(test_loader):
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
-                        raw = get(i, train=False)
+                        raw = get_raw(i)
                         logger.info("Raw: %s\n", raw)
 
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -397,7 +434,7 @@ class Experiment:
                 for batch, label, idx in tqdm(train_loader):
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
-                        raw = get(i, train=True)
+                        raw = get_raw(i)
                         logger.info("Raw: %s\n", raw)
 
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -415,7 +452,7 @@ class Experiment:
                 batch, label, idx = next(iter(test_loader))
                 for feat, index in zip(batch, idx):
 
-                    raw = get(index, train=False)
+                    raw = get_raw(index)
                     logger.info("Raw: %s\n", raw)
 
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
@@ -427,7 +464,7 @@ class Experiment:
                 for batch, label, idx in test_loader:
                     for feat, index in zip(batch, idx):
 
-                        raw = get(index, train=False)
+                        raw = get_raw(index)
                         logger.info("Raw: %s\n", raw)
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
                         test_count += explainer.explain_both_and_assert(

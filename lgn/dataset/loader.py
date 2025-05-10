@@ -81,4 +81,4 @@ def new_load_dataset(args):
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=int(1e6), shuffle=False
     )
-    return train_loader, test_loader, train_set, test_set, get_raw(dataset), None, None
+    return train_loader, test_loader, get_raw(dataset)
