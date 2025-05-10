@@ -384,13 +384,13 @@ class Experiment:
 
         train_loader, test_loader, get_raw, get_train, get_test = load_dataset(args)
 
-        def get(idx, train=True):
+        def get(idx, test=True):
             if get_raw is not None:
                 return get_raw(idx)
-            elif train:
-                return get_train(idx)
-            else:
+            elif test:
                 return get_test(idx)
+            else:
+                return get_train(idx)
 
         model = self.train_model(args, results, train_loader, test_loader)
 
@@ -442,7 +442,7 @@ class Experiment:
                 for batch, label, idx in tqdm(train_loader):
                     start = time.time()
                     for feat, i in tqdm(zip(batch, idx)):
-                        raw = get(i, train=True)
+                        raw = get(i, test=False)
                         logger.info("Raw: %s\n", raw)
 
                         instance = Instance.from_encoding(encoding=encoding, feat=feat)
