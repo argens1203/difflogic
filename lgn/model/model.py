@@ -1,37 +1,42 @@
 import torch
+from dataclasses import dataclass
 
 from difflogic import LogicLayer, GroupSum
 
-from lgn.dataset import input_dim_of_dataset, num_classes_of_dataset
+from lgn.dataset import input_dim_of_dataset, num_classes_of_dataset, get_dataset
 from constant import device
+
+
+@dataclass
+class ModelArgs:
+    num_neurons: int
+    num_layers: int
+    grad_factor: float
+    connections: str
+    tau: float
+    learning_rate: float
+    dataset: str
+    verbose: bool = False
 
 
 def get_model(args, results=None):
     llkw = dict(grad_factor=args.grad_factor, connections=args.connections)
-
-    in_dim = input_dim_of_dataset(args.dataset)
-    class_count = num_classes_of_dataset(args.dataset)
+    dataset = get_dataset(args.dataset)
+    in_dim = dataset.get_input_dim()
+    class_count = dataset.get_num_of_classes()
 
     logic_layers = []
 
-    arch = args.architecture
     k = args.num_neurons
     l = args.num_layers
 
     ####################################################################################################################
 
-    if arch == "randomly_connected":
-        # logic_layers.append(torch.nn.Flatten())
-        logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
-        for _ in range(l - 1):
-            logic_layers.append(LogicLayer(in_dim=k, out_dim=k, **llkw))
+    logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
+    for _ in range(l - 1):
+        logic_layers.append(LogicLayer(in_dim=k, out_dim=k, **llkw))
 
-        model = torch.nn.Sequential(*logic_layers, GroupSum(class_count, args.tau))
-
-    ####################################################################################################################
-
-    else:
-        raise NotImplementedError(arch)
+    model = torch.nn.Sequential(*logic_layers, GroupSum(class_count, args.tau))
 
     ####################################################################################################################
 

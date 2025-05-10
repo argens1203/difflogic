@@ -102,7 +102,6 @@ def get_args():
     parser.add_argument(
         "--connections", type=str, default="unique", choices=["random", "unique"]
     )
-    parser.add_argument("--architecture", "-a", type=str, default="randomly_connected")
     parser.add_argument("--num_neurons", "-k", type=int)
     parser.add_argument("--num_layers", "-l", type=int)
 

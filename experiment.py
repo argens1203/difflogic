@@ -8,9 +8,7 @@ from tqdm import tqdm
 from lgn.encoding import Encoding
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
-    input_dim_of_dataset,
-    num_classes_of_dataset,
-    get_attribute_ranges,
+    get_dataset,
     new_load_dataset as load_dataset,
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
@@ -171,7 +169,6 @@ default_args = {
     "valid_set_size": 0.0,
     "extensive_eval": False,
     "connections": "unique",
-    "architecture": "randomly_connected",
     "num_neurons": None,
     "num_layers": None,
     "grad_factor": 1.0,
@@ -186,6 +183,7 @@ default_args = {
     "xnum": 1000,
     "enc_type": "tot",
     "deduplicate": False,
+    "experiment_id": None,
 }
 
 
@@ -205,17 +203,16 @@ class Experiment:
     def __init__(self):
         pass
 
-    def debug(self, args=None):
-        if args.dataset is None:
-            args.dataset = "iris"
-        dataset_args = Settings.debug_network_param.get(args.dataset)
+    def debug(self, dataset=None):
+        dataset = dataset if dataset is not None else "iris"
+        dataset_args = Settings.debug_network_param.get(dataset)
         exp_args = {
             "eval_freq": 1000,
             "get_formula": True,
-            "model_path": args.dataset + "_" + "model.pth",
+            "model_path": dataset + "_" + "model.pth",
             "verbose": True,
         }
-        args = {**default_args, **exp_args, **dataset_args, **args}
+        args = {**default_args, **exp_args, **dataset_args, **{"dataset": dataset}}
         self.run(args)
 
     def run_with_cmd(self):
@@ -357,13 +354,9 @@ class Experiment:
 
         Stat.start_memory_usage()
         if args.get_formula:
-            input_dim = input_dim_of_dataset(args.dataset)
-            output_dim = num_classes_of_dataset(args.dataset)
-            dataset = get_attribute_ranges(args.dataset)
+            dataset = get_dataset(args.dataset)
             encoding = Encoding(
                 model,
-                input_dim,
-                output_dim,
                 dataset,
                 enc_type=Experiment.get_enc_type(args.enc_type),
             )

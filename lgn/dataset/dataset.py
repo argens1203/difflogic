@@ -35,7 +35,6 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
     if dataset == "mnist":
         return MNISTDataset.get_input_dim()
     return {
-        "mnist": 400 * 2,
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
         "cifar-10-31-thresholds": 3 * 32 * 32 * 31,
@@ -62,7 +61,7 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
     }[dataset]
 
 
-def get_attribute_ranges(dataset):
+def get_dataset(dataset):
     if dataset == "adult":
         return AdultDataset
     if dataset in ["monk1", "monk2", "monk3"]:
