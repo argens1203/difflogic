@@ -1,6 +1,6 @@
 import torch
 
-import difflogic_cuda
+# import difflogic_cuda
 import numpy as np
 from .functional import (
     bin_op_s,

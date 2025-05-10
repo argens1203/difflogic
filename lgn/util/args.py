@@ -99,17 +99,11 @@ def get_args():
         help="Additional evaluation (incl. valid set eval).",
     )
 
-    parser.add_argument(
-        "--connections", type=str, default="unique", choices=["random", "unique"]
-    )
     parser.add_argument("--num_neurons", "-k", type=int)
     parser.add_argument("--num_layers", "-l", type=int)
 
     parser.add_argument("--grad-factor", type=float, default=1.0)
 
-    parser.add_argument(
-        "--get_formula", action="store_true", help="Gets the formula of a model"
-    )
     parser.add_argument(
         "--verbose", action="store_true", default=False, help="Sets vebosity"
     )

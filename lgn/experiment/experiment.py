@@ -153,38 +153,77 @@ class Settings:
                 return Settings.network_param.get(dataset_name).get("small")
 
 
-default_args = {
-    "eid": None,
-    "dataset": "iris",
-    "tau": 10,
-    "seed": 0,
-    "batch_size": 128,
-    "learning_rate": 0.01,
-    "training_bit_count": 32,
-    "implementation": "cuda",
-    "packbits_eval": False,
-    "compile_model": False,
-    "num_iterations": 100_000,
-    "eval_freq": 2000,
-    "valid_set_size": 0.0,
-    "extensive_eval": False,
-    "connections": "unique",
-    "num_neurons": None,
-    "num_layers": None,
-    "grad_factor": 1.0,
-    "get_formula": False,
-    "verbose": False,
-    "model_path": "model.pth",
-    "save_model": False,
-    "load_model": False,
-    "explain": None,
-    "explain_all": False,
-    "explain_one": False,
-    "xnum": 1000,
-    "enc_type": "tot",
-    "deduplicate": False,
-    "experiment_id": None,
-}
+from dataclasses import dataclass
+
+
+@dataclass
+class DatasetArgs:
+    num_neurons: int = None
+    num_layers: int = None
+
+
+@dataclass
+class ModelArgs:
+    connections: str = "unique"
+
+
+@dataclass
+class HyperParamsArgs:
+    tau: int = 10
+    learning_rate: float = 0.01
+    grad_factor: float = 1.0
+
+
+@dataclass
+class TrainingArgs:
+    seed: int = 0
+    batch_size: int = 128
+    training_bit_count: int = 32  # Torch floating point precision
+
+
+@dataclass
+class ExplanationArgs:
+    enc_type: str = "tot"
+    explain: str = None
+    explain_all: bool = False
+    explain_one: bool = False
+
+
+@dataclass
+class ExperimentArgs:
+    experiment_id: int = None
+    deduplicate: bool = False
+    xnum: int = 1000
+    dataset: str = "iris"
+
+
+@dataclass
+class SettingsArgs:
+    verbose: bool = False
+    save_model: bool = False
+    load_model: bool = False
+    model_path: str = "model.pth"
+    eval_freq: int = 2000
+    num_iterations: int = 100_000
+    packbits_eval: bool = False
+    compile_model: bool = False
+    implementation: str = "cuda"
+
+
+@dataclass
+class DefaultArgs(
+    DatasetArgs,
+    ModelArgs,
+    HyperParamsArgs,
+    TrainingArgs,
+    ExplanationArgs,
+    ExperimentArgs,
+    SettingsArgs,
+):
+    pass
+
+
+default_args = DefaultArgs()
 
 
 class Experiment:
@@ -208,11 +247,15 @@ class Experiment:
         dataset_args = Settings.debug_network_param.get(dataset)
         exp_args = {
             "eval_freq": 1000,
-            "get_formula": True,
             "model_path": dataset + "_" + "model.pth",
             "verbose": True,
         }
-        args = {**default_args, **exp_args, **dataset_args, **{"dataset": dataset}}
+        args = {
+            **vars(default_args),
+            **exp_args,
+            **dataset_args,
+            **{"dataset": dataset},
+        }
         self.run(args)
 
     def run_with_cmd(self):
@@ -220,11 +263,10 @@ class Experiment:
         dataset_args = Settings.debug_network_param.get(args.dataset)
         exp_args = {
             "eval_freq": 1000,
-            "get_formula": True,
             "model_path": args.dataset + "_" + "model.pth",
             "verbose": True,
         }
-        args = {**vars(args), **default_args, **exp_args, **dataset_args}
+        args = {**vars(args), **vars(default_args), **exp_args, **dataset_args}
         self.run(args)
 
     def f(self):
@@ -237,13 +279,17 @@ class Experiment:
             )
             exp_args = {
                 "eval_freq": 1000,
-                "get_formula": True,
                 "model_path": datasets + "_" + "model.pth",
                 "explain_all": True,
                 "verbose": False,
                 "xnum": 1000,
             }
-            args = {**default_args, **exp_args, **dataset_args, **{"dataset": datasets}}
+            args = {
+                **vars(default_args),
+                **exp_args,
+                **dataset_args,
+                **{"dataset": datasets},
+            }
             for dedup in [True, False]:
                 args["deduplicate"] = dedup
                 args["experiment_id"] = experiment_id
@@ -286,7 +332,6 @@ class Experiment:
             )
             exp_args = {
                 "eval_freq": 1000,
-                "get_formula": True,
                 "model_path": dataset + "_" + "model.pth",
                 "explain_all": True,
                 "deduplicate": True,
@@ -295,7 +340,12 @@ class Experiment:
                 # 'explain_timeout': 100,
                 # TODO: add timeout
             }
-            args = {**default_args, **exp_args, **dataset_args, **{"dataset": dataset}}
+            args = {
+                **vars(default_args),
+                **exp_args,
+                **dataset_args,
+                **{"dataset": dataset},
+            }
             args["experiment_id"] = experiment_id
             results = self.run(args)
             all_res.append(
@@ -348,11 +398,10 @@ class Experiment:
             multi_eval(
                 model,
                 train_loader,
-                None,
                 test_loader,
+                None,
                 results=results,
                 packbits_eval=args.packbits_eval,
-                extensive_eval=args.extensive_eval,
             )
 
         if args.load_model:
@@ -373,7 +422,6 @@ class Experiment:
 
     def run(self, args):
         args = argparse.Namespace(**args)
-
         if args.deduplicate:
             Args["Deduplicate"] = True  # TODO: find ways to store global args
         setup_logger(args)
@@ -395,90 +443,93 @@ class Experiment:
         model = self.train_model(args, results, train_loader, test_loader)
 
         Stat.start_memory_usage()
-        if args.get_formula:
-            dataset = get_dataset(args.dataset)
-            encoding = Encoding(
-                model,
-                dataset,
-                enc_type=Experiment.get_enc_type(args.enc_type),
-            )
-            if results is not None:
-                results.store_encoding(encoding)
+        # ============= ============= ============= ============= ============= ============= ============= =============
+        dataset = get_dataset(args.dataset)
+        encoding = Encoding(
+            model,
+            dataset,
+            enc_type=Experiment.get_enc_type(args.enc_type),
+        )
+        if results is not None:
+            results.store_encoding(encoding)
 
-            if args.verbose:
-                encoding.print()
-                logger.info("\n")
+        if args.verbose:
+            encoding.print()
+            logger.info("\n")
 
-            # TODO: add test to conduct this
-            # Validator.validate_with_truth_table(encoding=encoding, model=model)
+        # TODO: add test to conduct this
+        # Validator.validate_with_truth_table(encoding=encoding, model=model)
 
-            # ============= ============= ============= ============= ============= ============= ============= =============
+        # ============= ============= ============= ============= ============= ============= ============= =============
 
-            explainer = Explainer(encoding)
+        explainer = Explainer(encoding)
 
-            if args.explain is not None:
-                raw = args.explain.split(",")
+        if args.explain is not None:
+            raw = args.explain.split(",")
+            logger.info("Raw: %s\n", raw)
+            instance = Instance.from_encoding(encoding=encoding, raw=raw)
+            explainer.explain_both_and_assert(instance, xnum=args.xnum)
+        elif args.explain_all:
+            all_times = 0
+            exp_count = 0
+            count = 0
+            for batch, label, idx in tqdm(test_loader):
+                start = time.time()
+                for feat, i in tqdm(zip(batch, idx)):
+                    raw = get(i, test=True)
+                    logger.info("Raw: %s\n", raw)
+
+                    instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                    exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
+                        instance, xnum=args.xnum
+                    )
+                    exp_count += exp_count_axp_plus_cxp
+                all_times += time.time() - start
+                count += len(batch)
+
+            for batch, label, idx in tqdm(train_loader):
+                start = time.time()
+                for feat, i in tqdm(zip(batch, idx)):
+                    raw = get(i, test=False)
+                    logger.info("Raw: %s\n", raw)
+
+                    instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                    exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
+                        instance, xnum=args.xnum
+                    )
+                    exp_count += exp_count_axp_plus_cxp
+                all_times += time.time() - start
+                count += len(batch)
+
+            results.store_custom("mean_explain_time", all_times / count)
+            results.store_custom("mean_explain_count", exp_count / count)
+
+        elif args.explain_one:
+            batch, label, idx = next(iter(test_loader))
+            for feat, index in zip(batch, idx):
+
+                raw = get(index, test=True)
                 logger.info("Raw: %s\n", raw)
-                instance = Instance.from_encoding(encoding=encoding, raw=raw)
+
+                instance = Instance.from_encoding(encoding=encoding, feat=feat)
                 explainer.explain_both_and_assert(instance, xnum=args.xnum)
-            elif args.explain_all:
-                all_times = 0
-                exp_count = 0
-                count = 0
-                for batch, label, idx in tqdm(test_loader):
-                    start = time.time()
-                    for feat, i in tqdm(zip(batch, idx)):
-                        raw = get(i, test=True)
-                        logger.info("Raw: %s\n", raw)
 
-                        instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                        exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
-                            instance, xnum=args.xnum
-                        )
-                        exp_count += exp_count_axp_plus_cxp
-                    all_times += time.time() - start
-                    count += len(batch)
-
-                for batch, label, idx in tqdm(train_loader):
-                    start = time.time()
-                    for feat, i in tqdm(zip(batch, idx)):
-                        raw = get(i, test=False)
-                        logger.info("Raw: %s\n", raw)
-
-                        instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                        exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
-                            instance, xnum=args.xnum
-                        )
-                        exp_count += exp_count_axp_plus_cxp
-                    all_times += time.time() - start
-                    count += len(batch)
-
-                results.store_custom("mean_explain_time", all_times / count)
-                results.store_custom("mean_explain_count", exp_count / count)
-
-            elif args.explain_one:
-                batch, label, idx = next(iter(test_loader))
+                break
+        else:
+            test_count = 0
+            for batch, label, idx in test_loader:
                 for feat, index in zip(batch, idx):
 
                     raw = get(index, test=True)
                     logger.info("Raw: %s\n", raw)
-
                     instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                    explainer.explain_both_and_assert(instance, xnum=args.xnum)
+                    test_count += explainer.explain_both_and_assert(
+                        instance, xnum=args.xnum
+                    )
+            print("Test Count: ", test_count)
 
-                    break
-            else:
-                test_count = 0
-                for batch, label, idx in test_loader:
-                    for feat, index in zip(batch, idx):
+        # ============= ============= ============= ============= ============= ============= ============= =============
 
-                        raw = get(index, test=True)
-                        logger.info("Raw: %s\n", raw)
-                        instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                        test_count += explainer.explain_both_and_assert(
-                            instance, xnum=args.xnum
-                        )
-                print("Test Count: ", test_count)
         if results is not None:
             results.store_custom("deduplication", Stats["deduplication"])
             results.store_custom("memory_usage", Stat.get_memory_usage())
