@@ -60,7 +60,8 @@ def new_load_dataset(args):
             train_loader,
             test_loader,
             get_raw(None, train_set, test_set),
-        ), train_set
+            train_set,
+        )
 
     if args.dataset == "iris":
         dataset = IrisDataset()

@@ -39,7 +39,8 @@ class OneExperiment:
         if args.deduplicate:
             Args["Deduplicate"] = True  # TODO: find ways to store global args
 
-        self.results = get_results(args.experiment_id, args)
+        eid = args.experiment_id if args.experiment_id is not None else 0
+        self.results = get_results(eid, args)
         self.train_loader, self.test_loader, self.get_raw, self.dataset = load_dataset(
             args
         )
@@ -89,6 +90,11 @@ class OneExperiment:
         self.results.save()
 
         return self.results
+
+    def find_model(self, args):
+        self.get_model(args)
+        self.results.save()
+        return self.results, self.model
 
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
 
@@ -159,49 +165,59 @@ class OneExperiment:
 
     # ---- ---- ---- ---- ---- GETTERS ---- ---- ---- ---- ---- #
 
+    def train_model(self, args, model, loss_fn, optim):
+        train_eval(
+            args,
+            self.train_loader,
+            None,
+            self.test_loader,
+            model,
+            loss_fn,
+            optim,
+            self.results,
+        )
+
+    def eval_model(self, args, model):
+        multi_eval(
+            model,
+            self.train_loader,
+            self.test_loader,
+            None,
+            results=self.results,
+            packbits_eval=args.packbits_eval,
+        )
+
     def get_model(self, args):
         model, loss_fn, optim = get_model(args, self.results)
-
-        if not args.save_model and not args.load_model:
+        if args.save_model and args.load_model:
             try:
                 model.load_state_dict(torch.load(args.model_path))
+                print("Model loaded successfully")
             except Exception as e:
-                print(e)
-                train_eval(
-                    args,
-                    self.train_loader,
-                    None,
-                    self.test_loader,
-                    model,
-                    loss_fn,
-                    optim,
-                    self.results,
-                )
-                torch.save(model.state_dict(), args.model_path)
-            multi_eval(
-                model,
-                self.train_loader,
-                self.test_loader,
-                None,
-                results=self.results,
-                packbits_eval=args.packbits_eval,
-            )
+                self.train_model(args, model, loss_fn, optim)
+                self.eval_model(args, model)
 
-        if args.load_model:
-            print("Loading Model...")
+        elif args.save_model:
+            self.train_model(args, model, loss_fn, optim)
+            self.eval_model(args, model)
+            torch.save(model.state_dict(), args.model_path)
+
+        elif args.load_model:
             model.load_state_dict(torch.load(args.model_path))
+
+        else:
+            self.train_model(args, model, loss_fn, optim)
+            self.eval_model(args, model)
 
         ####################################################################################################################
         if self.results is not None:
             self.results.store_custom("model_complete_time", time.time())
 
-        if args.save_model:
-            torch.save(model.state_dict(), args.model_path)
-
         if args.compile_model:
             compile_model(args, model, self.test_loader)
 
         self.model = model
+        return self.model
 
     def get_encoding(self, enc_type):
         self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)

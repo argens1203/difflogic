@@ -83,6 +83,9 @@ class ResultsJSON(object):
     def store_custom(self, key: str, val):
         setattr(self, key, val)
 
+    def store_test_acc(self, test_acc):
+        self.test_acc = test_acc
+
 
 if __name__ == "__main__":
 

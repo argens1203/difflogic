@@ -113,10 +113,10 @@ def get_args():
     )
 
     parser.add_argument(
-        "--save_model", action="store_true", default=False, help="Save the model"
+        "--save_model", action="store_true", default=True, help="Save the model"
     )
     parser.add_argument(
-        "--load_model", action="store_true", default=False, help="Load the model"
+        "--load_model", action="store_true", default=True, help="Load the model"
     )
 
     parser.add_argument(
@@ -199,8 +199,8 @@ class ExperimentArgs:
 @dataclass
 class PresentationArgs:
     verbose: bool = False
-    save_model: bool = False
-    load_model: bool = False
+    save_model: bool = True
+    load_model: bool = True
     model_path: str = "model.pth"
 
 

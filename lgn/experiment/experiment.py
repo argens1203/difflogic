@@ -58,6 +58,14 @@ class Experiment:
         }
         self.run(args)
 
+    # def pseudo_run(self, dataset, model_path):
+    #     num_neurons = Settings.dataset_neurons.get(dataset)
+    #     num_layers = 2
+    #     num_iterations = 2000
+    #     batch_size = 100
+    #     model_path = dataset + "_" + model_path
+    #     eval_freq = 1000
+
     def run_with_cmd(self):
         args = get_args()
         dataset_args = Settings.debug_network_param.get(args.dataset)
@@ -184,4 +192,55 @@ class Experiment:
         # return one.run_presentation
         args.experiment_id = 0
         one = OneExperiment(args)
-        return one.run_experiment(args)
+        results = one.run_experiment(args)
+
+    def find_model(self):
+        experiement_id = 1000
+        best_ids = []
+        for dataset in [
+            "iris",
+            "monk1",
+            "monk2",
+            "monk3",
+            "breast_cancer",
+            "mnist",
+            "adult",
+        ]:
+            # for temp in [1, 1 / 0.3, 1 / 0.1, 1 / 0.03, 1 / 0.01]:
+            best_acc = 0
+            best_eid = 0
+            for temp in [1]:
+                dataset_args = Settings.get_settings(
+                    dataset_name=dataset, paper=True, minimal=True
+                )
+                exp_args = {
+                    "model_path": f"model-paths/${dataset}_model.pth",
+                    "batch_size": 64,
+                    "experiment_id": experiement_id,
+                    "tau": temp,
+                    "learning_rate": 0.01,
+                    "num_iterations": 200,
+                    "save_model": False,
+                    "load_model": False,
+                }
+                args = {
+                    **vars(default_args),
+                    **dataset_args,
+                    **exp_args,
+                    **{"dataset": dataset},
+                }
+                args = argparse.Namespace(**args)
+                setup_logger(args)
+                seed_all(args.seed)
+                args.experiment_id = experiement_id
+                results, model = OneExperiment(args).find_model(args)
+                if results.test_acc > best_acc:
+                    best_acc = results.test_acc
+                    best_eid = experiement_id
+                    torch.save(model.state_dict(), args.model_path)
+
+                experiement_id += 1
+            best_ids.append((dataset, best_eid, best_acc))
+        with open("best_ids.txt", mode="w") as f:
+            f.write(json.dumps(best_ids, indent=4))
+        print(best_ids)

@@ -90,6 +90,7 @@ def multi_eval(
 
     if results is not None:
         results.store_results(r)
+        results.store_test_acc(test_accuracy_eval_mode)
     else:
         print(r)
 
