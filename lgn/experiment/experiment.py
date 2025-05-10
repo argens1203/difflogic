@@ -305,7 +305,7 @@ class Experiment:
             try:
                 model.load_state_dict(torch.load(args.model_path))
             except Exception as e:
-                print(e)
+                # print(e)
                 train_eval(
                     args,
                     train_loader,

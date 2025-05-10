@@ -26,14 +26,14 @@ setup(
     package_dir={"difflogic": "difflogic"},
     packages=["difflogic"],
     ext_modules=[
-        # CUDAExtension(
-        #     "difflogic_cuda",
-        #     [
-        #         "difflogic/cuda/difflogic.cpp",
-        #         "difflogic/cuda/difflogic_kernel.cu",
-        #     ],
-        #     extra_compile_args={"nvcc": ["-lineinfo"]},
-        # )
+        CUDAExtension(
+            "difflogic_cuda",
+            [
+                "difflogic/cuda/difflogic.cpp",
+                "difflogic/cuda/difflogic_kernel.cu",
+            ],
+            extra_compile_args={"nvcc": ["-lineinfo"]},
+        )
     ],
     cmdclass={"build_ext": BuildExtension},
     python_requires=">=3.6",
