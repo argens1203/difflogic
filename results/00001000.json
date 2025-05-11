@@ -1,0 +1,62 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "iris",
+        "deduplicate": false,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 1000,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": false,
+        "model_path": "model-paths/$iris_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 5,
+        "num_neurons": 24,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 1,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 1000
+    },
+    "eid": 1000,
+    "init_time": 1746884313.2506104,
+    "model_complete_time": 1746884319.8127778,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(8, 24, train)\n  (1): LogicLayer(24, 24, train)\n  (2): LogicLayer(24, 24, train)\n  (3): LogicLayer(24, 24, train)\n  (4): LogicLayer(24, 24, train)\n  (5): GroupSum(k=3, tau=1)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746884319.8128126,
+    "server_name": "Glaciers",
+    "test_acc": 0.8333333730697632,
+    "test_acc_eval_mode": [
+        0.8333333730697632,
+        0.8333333730697632,
+        0.8333333730697632
+    ],
+    "total_num_neurons": [
+        72
+    ],
+    "total_num_weights": [
+        72
+    ],
+    "total_time": 6.562202215194702,
+    "train_acc_eval_mode": [
+        0.7901785969734192,
+        0.7857142984867096,
+        0.7890625298023224
+    ],
+    "valid_acc_eval_mode": [
+        -1,
+        -1,
+        -1
+    ]
+}

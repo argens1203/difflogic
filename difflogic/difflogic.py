@@ -182,7 +182,7 @@ class LogicLayer(torch.nn.Module):
 
         a, b = self.indices
         w = self.weights.argmax(-1).to(torch.uint8)
-        # x.t = difflogic_cuda.eval(x.t, a, b, w)
+        x.t = difflogic_cuda.eval(x.t, a, b, w)
 
         return x
 

@@ -54,14 +54,13 @@ class Encoding:
     def __init__(
         self,
         model,
-        input_dim,
-        class_dim,
         Dataset: AutoTransformer,
         fp_type=fp_type,
         **kwargs,
     ):
         self.enc_type = kwargs.get("enc_type", EncType.totalizer)
-
+        input_dim = Dataset.get_input_dim()
+        class_dim = Dataset.get_num_of_classes()
         with self.use_context() as vpool:
             self.formula, self.input_handles = get_formula(model, input_dim, Dataset)
             self.input_ids = [vpool.id(h) for h in self.input_handles]

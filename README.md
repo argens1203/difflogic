@@ -189,6 +189,17 @@ python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 
 
 Patent pending.
 
+## CUDA
+Install CUDA: https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_network
+
+export TORCH_CUDA_ARCH_LIST="8.9"
+
+Install python dev `sudo apt-get install python3.12-dev`
+
+python setup.py install
+
+
+
 ## Commands
 
 ```shell

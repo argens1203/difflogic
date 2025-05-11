@@ -1,0 +1,68 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "breast_cancer",
+        "deduplicate": false,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 1060,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": false,
+        "model_path": "model-paths/$breast_cancer_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 5,
+        "num_neurons": 128,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 1,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 1000
+    },
+    "eid": 1060,
+    "init_time": 1746884773.8132768,
+    "model_complete_time": 1746884785.9752939,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(41, 128, train)\n  (1): LogicLayer(128, 128, train)\n  (2): LogicLayer(128, 128, train)\n  (3): LogicLayer(128, 128, train)\n  (4): LogicLayer(128, 128, train)\n  (5): GroupSum(k=2, tau=1)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746884785.9753284,
+    "server_name": "Glaciers",
+    "test_acc": 0.7090908885002136,
+    "test_acc_eval_mode": [
+        0.5454545021057129,
+        0.6727272272109985,
+        0.7090908885002136,
+        0.7090908885002136,
+        0.7090908885002136
+    ],
+    "total_num_neurons": [
+        384
+    ],
+    "total_num_weights": [
+        384
+    ],
+    "total_time": 12.162051677703857,
+    "train_acc_eval_mode": [
+        0.9359375089406967,
+        0.9481770992279053,
+        0.9091145992279053,
+        0.9403645992279053,
+        0.9270833432674408
+    ],
+    "valid_acc_eval_mode": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    ]
+}

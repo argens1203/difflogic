@@ -8,9 +8,13 @@ from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
 
 
-def get_raw(dataset):
-    def get_raw_data(index: int):
-        return dataset.raw_features[index]
+def get_raw(raw, train, test):
+    def get_raw_data(index: int, is_train: bool):
+        if raw is not None:
+            return raw.raw_features[index]
+        if is_train:
+            return train.raw_features[index]
+        return test.raw_features[index]
 
     return get_raw_data
 
@@ -28,11 +32,8 @@ def new_load_dataset(args):
         return (
             train_loader,
             test_loader,
+            get_raw(None, train_set, test_set),
             train_set,
-            test_set,
-            None,
-            get_raw(train_set),
-            get_raw(test_set),
         )
 
     if args.dataset in ["monk1", "monk2", "monk3"]:
@@ -58,11 +59,8 @@ def new_load_dataset(args):
         return (
             train_loader,
             test_loader,
+            get_raw(None, train_set, test_set),
             train_set,
-            test_set,
-            None,
-            get_raw(train_set),
-            get_raw(test_set),
         )
 
     if args.dataset == "iris":
@@ -81,4 +79,4 @@ def new_load_dataset(args):
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=int(1e6), shuffle=False
     )
-    return train_loader, test_loader, train_set, test_set, get_raw(dataset), None, None
+    return train_loader, test_loader, get_raw(dataset, None, None), dataset
