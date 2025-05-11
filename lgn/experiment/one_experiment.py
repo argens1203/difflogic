@@ -76,6 +76,7 @@ class OneExperiment:
         Stat.start_memory_usage()
 
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
+        self.encoding.print()
         self.get_explainer()
 
         total_time_taken, exp_count, count = self.explain_dataloader(

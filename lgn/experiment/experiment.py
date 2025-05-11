@@ -74,7 +74,7 @@ class Experiment:
             "model_path": args.dataset + "_" + "model.pth",
             "verbose": True,
         }
-        args = {**vars(args), **vars(default_args), **exp_args, **dataset_args}
+        args = {**vars(default_args), **exp_args, **dataset_args, **vars(args)}
         self.run(args)
 
     def f(self):
@@ -251,16 +251,19 @@ class Experiment:
         experiement_ids = [1000, 1015, 1031, 1048, 1060, 1083, 1096]
         output_eid = 500
         for eid in experiement_ids:
-            with open(f"results/0000{eid}.json", mode="r") as f:
-                results = json.load(f)
-                args = results["args"]
-                args["load_model"] = True
-                args["save_model"] = False
-                args["experiment_id"] = output_eid
+            for deduplication in [False, True]:
+                with open(f"results/0000{eid}.json", mode="r") as f:
+                    results = json.load(f)
+                    args = results["args"]
+                    args["load_model"] = True
+                    args["save_model"] = False
+                    args["experiment_id"] = output_eid
+                    args["deduplicate"] = deduplication
+                    args["verbose"] = True
 
-                print(args)
-                continue
-                args = argparse.Namespace(**args)
-                setup_logger(args)
-                seed_all(args.seed)
-                res = OneExperiment(args).run_experiment(args)
+                    args = argparse.Namespace(**args)
+                    setup_logger(args)
+                    seed_all(args.seed)
+                    res = OneExperiment(args).run_experiment(args)
+
+                    output_eid += 1

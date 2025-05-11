@@ -199,6 +199,11 @@ Install python dev `sudo apt-get install python3.12-dev`
 python setup.py install
 
 
+## 
+[Errno 2] No such file or directory: 'dot'
+bdd, when trying to output graphics, uses graphviz
+
+`sudo apt-get install graphviz`
 
 ## Commands
 
