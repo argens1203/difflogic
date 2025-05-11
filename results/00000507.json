@@ -1,0 +1,69 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "monk3",
+        "deduplicate": true,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 507,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": true,
+        "max_time": 3600,
+        "model_path": "model-paths/$monk3_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 6,
+        "num_neurons": 12,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 3.3333333333333335,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 100
+    },
+    "cnf_size": 24,
+    "deduplication": 52,
+    "eid": 507,
+    "encoding_time": 1746960560.7629921,
+    "encoding_time_taken": 0.6761939525604248,
+    "eq_size": 50,
+    "formulas": [
+        "F",
+        "~(~15 & ~6)",
+        "~(~15 & ~6)",
+        "~(~15 & ~6)",
+        "~((~(~(6 | 7)) >> ~((4 | 5) >> ~12)) & ~15)",
+        "~(~15 & ~6)",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~12 >> 3"
+    ],
+    "init_time": 1746960560.072961,
+    "mean_explain_count": 2.5833333333333335,
+    "mean_explain_time": 0.005639221292242782,
+    "memory_usage": 1862835,
+    "model_complete_time": 1746960560.0867982,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=3.3333333333333335)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746960567.066432,
+    "server_name": "Argenss-MacBook-Pro",
+    "total_num_neurons": [
+        48
+    ],
+    "total_num_weights": [
+        48
+    ],
+    "total_time": 6.993470907211304
+}
