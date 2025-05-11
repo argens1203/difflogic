@@ -27,7 +27,7 @@ def new_load_dataset(args):
             train_set, batch_size=args.batch_size, shuffle=True
         )
         test_loader = torch.utils.data.DataLoader(
-            test_set, batch_size=int(1e6), shuffle=False
+            test_set, batch_size=args.batch_size, shuffle=False
         )
         return (
             train_loader,
@@ -54,7 +54,7 @@ def new_load_dataset(args):
             train_set, batch_size=args.batch_size, shuffle=True
         )
         test_loader = torch.utils.data.DataLoader(
-            test_set, batch_size=int(1e6), shuffle=False
+            test_set, batch_size=args.batch_size, shuffle=False
         )
         return (
             train_loader,
@@ -77,6 +77,6 @@ def new_load_dataset(args):
         train_set, batch_size=args.batch_size, shuffle=True
     )
     test_loader = torch.utils.data.DataLoader(
-        test_set, batch_size=int(1e6), shuffle=False
+        test_set, batch_size=args.batch_size, shuffle=False
     )
     return train_loader, test_loader, get_raw(dataset, None, None), dataset

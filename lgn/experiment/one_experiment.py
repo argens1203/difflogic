@@ -18,6 +18,7 @@ from pysat.card import EncType
 
 from constant import Stats
 import time
+from lgn.encoding import Validator
 
 torch.set_num_threads(1)  # ???
 
@@ -79,6 +80,8 @@ class OneExperiment:
         Stat.start_memory_usage()
 
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
+        # Doesn't work when using OHE to deduplicate
+        # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
         self.encoding.print()
         self.get_explainer()
 
@@ -91,6 +94,7 @@ class OneExperiment:
         self.results.store_resource_usage(
             total_time_taken / exp_count, Stat.get_memory_usage()
         )
+        self.results.store_counts(count, exp_count)
         Stat.end_memory_usage()
         self.results.save()
 
@@ -169,6 +173,8 @@ class OneExperiment:
                 exp_count += exp_count_axp_plus_cxp
                 if max_time is not None and time.time() - begin > max_time:
                     break
+            if max_time is not None and time.time() - begin > max_time:
+                break
             all_times += time.time() - start
             count += len(batch)
 

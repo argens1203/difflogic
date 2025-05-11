@@ -80,6 +80,10 @@ class ResultsJSON(object):
         self.mean_explain_time = mean_explain_time
         self.memory_usage = memory_usage
 
+    def store_counts(self, instance_count, explain_count):
+        self.instance_count = instance_count
+        self.explanation_count = explain_count
+
     def store_custom(self, key: str, val):
         setattr(self, key, val)
 

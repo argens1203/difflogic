@@ -46,7 +46,6 @@ def get_formula(model, input_dim, Dataset: AutoTransformer):
                 x[idx] = solver.deduplicate(x[idx], all)
                 all.add(x[idx])
 
-    x[0] = Atom(False)
     return x, inputs
 
 

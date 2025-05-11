@@ -31,11 +31,11 @@
     "cnf_size": 117,
     "deduplication": [],
     "eid": 506,
-    "encoding_time": 1746960553.1905038,
-    "encoding_time_taken": 0.2182767391204834,
+    "encoding_time": 1746964258.412909,
+    "encoding_time_taken": 0.21873807907104492,
     "eq_size": 50,
     "formulas": [
-        "F",
+        "~(~((4 | 5) >> 15))",
         "~(~((4 | 5) >> 15))",
         "~(~((~(~(6 | 7) & ~(7 & 8)) >> ~((4 | 5) >> ~12)) & ~(~(~15))) >> ~((~(~6) >> ~(~(~(6 | 7) & ~(7 & 8)))) >> ~(~((4 | 5) >> 15))))",
         "~(~(~(~((4 | 5) >> 15))))",
@@ -48,16 +48,16 @@
         "~((4 | 5) >> 15)",
         "~(~(~12 >> ~(1 | 2)))"
     ],
-    "init_time": 1746960552.9580119,
+    "init_time": 1746964258.17905,
     "mean_explain_count": 2.5833333333333335,
-    "mean_explain_time": 0.006143897024106808,
-    "memory_usage": 413957,
-    "model_complete_time": 1746960552.972227,
+    "mean_explain_time": 0.006012579659834557,
+    "memory_usage": 433218,
+    "model_complete_time": 1746964258.194171,
     "model_str": [
         "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=3.3333333333333335)\n)"
     ],
     "path": "./results/",
-    "save_time": 1746960560.0713239,
+    "save_time": 1746964265.147669,
     "server_name": "Argenss-MacBook-Pro",
     "total_num_neurons": [
         48
@@ -65,5 +65,5 @@
     "total_num_weights": [
         48
     ],
-    "total_time": 7.113312005996704
+    "total_time": 6.968619108200073
 }
