@@ -13,7 +13,7 @@ from lgn.dataset import (
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
 from lgn.util import get_args, get_results, setup_logger, Stat
-from constant import Args
+from constant import Args, device
 from pysat.card import EncType
 
 from constant import Stats
@@ -70,6 +70,9 @@ class OneExperiment:
         # Asserts that results is not None, and enforces that entire test_set is explained
         if args.deduplicate:
             Args["Deduplicate"] = True  # TODO: find ways to store global args
+        else:
+            Args["Deduplicate"] = False
+        Stats["deduplication"] = []
 
         self.get_model(args)
 
@@ -86,8 +89,9 @@ class OneExperiment:
 
         self.results.store_explanation_stat(exp_count / count, Stats["deduplication"])
         self.results.store_resource_usage(
-            total_time_taken / count, Stat.get_memory_usage()
+            total_time_taken / exp_count, Stat.get_memory_usage()
         )
+        Stat.end_memory_usage()
         self.results.save()
 
         return self.results
@@ -124,17 +128,19 @@ class OneExperiment:
         exp_count = 0
         count = 0
 
+        remaining_time = args.max_time
         for data_loader, is_train in zip(
             [self.train_loader, self.test_loader], [True, False]
         ):
             t, e, c = self.explain_dataloader(
                 data_loader=data_loader,
-                exp_args=ExplainerArgs(xnum=args.xnum),
+                exp_args=ExplainerArgs(xnum=args.xnum, max_time=remaining_time),
                 is_train=is_train,
             )
             all_times += t
             exp_count += e
             count += c
+            remaining_time -= t
 
         return all_times, exp_count, count
 
@@ -147,7 +153,9 @@ class OneExperiment:
         all_times = 0
         exp_count = 0
         count = 0
+        max_time = exp_args.max_time
 
+        begin = time.time()
         for batch, label, idx in tqdm(data_loader):
             start = time.time()
             for feat, i in tqdm(zip(batch, idx)):
@@ -159,6 +167,8 @@ class OneExperiment:
                     instance, xnum=exp_args.xnum
                 )
                 exp_count += exp_count_axp_plus_cxp
+                if max_time is not None and time.time() - begin > max_time:
+                    break
             all_times += time.time() - start
             count += len(batch)
 
@@ -192,7 +202,9 @@ class OneExperiment:
         model, loss_fn, optim = get_model(args, self.results)
         if args.save_model and args.load_model:
             try:
-                model.load_state_dict(torch.load(args.model_path))
+                model.load_state_dict(
+                    torch.load(args.model_path, map_location=torch.device(device))
+                )
                 print("Model loaded successfully")
             except Exception as e:
                 self.train_model(args, model, loss_fn, optim)
@@ -204,7 +216,9 @@ class OneExperiment:
             torch.save(model.state_dict(), args.model_path)
 
         elif args.load_model:
-            model.load_state_dict(torch.load(args.model_path))
+            model.load_state_dict(
+                torch.load(args.model_path, map_location=torch.device(device))
+            )
 
         else:
             self.train_model(args, model, loss_fn, optim)

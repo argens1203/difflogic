@@ -248,7 +248,7 @@ class Experiment:
         print(best_ids)
 
     def get_and_retest_model(self):
-        experiement_ids = [1000, 1015, 1031, 1048, 1060, 1083, 1096]
+        experiement_ids = [1000, 1015, 1031, 1048, 1060, 1096, 1083]
         output_eid = 500
         for eid in experiement_ids:
             for deduplication in [False, True]:
@@ -259,7 +259,9 @@ class Experiment:
                     args["save_model"] = False
                     args["experiment_id"] = output_eid
                     args["deduplicate"] = deduplication
-                    args["verbose"] = True
+                    args["verbose"] = False
+                    args["xnum"] = 100
+                    args["max_time"] = 3600
 
                     args = argparse.Namespace(**args)
                     setup_logger(args)

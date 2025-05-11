@@ -147,6 +147,13 @@ def get_args():
 
     parser.add_argument("--deduplicate", action="store_true", default=False)
 
+    parser.add_argument(
+        "--max_time",
+        type=int,
+        default=3600,
+        help="Timeout for entire run (in seconds) (default: 3600)",
+    )
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -188,6 +195,7 @@ class ExplainerArgs:
     enc_type: str = "tot"
     deduplicate: bool = False
     xnum: int = 1000
+    max_time: int = 3600
 
 
 @dataclass

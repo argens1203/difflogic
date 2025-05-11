@@ -19,6 +19,10 @@ class Stat:
     def start_memory_usage():
         tracemalloc.start()
 
+    @staticmethod
+    def end_memory_usage():
+        tracemalloc.stop()
+
     def get_memory_usage():
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
