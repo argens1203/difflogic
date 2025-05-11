@@ -206,41 +206,61 @@ class Experiment:
             "mnist",
             "adult",
         ]:
-            # for temp in [1, 1 / 0.3, 1 / 0.1, 1 / 0.03, 1 / 0.01]:
             best_acc = 0
             best_eid = 0
-            for temp in [1]:
-                dataset_args = Settings.get_settings(
-                    dataset_name=dataset, paper=True, minimal=True
-                )
-                exp_args = {
-                    "model_path": f"model-paths/${dataset}_model.pth",
-                    "batch_size": 64,
-                    "experiment_id": experiement_id,
-                    "tau": temp,
-                    "learning_rate": 0.01,
-                    "num_iterations": 200,
-                    "save_model": False,
-                    "load_model": False,
-                }
-                args = {
-                    **vars(default_args),
-                    **dataset_args,
-                    **exp_args,
-                    **{"dataset": dataset},
-                }
-                args = argparse.Namespace(**args)
-                setup_logger(args)
-                seed_all(args.seed)
-                args.experiment_id = experiement_id
-                results, model = OneExperiment(args).find_model(args)
-                if results.test_acc > best_acc:
-                    best_acc = results.test_acc
-                    best_eid = experiement_id
-                    torch.save(model.state_dict(), args.model_path)
+            for temp in [1, 1 / 0.3, 1 / 0.1, 1 / 0.03, 1 / 0.01]:
+                for grad_factor in [1, 1.5, 2]:
+                    dataset_args = Settings.get_settings(
+                        dataset_name=dataset, paper=True, minimal=True
+                    )
+                    exp_args = {
+                        "model_path": f"model-paths/{dataset}_model.pth",
+                        "batch_size": 64,
+                        "experiment_id": experiement_id,
+                        "tau": temp,
+                        "grad_factor": grad_factor,
+                        "learning_rate": 0.01,
+                        "num_iterations": 5000,
+                        "eval_freq": 1000,
+                        "save_model": False,
+                        "load_model": False,
+                    }
+                    args = {
+                        **vars(default_args),
+                        **dataset_args,
+                        **exp_args,
+                        **{"dataset": dataset},
+                    }
+                    args = argparse.Namespace(**args)
+                    setup_logger(args)
+                    seed_all(args.seed)
+                    args.experiment_id = experiement_id
+                    results, model = OneExperiment(args).find_model(args)
+                    if results.test_acc > best_acc:
+                        best_acc = results.test_acc
+                        best_eid = experiement_id
+                        torch.save(model.state_dict(), args.model_path)
 
-                experiement_id += 1
+                    experiement_id += 1
             best_ids.append((dataset, best_eid, best_acc))
         with open("best_ids.txt", mode="w") as f:
             f.write(json.dumps(best_ids, indent=4))
         print(best_ids)
+
+    def get_and_retest_model(self):
+        experiement_ids = [1000, 1015, 1031, 1048, 1060, 1083, 1096]
+        output_eid = 500
+        for eid in experiement_ids:
+            with open(f"results/0000{eid}.json", mode="r") as f:
+                results = json.load(f)
+                args = results["args"]
+                args["load_model"] = True
+                args["save_model"] = False
+                args["experiment_id"] = output_eid
+
+                print(args)
+                continue
+                args = argparse.Namespace(**args)
+                setup_logger(args)
+                seed_all(args.seed)
+                res = OneExperiment(args).run_experiment(args)

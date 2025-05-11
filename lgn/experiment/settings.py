@@ -88,7 +88,7 @@ class Settings:
 
     # Our setup for debugging
     dataset_neurons = [
-        ("iris", 12),
+        ("iris", 24),
         ("caltech101", 41 * 101),
         ("adult", 58),
         ("monk1", 10),
@@ -103,7 +103,7 @@ class Settings:
             {
                 **{"num_neurons": neurons},
                 **{
-                    "num_layers": 2,
+                    "num_layers": 5,
                     "num_iterations": 2000,
                     "batch_size": 100,
                 },

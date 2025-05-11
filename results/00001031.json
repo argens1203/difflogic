@@ -1,0 +1,68 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "monk2",
+        "deduplicate": false,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 1031,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1.5,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": false,
+        "model_path": "model-paths/$monk2_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 6,
+        "num_neurons": 12,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 1,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 1000
+    },
+    "eid": 1031,
+    "init_time": 1746884530.8458054,
+    "model_complete_time": 1746884545.7458022,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=1)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746884545.7458394,
+    "server_name": "Glaciers",
+    "test_acc": 0.756944477558136,
+    "test_acc_eval_mode": [
+        0.6689814925193787,
+        0.7337962985038757,
+        0.7523148059844971,
+        0.756944477558136,
+        0.756944477558136
+    ],
+    "total_num_neurons": [
+        48
+    ],
+    "total_num_weights": [
+        48
+    ],
+    "total_time": 14.900033950805664,
+    "train_acc_eval_mode": [
+        0.7949694991111755,
+        0.8024644255638123,
+        0.8285060922304789,
+        0.8499745925267538,
+        0.8499745925267538
+    ],
+    "valid_acc_eval_mode": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    ]
+}

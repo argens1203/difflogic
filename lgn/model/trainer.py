@@ -115,6 +115,7 @@ def train_eval(
     optim,
     results=None,
 ):
+    previous_acc = 0
     for i, (x, y, _) in tqdm(
         enumerate(load_n(train_loader, args.num_iterations)),
         desc="iteration",
@@ -124,7 +125,6 @@ def train_eval(
         y = y.to(device)
 
         loss = train(model, x, y, loss_fn, optim)
-
         if (i + 1) % args.eval_freq == 0:
             multi_eval(
                 model,
@@ -134,3 +134,8 @@ def train_eval(
                 results=results,
                 packbits_eval=args.packbits_eval,
             )
+            print(results.test_acc)
+            if results.test_acc - previous_acc < 0.01:
+                print("Early stopping")
+                return
+            previous_acc = results.test_acc
