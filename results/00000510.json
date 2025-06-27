@@ -28,14 +28,15 @@
         "verbose": false,
         "xnum": 100
     },
-    "cnf_size": 4967,
+    "cnf_size": 5011,
     "deduplication": [],
     "eid": 510,
-    "encoding_time": 1746944979.641098,
-    "encoding_time_taken": 4.016537189483643,
+    "encoding_time": 1746965742.3034172,
+    "encoding_time_taken": 3.8763363361358643,
     "eq_size": 1600,
+    "explanation_count": 61750,
     "formulas": [
-        "F",
+        "~(~(~(23 | 25) & (115 >> 113)) & ~(((~(33 >> 35) ^ (19 >> 20)) >> ~((29 >> 27) ^ 18)) | ~(~(105 & 106) >> ~(99 | 100))))",
         "~(~64 >> ~(~(~31 >> ~(83 >> 85))))",
         "(~(~(~63 >> (12 | 14)) >> ~(~(59 ^ 61) >> ~112)) | ~(~12 >> (31 >> 33))) >> ~(~(~63) >> ((49 ^ 50) >> ~(24 >> 23)))",
         "~(~(~(72 | 73) & ~(~(31 >> 33))))",
@@ -292,16 +293,17 @@
         "~(~(16 ^ 18) >> (64 ^ 66))",
         "72 | 73"
     ],
-    "init_time": 1746944974.727036,
-    "mean_explain_count": 7.589442231075697,
-    "mean_explain_time": 0.0315116298669396,
-    "memory_usage": 13785066,
-    "model_complete_time": 1746944975.6245608,
+    "init_time": 1746965737.76866,
+    "instance_count": 768,
+    "mean_explain_count": 80.40364583333333,
+    "mean_explain_time": 0.05171454448931613,
+    "memory_usage": 10143198,
+    "model_complete_time": 1746965738.4270809,
     "model_str": [
         "Sequential(\n  (0): LogicLayer(115, 256, train)\n  (1): LogicLayer(256, 256, train)\n  (2): LogicLayer(256, 256, train)\n  (3): LogicLayer(256, 256, train)\n  (4): LogicLayer(256, 256, train)\n  (5): GroupSum(k=2, tau=10.0)\n)"
     ],
     "path": "./results/",
-    "save_time": 1746948581.994922,
+    "save_time": 1746970024.596731,
     "server_name": "Argenss-MacBook-Pro",
     "total_num_neurons": [
         768
@@ -309,5 +311,5 @@
     "total_num_weights": [
         768
     ],
-    "total_time": 3607.2678859233856
+    "total_time": 4286.8280708789825
 }

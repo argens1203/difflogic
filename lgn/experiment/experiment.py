@@ -248,7 +248,7 @@ class Experiment:
         print(best_ids)
 
     def get_and_retest_model(self):
-        experiement_ids = [1000, 1015, 1031, 1048, 1060, 1096, 1083]
+        experiement_ids = [1000, 1015, 1031, 1048, 1060]
         output_eid = 500
         for eid in experiement_ids:
             for deduplication in [False, True]:

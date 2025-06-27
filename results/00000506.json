@@ -31,9 +31,10 @@
     "cnf_size": 117,
     "deduplication": [],
     "eid": 506,
-    "encoding_time": 1746964258.412909,
-    "encoding_time_taken": 0.21873807907104492,
+    "encoding_time": 1746965465.833567,
+    "encoding_time_taken": 0.2261350154876709,
     "eq_size": 50,
+    "explanation_count": 1116,
     "formulas": [
         "~(~((4 | 5) >> 15))",
         "~(~((4 | 5) >> 15))",
@@ -48,16 +49,17 @@
         "~((4 | 5) >> 15)",
         "~(~(~12 >> ~(1 | 2)))"
     ],
-    "init_time": 1746964258.17905,
+    "init_time": 1746965465.595087,
+    "instance_count": 432,
     "mean_explain_count": 2.5833333333333335,
-    "mean_explain_time": 0.006012579659834557,
-    "memory_usage": 433218,
-    "model_complete_time": 1746964258.194171,
+    "mean_explain_time": 0.00672529675199994,
+    "memory_usage": 345374,
+    "model_complete_time": 1746965465.607432,
     "model_str": [
         "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=3.3333333333333335)\n)"
     ],
     "path": "./results/",
-    "save_time": 1746964265.147669,
+    "save_time": 1746965473.367496,
     "server_name": "Argenss-MacBook-Pro",
     "total_num_neurons": [
         48
@@ -65,5 +67,5 @@
     "total_num_weights": [
         48
     ],
-    "total_time": 6.968619108200073
+    "total_time": 7.772408962249756
 }
