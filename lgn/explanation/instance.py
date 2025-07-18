@@ -77,6 +77,7 @@ class Instance:
 
     # Class Methods
 
+    @staticmethod
     def from_encoding(encoding: Encoding, feat=None, raw=None, inp=None):
         if feat is None:
             feat = encoding.Dataset.transform_feature(np.array([raw]))[0]
@@ -98,6 +99,7 @@ class Instance:
             Dataset=encoding.Dataset,
         )
 
+    @staticmethod
     def fill_missing(inp=None, feat=None):
         if inp is None:
             inp = feat_to_input(feat)

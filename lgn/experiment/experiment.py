@@ -4,20 +4,7 @@ import argparse
 import numpy as np
 import torch
 import json
-from tqdm import tqdm
-from lgn.encoding import Encoding
-from lgn.explanation import Explainer, Instance
-from lgn.dataset import (
-    get_dataset,
-    new_load_dataset as load_dataset,
-)
-from lgn.model import get_model, compile_model, train_eval, multi_eval
-from lgn.util import get_args, get_results, setup_logger, Stat
-from constant import Args
-from pysat.card import EncType
-
-from constant import Stats
-import time
+from lgn.util import get_args, setup_logger
 
 torch.set_num_threads(1)  # ???
 
@@ -28,7 +15,7 @@ def seed_all(seed=0):
     np.random.seed(seed)
 
 
-from lgn.util import DefaultArgs, ExplainerArgs
+from lgn.util import DefaultArgs
 from .settings import Settings
 
 default_args = DefaultArgs()
@@ -36,15 +23,17 @@ from .one_experiment import OneExperiment
 
 
 class Experiment:
-    def __init__(self):
-        self.logger = logging.getLogger()
+    # def __init__(self):
+    # self.logger = logging.getLogger()
 
     def __init__(self):
         pass
 
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
-        dataset_args = Settings.debug_network_param.get(dataset)
+        dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
+        print(dataset_args)
+        print(type(dataset_args))
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
@@ -68,7 +57,7 @@ class Experiment:
 
     def run_with_cmd(self):
         args = get_args()
-        dataset_args = Settings.debug_network_param.get(args.dataset)
+        dataset_args = Settings.debug_network_param.get(args.dataset) or {}
         exp_args = {
             "eval_freq": 1000,
             "model_path": args.dataset + "_" + "model.pth",
@@ -82,8 +71,9 @@ class Experiment:
         all_res = []
 
         for datasets in ["monk1", "monk2", "monk3"]:
-            dataset_args = Settings.get_settings(
-                dataset_name=datasets, paper=True, minimal=True
+            dataset_args = (
+                Settings.get_settings(dataset_name=datasets, paper=True, minimal=True)
+                or {}
             )
             exp_args = {
                 "eval_freq": 1000,
@@ -193,6 +183,7 @@ class Experiment:
         args.experiment_id = 0
         one = OneExperiment(args)
         results = one.run_experiment(args)
+        return results
 
     def find_model(self):
         experiement_id = 1000

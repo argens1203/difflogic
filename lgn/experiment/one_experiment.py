@@ -1,24 +1,19 @@
 import random
 import logging
-import argparse
 import numpy as np
 import torch
-import json
 from tqdm import tqdm
 from lgn.encoding import Encoding
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
-    get_dataset,
     new_load_dataset as load_dataset,
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
-from lgn.util import get_args, get_results, setup_logger, Stat
+from lgn.util import get_results, Stat
 from constant import Args, device
-from pysat.card import EncType
 
 from constant import Stats
 import time
-from lgn.encoding import Validator
 
 torch.set_num_threads(1)  # ???
 
@@ -29,8 +24,7 @@ def seed_all(seed=0):
     np.random.seed(seed)
 
 
-from lgn.util import DefaultArgs, ExplainerArgs
-from .settings import Settings
+from lgn.util import ExplainerArgs
 from .util import get_enc_type
 
 

@@ -1,5 +1,5 @@
 from .custom_dataset import CustomDataset
-from .auto_transformer import AutoTransformer
+from .auto_transformer import AutoTransformer, classproperty
 
 
 class BreastCancerDataset(CustomDataset, AutoTransformer):
@@ -10,20 +10,31 @@ class BreastCancerDataset(CustomDataset, AutoTransformer):
     converter = None
     label_encoder = None
 
-    attributes = [
-        "age",
-        "menopause",
-        "tumor-size",
-        "inv-nodes",
-        "node-caps",
-        "deg-malig",
-        "breast",
-        "breast-quad",
-        "irradiat",
-    ]
-    continuous_attributes = set()
-    discrete_attributes = set(attributes)
-    bin_sizes = dict()
+    @classproperty
+    def attributes(self):
+        return [
+            "age",
+            "menopause",
+            "tumor-size",
+            "inv-nodes",
+            "node-caps",
+            "deg-malig",
+            "breast",
+            "breast-quad",
+            "irradiat",
+        ]
+
+    @classproperty
+    def continuous_attributes(self):
+        return set()
+
+    @classproperty
+    def discrete_attributes(self):
+        return set(self.attributes)
+
+    @classproperty
+    def bin_sizes(self):
+        return dict()
 
     def load_data(self):
         raw_data = self.read_raw_data(select=lambda x: "?" not in x)

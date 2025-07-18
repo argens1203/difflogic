@@ -1,13 +1,46 @@
 from .custom_dataset import CustomDataset
-from .auto_transformer import AutoTransformer
+from .auto_transformer import AutoTransformer, classproperty
+
+from abc import ABC, abstractmethod
 
 
-class MonkDataset(CustomDataset, AutoTransformer):
-    attributes = [f"attribute_{i}" for i in range(1, 7)]
-    continuous_attributes = set()  # No continuous attributes in Monk datasets
-    bin_sizes = dict()  # No bin sizes since no continuous attributes
+class MonkDataset(CustomDataset, AutoTransformer, ABC):
+    @classproperty
+    def attributes(self):
+        return [f"attribute_{i}" for i in range(1, 7)]
 
-    discrete_attributes = set(attributes)
+    @classproperty
+    def continuous_attributes(self):
+        return set()
+
+    @classproperty
+    def discrete_attributes(self):
+        return set(self.attributes)
+
+    @classproperty
+    def bin_sizes(self):
+        return dict()
+
+    @classproperty
+    @abstractmethod
+    def train_url(self):
+        return None
+
+    @classproperty
+    @abstractmethod
+    def test_url(self):
+        return None
+
+    @classproperty
+    @abstractmethod
+    def train_md5(self):
+        return None
+
+    @classproperty
+    @abstractmethod
+    def test_md5(self):
+        return None
+
     converter = None
     label_encoder = None
 

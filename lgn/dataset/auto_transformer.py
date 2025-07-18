@@ -1,8 +1,38 @@
 from .converter import Converter
 from sklearn.preprocessing import LabelEncoder
+from abc import ABC, abstractmethod
 
 
-class AutoTransformer:
+class classproperty(object):
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, owner):
+        return self.f(owner)
+
+
+class AutoTransformer(ABC):
+    # TODO: abstractmethod actually doesn't warn on missing implementation
+    @classproperty
+    @abstractmethod
+    def attributes(self) -> list[str]:
+        pass
+
+    @classproperty
+    @abstractmethod
+    def continuous_attributes(self) -> set[str]:
+        pass
+
+    @classproperty
+    @abstractmethod
+    def discrete_attributes(self) -> set[str]:
+        pass
+
+    @classproperty
+    @abstractmethod
+    def bin_sizes(self) -> dict[str, int]:
+        pass
+
     @classmethod
     def transform_label(cls, labels):
         if cls.label_encoder is None:
