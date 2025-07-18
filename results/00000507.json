@@ -1,0 +1,71 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "monk3",
+        "deduplicate": true,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 507,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": true,
+        "max_time": 3600,
+        "model_path": "model-paths/$monk3_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 6,
+        "num_neurons": 12,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 3.3333333333333335,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 100
+    },
+    "cnf_size": 30,
+    "deduplication": 52,
+    "eid": 507,
+    "encoding_time": 1746965474.1358132,
+    "encoding_time_taken": 0.7560253143310547,
+    "eq_size": 50,
+    "explanation_count": 1116,
+    "formulas": [
+        "(4 | 5) >> 15",
+        "~(~15 & ~6)",
+        "~(~15 & ~6)",
+        "~(~15 & ~6)",
+        "~((~(~(6 | 7)) >> ~((4 | 5) >> ~12)) & ~15)",
+        "~(~15 & ~6)",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~15 & ~6",
+        "~12 >> 3"
+    ],
+    "init_time": 1746965473.36933,
+    "instance_count": 432,
+    "mean_explain_count": 2.5833333333333335,
+    "mean_explain_time": 0.005767303342033031,
+    "memory_usage": 1965299,
+    "model_complete_time": 1746965473.379788,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=3.3333333333333335)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746965480.586124,
+    "server_name": "Argenss-MacBook-Pro",
+    "total_num_neurons": [
+        48
+    ],
+    "total_num_weights": [
+        48
+    ],
+    "total_time": 7.216794013977051
+}

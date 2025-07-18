@@ -99,18 +99,11 @@ def get_args():
         help="Additional evaluation (incl. valid set eval).",
     )
 
-    parser.add_argument(
-        "--connections", type=str, default="unique", choices=["random", "unique"]
-    )
-    parser.add_argument("--architecture", "-a", type=str, default="randomly_connected")
     parser.add_argument("--num_neurons", "-k", type=int)
     parser.add_argument("--num_layers", "-l", type=int)
 
     parser.add_argument("--grad-factor", type=float, default=1.0)
 
-    parser.add_argument(
-        "--get_formula", action="store_true", help="Gets the formula of a model"
-    )
     parser.add_argument(
         "--verbose", action="store_true", default=False, help="Sets vebosity"
     )
@@ -120,10 +113,10 @@ def get_args():
     )
 
     parser.add_argument(
-        "--save_model", action="store_true", default=False, help="Save the model"
+        "--save_model", action="store_true", default=True, help="Save the model"
     )
     parser.add_argument(
-        "--load_model", action="store_true", default=False, help="Load the model"
+        "--load_model", action="store_true", default=True, help="Load the model"
     )
 
     parser.add_argument(
@@ -154,6 +147,13 @@ def get_args():
 
     parser.add_argument("--deduplicate", action="store_true", default=False)
 
+    parser.add_argument(
+        "--max_time",
+        type=int,
+        default=3600,
+        help="Timeout for entire run (in seconds) (default: 3600)",
+    )
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -164,3 +164,80 @@ def get_args():
     ), f"iteration count ({args.num_iterations}) has to be divisible by evaluation frequency ({args.eval_freq})"
 
     return args
+
+
+# --- --- --- --- ---
+from dataclasses import dataclass
+
+
+@dataclass
+class DatasetArgs:
+    num_neurons: int = None
+    num_layers: int = None
+
+
+@dataclass
+class ModelArgs:
+    connections: str = "unique"
+
+
+@dataclass
+class TrainingArgs:
+    tau: int = 10
+    learning_rate: float = 0.01
+    grad_factor: float = 1.0
+    batch_size: int = 128
+    training_bit_count: int = 32  # Torch floating point precision
+
+
+@dataclass
+class ExplainerArgs:
+    enc_type: str = "tot"
+    deduplicate: bool = False
+    xnum: int = 1000
+    max_time: int = 3600
+
+
+@dataclass
+class ExperimentArgs:
+    experiment_id: int = None
+    dataset: str = "iris"
+
+
+@dataclass
+class PresentationArgs:
+    verbose: bool = False
+    save_model: bool = True
+    load_model: bool = True
+    model_path: str = "model.pth"
+
+
+@dataclass
+class CmdSandboxArgs:
+    explain: str = None
+    explain_all: bool = False
+    explain_one: bool = False
+
+
+@dataclass
+class SettingsArgs:
+    seed: int = 0
+    eval_freq: int = 2000
+    num_iterations: int = 100_000
+    packbits_eval: bool = False
+    compile_model: bool = False
+    implementation: str = "cuda"
+
+
+@dataclass
+class DefaultArgs(
+    DatasetArgs,
+    ModelArgs,
+    TrainingArgs,
+    ExplainerArgs,
+    ExperimentArgs,
+    PresentationArgs,
+    CmdSandboxArgs,
+    SettingsArgs,
+):
+    pass

@@ -20,7 +20,7 @@ class Explainer:
         self.encoding = encoding
         self.oracle = MulticlassSolver(encoding=encoding)
 
-    def explain(self, instance):
+    def explain(self, instance: Instance):
         pred_class = instance.get_predicted_class()
         inp = instance.get_input()
 

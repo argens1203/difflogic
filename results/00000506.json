@@ -1,0 +1,71 @@
+{
+    "args": {
+        "batch_size": 64,
+        "compile_model": false,
+        "connections": "unique",
+        "dataset": "monk3",
+        "deduplicate": false,
+        "enc_type": "tot",
+        "eval_freq": 1000,
+        "experiment_id": 506,
+        "explain": null,
+        "explain_all": false,
+        "explain_one": false,
+        "grad_factor": 1,
+        "implementation": "cuda",
+        "learning_rate": 0.01,
+        "load_model": true,
+        "max_time": 3600,
+        "model_path": "model-paths/$monk3_model.pth",
+        "num_iterations": 5000,
+        "num_layers": 6,
+        "num_neurons": 12,
+        "packbits_eval": false,
+        "save_model": false,
+        "seed": 0,
+        "tau": 3.3333333333333335,
+        "training_bit_count": 32,
+        "verbose": false,
+        "xnum": 100
+    },
+    "cnf_size": 117,
+    "deduplication": [],
+    "eid": 506,
+    "encoding_time": 1746965465.833567,
+    "encoding_time_taken": 0.2261350154876709,
+    "eq_size": 50,
+    "explanation_count": 1116,
+    "formulas": [
+        "~(~((4 | 5) >> 15))",
+        "~(~((4 | 5) >> 15))",
+        "~(~((~(~(6 | 7) & ~(7 & 8)) >> ~((4 | 5) >> ~12)) & ~(~(~15))) >> ~((~(~6) >> ~(~(~(6 | 7) & ~(7 & 8)))) >> ~(~((4 | 5) >> 15))))",
+        "~(~(~(~((4 | 5) >> 15))))",
+        "~((~(~(6 | 7) & ~(7 & 8)) >> ~((4 | 5) >> ~12)) & ~(~(~15)))",
+        "~(~((4 | 5) >> 15))",
+        "~(~(~((4 | 5) >> 15)))",
+        "~(~(~((~(~6) >> ~(~(~(6 | 7) & ~(7 & 8)))) >> ~(~((4 | 5) >> 15)))))",
+        "~((4 | 5) >> 15)",
+        "~(~(~((4 | 5) >> 15)))",
+        "~((4 | 5) >> 15)",
+        "~(~(~12 >> ~(1 | 2)))"
+    ],
+    "init_time": 1746965465.595087,
+    "instance_count": 432,
+    "mean_explain_count": 2.5833333333333335,
+    "mean_explain_time": 0.00672529675199994,
+    "memory_usage": 345374,
+    "model_complete_time": 1746965465.607432,
+    "model_str": [
+        "Sequential(\n  (0): LogicLayer(17, 12, train)\n  (1): LogicLayer(12, 12, train)\n  (2): LogicLayer(12, 12, train)\n  (3): LogicLayer(12, 12, train)\n  (4): LogicLayer(12, 12, train)\n  (5): LogicLayer(12, 12, train)\n  (6): GroupSum(k=2, tau=3.3333333333333335)\n)"
+    ],
+    "path": "./results/",
+    "save_time": 1746965473.367496,
+    "server_name": "Argenss-MacBook-Pro",
+    "total_num_neurons": [
+        48
+    ],
+    "total_num_weights": [
+        48
+    ],
+    "total_time": 7.772408962249756
+}

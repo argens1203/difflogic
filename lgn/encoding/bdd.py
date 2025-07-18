@@ -29,6 +29,12 @@ class BDDSolver:
         else:
             return xor(a, b) & self.ohe == self.bdd.false
 
+    def is_neg_equiv(self, a: Function, b: Function) -> bool:
+        if self.ohe is None:
+            return xor(a, b) == self.bdd.true
+        else:
+            return xor(a, b) & self.ohe == self.bdd.true
+
     def dump_list(self, roots: list[Function], filename: str = "example.png"):
         self.bdd.dump(filename, roots=roots)
 
@@ -105,11 +111,31 @@ class BDDSolver:
 
     def deduplicate(self, f: Formula, previous: Set[Formula]):
         transformed = self.transform(f)
+        if self.is_equiv(transformed, self.bdd.true):
+            if f != Atom(True):
+                Stats["deduplication"] += 1
+                return Atom(True)
+            else:
+                return f
+
+        if self.is_equiv(transformed, self.bdd.false):
+            if f != Atom(False):
+                Stats["deduplication"] += 1
+                return Atom(False)
+            else:
+                return f
+
         for p in previous:
             if self.is_equiv(transformed, self.transform(p)):
                 if len(str(f)) >= len(str(p)):
                     Stats["deduplication"] += 1
                     return p
+                else:
+                    return f
+            elif self.is_neg_equiv(transformed, self.transform(p)):
+                if len(str(f)) >= len(str(p)):
+                    Stats["deduplication"] += 1
+                    return Neg(p)
                 else:
                     return f
         return f
