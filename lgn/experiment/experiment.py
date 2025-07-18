@@ -32,8 +32,6 @@ class Experiment:
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
-        print(dataset_args)
-        print(type(dataset_args))
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
