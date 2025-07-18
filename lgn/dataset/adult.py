@@ -1,7 +1,7 @@
 import numpy as np
 
 from .custom_dataset import CustomDataset
-from .auto_transformer import AutoTransformer
+from .auto_transformer import AutoTransformer, classproperty
 
 
 class AdultDataset(CustomDataset, AutoTransformer):
@@ -17,37 +17,51 @@ class AdultDataset(CustomDataset, AutoTransformer):
     converter = None
     label_encoder = None
 
-    attributes = [
-        "age",
-        "workclass",
-        # "fnlwgt",
-        "education",
-        # "education-num",
-        "marital-status",
-        "occupation",
-        "relationship",
-        "race",
-        "sex",
-        "capital-gain",
-        "capital-loss",
-        "hours-per-week",
-        "native-country",
-        # "label",
-    ]
-    continuous_attributes = {
-        "age",
-        "capital-gain",
-        "capital-loss",
-        "hours-per-week",
-    }
-    # discrete_attributes would be replaced in AutoTransformer to be the rest of attributes
-    discrete_attributes = None
-    bin_sizes = {
-        "age": 5,
-        "capital-gain": 3,
-        "capital-loss": 3,
-        "hours-per-week": 6,
-    }
+    @classproperty
+    def attributes(self):
+        return [
+            "age",
+            "workclass",
+            # "fnlwgt",
+            "education",
+            # "education-num",
+            "marital-status",
+            "occupation",
+            "relationship",
+            "race",
+            "sex",
+            "capital-gain",
+            "capital-loss",
+            "hours-per-week",
+            "native-country",
+            # "label",
+        ]
+
+    @classproperty
+    def continuous_attributes(self):
+        return set(
+            {
+                "age",
+                "capital-gain",
+                "capital-loss",
+                "hours-per-week",
+            }
+        )
+
+    @classproperty
+    def discrete_attributes(self):
+        return set(self.attributes) - self.continuous_attributes
+
+    @classproperty
+    def bin_sizes(self):
+        return dict(
+            {
+                "age": 5,
+                "capital-gain": 3,
+                "capital-loss": 3,
+                "hours-per-week": 6,
+            }
+        )
 
     def __init__(
         self,

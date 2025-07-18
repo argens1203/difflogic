@@ -1,7 +1,7 @@
 from torchvision import transforms
 import torchvision.datasets
 
-from .auto_transformer import AutoTransformer
+from .auto_transformer import AutoTransformer, classproperty
 import torch
 
 
@@ -13,10 +13,22 @@ class Flatten:
 class MNISTDataset(AutoTransformer):
     converter = None
     label_encoder = None
-    attributes = ["pixel " + str(i) for i in range(400)]
-    discrete_attributes = set()
-    continuous_attributes = None
-    bin_sizes = {k: 2 for k in attributes}
+
+    @classproperty
+    def attributes(self):
+        return ["pixel " + str(i) for i in range(400)]
+
+    @classproperty
+    def continuous_attributes(self):
+        return set(self.attributes)
+
+    @classproperty
+    def discrete_attributes(self):
+        return set()
+
+    @classproperty
+    def bin_sizes(self):
+        return {k: 2 for k in self.attributes}
 
     def __init__(self):
         self.dataset = torchvision.datasets.MNIST(

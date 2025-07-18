@@ -1,13 +1,14 @@
 from sklearn.preprocessing import LabelEncoder, KBinsDiscretizer, OneHotEncoder
+import numpy as np
 
 
 class Converter:
     def __init__(
         self,
-        attributes,
-        continuous_attributes=None,
-        discrete_attributes=None,
-        bin_sizes=dict(),
+        attributes: list[str],
+        continuous_attributes: set[str] | None = None,
+        discrete_attributes: set[str] | None = None,
+        bin_sizes: dict[str, int] = dict(),
     ):
         self.attributes = attributes
         self.continuous_attributes = continuous_attributes
@@ -15,9 +16,26 @@ class Converter:
         self.bin_sizes = bin_sizes
 
         if continuous_attributes is None:
-            self.continuous_attributes = set(attributes) - discrete_attributes
+            if discrete_attributes is None:
+                raise ValueError(
+                    "Either continuous_attributes or discrete_attributes must be provided"
+                )
+            else:
+                self.continuous_attributes = set(attributes) - discrete_attributes
         if discrete_attributes is None:
-            self.discrete_attributes = set(attributes) - continuous_attributes
+            if continuous_attributes is None:
+                raise ValueError(
+                    "Either continuous_attributes or discrete_attributes must be provided"
+                )
+            else:
+                self.discrete_attributes = set(attributes) - continuous_attributes
+
+        assert (
+            self.continuous_attributes & self.discrete_attributes == set()
+        ), "Attributes cannot be both continuous and discrete"
+        assert self.continuous_attributes | self.discrete_attributes == set(
+            attributes
+        ), "Attributes must be either continuous or discrete"
 
         self.convertors = dict()
         self.setup_convertors()
@@ -74,7 +92,7 @@ class Converter:
 
         raise ValueError(f"Unknown attribute {attr}")
 
-    def transform(self, data):
+    def transform(self, data) -> np.ndarray:
         for i, attr in enumerate(self.attributes):
             data[:, i] = self.transform_attr(data[:, i], attr)
 
@@ -87,6 +105,7 @@ class Converter:
             data = self.ohe.fit_transform(data)
         else:
             data = self.ohe.transform(data)
+            assert type(data) == np.ndarray, "OneHotEncoder should return a numpy array"
 
         return data
 
