@@ -1,5 +1,5 @@
 from .custom_dataset import CustomDataset
-from .auto_transformer import AutoTransformer, classproperty
+from .auto_transformer import AutoTransformer
 
 
 class IrisDataset(CustomDataset, AutoTransformer):
@@ -8,21 +8,21 @@ class IrisDataset(CustomDataset, AutoTransformer):
         "42615765a885ddf54427f12c34a0a070",
     )
 
-    @classproperty
-    def attributes(self):
+    @classmethod
+    def attributes(cls):
         return ["sepal_length", "sepal_width", "petal_length", "petal_width"]
 
-    @classproperty
-    def continuous_attributes(self):
-        return set(self.attributes)
+    @classmethod
+    def continuous_attributes(cls):
+        return set(cls.attributes())
 
-    @classproperty
-    def discrete_attributes(self):
+    @classmethod
+    def discrete_attributes(cls):
         return set()  # No discrete attributes in Iris dataset
 
-    @classproperty
-    def bin_sizes(self):
-        return {k: 2 for k in self.attributes}
+    @classmethod
+    def bin_sizes(cls):
+        return {k: 2 for k in cls.attributes()}
 
     converter = None
     label_encoder = None

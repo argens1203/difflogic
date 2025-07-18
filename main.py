@@ -7,9 +7,11 @@ if __name__ == "__main__":
     # experiment.run_with_cmd()
     experiment.debug(dataset="iris")
     experiment.debug(dataset="monk1")
-    experiment.debug(dataset="adult")
+    experiment.debug(dataset="monk2")
+    experiment.debug(dataset="monk3")
     experiment.debug(dataset="breast_cancer")
-    experiment.debug(dataset="mnist")
+    # experiment.debug(dataset="adult")
+    # experiment.debug(dataset="mnist")
     # experiment.find_model()
 
     # datasets = ["iris", "monk1", "monk2", "monk3", "adult", "breast_cancer"]

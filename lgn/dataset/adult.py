@@ -1,7 +1,7 @@
 import numpy as np
 
 from .custom_dataset import CustomDataset
-from .auto_transformer import AutoTransformer, classproperty
+from .auto_transformer import AutoTransformer
 
 
 class AdultDataset(CustomDataset, AutoTransformer):
@@ -17,8 +17,8 @@ class AdultDataset(CustomDataset, AutoTransformer):
     converter = None
     label_encoder = None
 
-    @classproperty
-    def attributes(self):
+    @classmethod
+    def attributes(cls):
         return [
             "age",
             "workclass",
@@ -37,8 +37,8 @@ class AdultDataset(CustomDataset, AutoTransformer):
             # "label",
         ]
 
-    @classproperty
-    def continuous_attributes(self):
+    @classmethod
+    def continuous_attributes(cls):
         return set(
             {
                 "age",
@@ -48,12 +48,12 @@ class AdultDataset(CustomDataset, AutoTransformer):
             }
         )
 
-    @classproperty
-    def discrete_attributes(self):
-        return set(self.attributes) - self.continuous_attributes
+    @classmethod
+    def discrete_attributes(cls):
+        return set(cls.attributes()) - cls.continuous_attributes()
 
-    @classproperty
-    def bin_sizes(self):
+    @classmethod
+    def bin_sizes(cls):
         return dict(
             {
                 "age": 5,

@@ -1,7 +1,7 @@
 from torchvision import transforms
 import torchvision.datasets
 
-from .auto_transformer import AutoTransformer, classproperty
+from .auto_transformer import AutoTransformer
 import torch
 
 
@@ -14,21 +14,21 @@ class MNISTDataset(AutoTransformer):
     converter = None
     label_encoder = None
 
-    @classproperty
-    def attributes(self):
+    @classmethod
+    def attributes(cls):
         return ["pixel " + str(i) for i in range(400)]
 
-    @classproperty
-    def continuous_attributes(self):
-        return set(self.attributes)
+    @classmethod
+    def continuous_attributes(cls):
+        return set(cls.attributes())
 
-    @classproperty
-    def discrete_attributes(self):
+    @classmethod
+    def discrete_attributes(cls):
         return set()
 
-    @classproperty
-    def bin_sizes(self):
-        return {k: 2 for k in self.attributes}
+    @classmethod
+    def bin_sizes(cls):
+        return {k: 2 for k in cls.attributes()}
 
     def __init__(self):
         self.dataset = torchvision.datasets.MNIST(
