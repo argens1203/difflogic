@@ -17,37 +17,51 @@ class AdultDataset(CustomDataset, AutoTransformer):
     converter = None
     label_encoder = None
 
-    attributes = [
-        "age",
-        "workclass",
-        # "fnlwgt",
-        "education",
-        # "education-num",
-        "marital-status",
-        "occupation",
-        "relationship",
-        "race",
-        "sex",
-        "capital-gain",
-        "capital-loss",
-        "hours-per-week",
-        "native-country",
-        # "label",
-    ]
-    continuous_attributes = {
-        "age",
-        "capital-gain",
-        "capital-loss",
-        "hours-per-week",
-    }
-    # discrete_attributes would be replaced in AutoTransformer to be the rest of attributes
-    discrete_attributes = None
-    bin_sizes = {
-        "age": 5,
-        "capital-gain": 3,
-        "capital-loss": 3,
-        "hours-per-week": 6,
-    }
+    @classmethod
+    def attributes(cls):
+        return [
+            "age",
+            "workclass",
+            # "fnlwgt",
+            "education",
+            # "education-num",
+            "marital-status",
+            "occupation",
+            "relationship",
+            "race",
+            "sex",
+            "capital-gain",
+            "capital-loss",
+            "hours-per-week",
+            "native-country",
+            # "label",
+        ]
+
+    @classmethod
+    def continuous_attributes(cls):
+        return set(
+            {
+                "age",
+                "capital-gain",
+                "capital-loss",
+                "hours-per-week",
+            }
+        )
+
+    @classmethod
+    def discrete_attributes(cls):
+        return set(cls.attributes()) - cls.continuous_attributes()
+
+    @classmethod
+    def bin_sizes(cls):
+        return dict(
+            {
+                "age": 5,
+                "capital-gain": 3,
+                "capital-loss": 3,
+                "hours-per-week": 6,
+            }
+        )
 
     def __init__(
         self,

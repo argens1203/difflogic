@@ -13,10 +13,22 @@ class Flatten:
 class MNISTDataset(AutoTransformer):
     converter = None
     label_encoder = None
-    attributes = ["pixel " + str(i) for i in range(400)]
-    discrete_attributes = set()
-    continuous_attributes = None
-    bin_sizes = {k: 2 for k in attributes}
+
+    @classmethod
+    def attributes(cls):
+        return ["pixel " + str(i) for i in range(400)]
+
+    @classmethod
+    def continuous_attributes(cls):
+        return set(cls.attributes())
+
+    @classmethod
+    def discrete_attributes(cls):
+        return set()
+
+    @classmethod
+    def bin_sizes(cls):
+        return {k: 2 for k in cls.attributes()}
 
     def __init__(self):
         self.dataset = torchvision.datasets.MNIST(

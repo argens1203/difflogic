@@ -113,11 +113,13 @@ class Settings:
     ]
     debug_network_param = dict(dataset_params)
 
-    def get_settings(dataset_name=None, paper=False, minimal=True):
+    @staticmethod
+    def get_settings(dataset_name: str = "", paper=False, minimal=True):
         if not paper or dataset_name == "iris":
             return Settings.debug_network_param.get(dataset_name)
         if minimal:
             if dataset_name not in ["mnist", "cifar10"]:
                 return Settings.network_param.get(dataset_name)
             else:
-                return Settings.network_param.get(dataset_name).get("small")
+                return (Settings.network_param.get(dataset_name) or {}).get("small")
+        return {}

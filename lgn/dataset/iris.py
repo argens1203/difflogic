@@ -8,10 +8,21 @@ class IrisDataset(CustomDataset, AutoTransformer):
         "42615765a885ddf54427f12c34a0a070",
     )
 
-    attributes = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
-    continuous_attributes = set(attributes)
-    discrete_attributes = set()  # No discrete attributes in Iris dataset
-    bin_sizes = {k: 2 for k in attributes}
+    @classmethod
+    def attributes(cls):
+        return ["sepal_length", "sepal_width", "petal_length", "petal_width"]
+
+    @classmethod
+    def continuous_attributes(cls):
+        return set(cls.attributes())
+
+    @classmethod
+    def discrete_attributes(cls):
+        return set()  # No discrete attributes in Iris dataset
+
+    @classmethod
+    def bin_sizes(cls):
+        return {k: 2 for k in cls.attributes()}
 
     converter = None
     label_encoder = None

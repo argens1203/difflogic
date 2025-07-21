@@ -64,9 +64,9 @@ class Instance:
 
     def explain(self, p: One_Indexed_Single_Inp):
         attr_idx, attr_idx_offset = self.get_attr_indices(p)
-        attr = self.Dataset.attributes[attr_idx]
+        attr = self.Dataset.attributes()[attr_idx]
         converter = self.Dataset.converter.convertors[attr]
-        if attr in self.Dataset.continuous_attributes:
+        if attr in self.Dataset.continuous_attributes():
             return self.explain_continuous(attr_idx_offset, attr, converter)
         else:
             return self.explain_discrete(attr_idx_offset, attr, converter)
@@ -77,6 +77,7 @@ class Instance:
 
     # Class Methods
 
+    @staticmethod
     def from_encoding(encoding: Encoding, feat=None, raw=None, inp=None):
         if feat is None:
             feat = encoding.Dataset.transform_feature(np.array([raw]))[0]
@@ -98,6 +99,7 @@ class Instance:
             Dataset=encoding.Dataset,
         )
 
+    @staticmethod
     def fill_missing(inp=None, feat=None):
         if inp is None:
             inp = feat_to_input(feat)

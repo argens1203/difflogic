@@ -10,20 +10,31 @@ class BreastCancerDataset(CustomDataset, AutoTransformer):
     converter = None
     label_encoder = None
 
-    attributes = [
-        "age",
-        "menopause",
-        "tumor-size",
-        "inv-nodes",
-        "node-caps",
-        "deg-malig",
-        "breast",
-        "breast-quad",
-        "irradiat",
-    ]
-    continuous_attributes = set()
-    discrete_attributes = set(attributes)
-    bin_sizes = dict()
+    @classmethod
+    def attributes(cls):
+        return [
+            "age",
+            "menopause",
+            "tumor-size",
+            "inv-nodes",
+            "node-caps",
+            "deg-malig",
+            "breast",
+            "breast-quad",
+            "irradiat",
+        ]
+
+    @classmethod
+    def continuous_attributes(cls):
+        return set()
+
+    @classmethod
+    def discrete_attributes(cls):
+        return set(cls.attributes())
+
+    @classmethod
+    def bin_sizes(cls):
+        return dict()
 
     def load_data(self):
         raw_data = self.read_raw_data(select=lambda x: "?" not in x)
