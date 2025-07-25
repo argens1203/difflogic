@@ -25,6 +25,7 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
+from lgn.encoding.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
@@ -207,6 +208,7 @@ class OneExperiment:
                 )
                 print("Model loaded successfully")
             except Exception as e:
+                print(f"Error loading model: {e}")
                 self.train_model(args, model, loss_fn, optim)
                 self.eval_model(args, model)
 
@@ -237,6 +239,14 @@ class OneExperiment:
     def get_encoding(self, enc_type):
         self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)
         # Validator.validate_with_truth_table(encoding=encoding, model=model)
+
+        deduplicator = SolverWithDeduplication(self.encoding)
+        self.encoding = Encoding(
+            self.model,
+            self.dataset,
+            enc_type=enc_type,
+            deduplicator=deduplicator,
+        )
 
         if self.results is not None:
             self.results.store_encoding(self.encoding)

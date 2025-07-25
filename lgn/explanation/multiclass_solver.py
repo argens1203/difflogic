@@ -1,6 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lgn.encoding import Encoding
+
 import logging
 
-from lgn.encoding import Encoding
 from lgn.util import remove_none, Stat, Cached
 
 from .solver import Solver
@@ -17,7 +22,7 @@ class MulticlassSolver:
     ## -- Public -- #
     def is_uniquely_satisfied_by(
         self,
-        inp,
+        inp: list[int],  # input features
         predicted_cls,  # true_class as in not true class of data, but that predicted by model
     ):  # Return true means that only the true_class can satisfy all contraints given the input
         """
@@ -45,7 +50,7 @@ class MulticlassSolver:
             combined_core = combined_core.union(set(core))
         return True, None, list(combined_core)
 
-    def is_adj_class_satisfiable(self, true_class, adj_class, inp=None):
+    def is_adj_class_satisfiable(self, true_class, adj_class, inp: list[int]):
         solver = self.get_solver(true_class, adj_class)
         is_satisfiable = solver.solve(assumptions=inp)
 
@@ -58,18 +63,18 @@ class MulticlassSolver:
         )
         return is_satisfiable, solver.get_model(), solver.get_core()
 
-    def is_satisfiable(self, pred_class, inp):
+    def is_satisfiable(self, pred_class, inp: set[int]):
         is_satisfiable, _, __ = self.is_satisfiable_with_model_or_core(pred_class, inp)
         return is_satisfiable
 
-    def is_satisfiable_with_model_or_core(self, pred_class, inp):
+    def is_satisfiable_with_model_or_core(self, pred_class, inp: list[int]):
         logger.debug("Checking satisfiability of %s", str(inp))
         is_uniquely_satsified, model, core = self.is_uniquely_satisfied_by(
             inp, pred_class
         )
         return not is_uniquely_satsified, model, core
 
-    def solve(self, pred_class, inp):
+    def solve(self, pred_class, inp: list[int]):
         # NEW
         self.assert_input_correctness(inp)
         # NEW
@@ -80,7 +85,7 @@ class MulticlassSolver:
             "core": core,
         }
 
-    def is_solvable(self, pred_class, inp):
+    def is_solvable(self, pred_class, inp: set[int]):
         # NEW
         self.assert_input_correctness(inp)
         # NEW
@@ -107,10 +112,9 @@ class MulticlassSolver:
 
         Stat.inc_cache_miss(Cached.SOLVER)
 
-        lits, bound = self.get_lits_and_bound(true_class, adj_class)
-
         solver = Solver(encoding=self.encoding)
 
+        lits, bound = self.get_lits_and_bound(true_class, adj_class)
         solver.set_cardinality(lits, bound)
 
         self.solvers[(true_class, adj_class)] = solver
