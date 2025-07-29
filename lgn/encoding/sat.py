@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from pysat.formula import Formula, Atom, CNF, Or, Neg, PYSAT_TRUE, PYSAT_FALSE
+from pysat.formula import Formula, Atom, CNF, Or, Neg, PYSAT_TRUE, PYSAT_FALSE, Implies
 
 from typing import Set
 
@@ -16,32 +16,43 @@ class SolverWithDeduplication(Solver):
         super().__init__(encoding)
 
     def add_clause(self, clause: list[Formula]):
-        # self.solver.add_clause(clause)
-        for f in [Or(Atom(False), f.simplified()) for f in clause]:
-            cnf = CNF()
-            f.clausify()
-            cnf.extend(list(f)[:-1])
+        # print("Adding clause: ", clause)
+        if Atom(True) in [x.simplified() for x in clause]:
+            # print("Clause contains True, skipping")
+            return
 
-        self.solver.append_formula(cnf)
+        f = Or(*[x.simplified() for x in clause])
+        f.clausify()
+        # print("f.clauses", f.clauses)
+
+        clauses = list(
+            map(lambda x: list(filter(lambda y: y is not None, x)), f.clauses)
+        )
+        filtered = list(filter(lambda z: len(z) > 0, clauses))
+        # print("Appending formula: ", filtered)
+        self.solver.append_formula(filtered)
 
     def deduplicate_constant(self, f: Formula):
-        # TODO: test minus sign
-        # TODO: use variable to store the output
         with self.use_context() as vpool:
+            # print("------- deduplicating constant ------", f)
             auxvar = Atom(("constant", f))
             auxvar_id = vpool.id(auxvar)
+            # print("Adding auxvar to vpool", auxvar, auxvar_id)
+
             self.add_clause([auxvar, f])
             self.add_clause([Neg(auxvar), Neg(f)])
 
             if not self.solver.solve(assumptions=[-auxvar_id]):
+                # print("is constant false", f)
                 self.add_clause([auxvar])
                 Stats["deduplication"] += 1
-                return PYSAT_TRUE
+                return PYSAT_FALSE
 
             if not self.solver.solve(assumptions=[auxvar_id]):
+                # print("is constant true", f)
                 self.add_clause([Neg(auxvar)])
                 Stats["deduplication"] += 1
-                return PYSAT_FALSE
+                return PYSAT_TRUE
 
             return None
 
@@ -49,19 +60,23 @@ class SolverWithDeduplication(Solver):
         with self.use_context() as vpool:
             auxvar = Atom(("pair", f, prev))
             auxvar_id = vpool.id(auxvar)
+            # self.add_clause([auxvar])
+            # self.add_clause([Neg(auxvar)])
+
             self.add_clause([Neg(auxvar), Neg(f), prev])
             self.add_clause([Neg(auxvar), f, Neg(prev)])
             self.add_clause([auxvar, f, prev])
             self.add_clause([auxvar, Neg(f), Neg(prev)])
+
             if not self.solver.solve(assumptions=[-auxvar_id]):
                 self.add_clause([auxvar])
                 Stats["deduplication"] += 1
-                return prev
+                return Neg(prev)
 
             if not self.solver.solve(assumptions=[auxvar_id]):
                 self.add_clause([Neg(auxvar)])
                 Stats["deduplication"] += 1
-                return Neg(prev)
+                return prev
 
         return None
 

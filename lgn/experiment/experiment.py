@@ -36,9 +36,8 @@ class Experiment:
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
             "verbose": True,
-            "save_model": False,
+            "save_model": True,
             "load_model": True,
-            "verbose": True,
         }
         args = {
             **vars(default_args),
