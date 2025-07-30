@@ -211,6 +211,7 @@ class OneExperiment:
                 print(f"Error loading model: {e}")
                 self.train_model(args, model, loss_fn, optim)
                 self.eval_model(args, model)
+                torch.save(model.state_dict(), args.model_path)
 
         elif args.save_model:
             self.train_model(args, model, loss_fn, optim)
