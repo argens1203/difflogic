@@ -1,6 +1,8 @@
 import logging
 import torch
 from typing import List
+from tqdm import tqdm
+
 from contextlib import contextmanager
 
 from pysat.formula import Formula, Atom, CNF, Or
@@ -37,12 +39,13 @@ def get_formula_bdd(
         all.add(i)
     Stats["deduplication"] = 0
 
-    for layer in model:
+    for i, layer in enumerate(model):
+        logger.debug("Layer %d: %s", i, layer)
         assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
         if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
             continue
         x = layer.get_formula(x)
-        for idx in range(len(x)):
+        for idx in tqdm(range(len(x))):
             x[idx] = solver.deduplicate(x[idx], all)
             all.add(x[idx])
 
@@ -87,7 +90,7 @@ def get_formula_sat_solver(
         if isinstance(layer, GroupSum):
             continue
         x = layer.get_formula(x)
-        for idx in range(len(x)):
+        for idx in tqdm(range(len(x))):
             x[idx] = deduplicator.deduplicate(x[idx], all)
             all.add(x[idx])
 
