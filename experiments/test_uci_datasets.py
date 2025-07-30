@@ -3,6 +3,7 @@ import numpy as np
 import pytest
 from uci_datasets import IrisDataset
 
+
 @pytest.mark.skip("dataset no longer used")
 class TestIrisDataset(unittest.TestCase):
     def test_convert_sample_to_feature_vector(self):
@@ -55,7 +56,6 @@ class TestIrisDataset(unittest.TestCase):
             0.0,
             0.0,
         ]
-        print(vec.shape, len(expected))
         for a, b in zip(vec, expected):
             self.assertEqual(a, b)
 

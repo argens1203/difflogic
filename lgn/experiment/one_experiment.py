@@ -239,8 +239,6 @@ class OneExperiment:
 
     def get_encoding(self, enc_type):
         self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)
-        # Validator.validate_with_truth_table(encoding=encoding, model=model)
-
         deduplicator = SolverWithDeduplication(self.encoding)
         self.encoding = Encoding(
             self.model,
