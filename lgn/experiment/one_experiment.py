@@ -258,8 +258,8 @@ class OneExperiment:
             print("In Get_Encoding")
             print(id(self.encoding))
             self.encoding.print()
-            print("Second print")
-            self.encoding.print()
+        print("Second print")
+        self.encoding.print()
         print("line 262")
 
     def get_explainer(self):
