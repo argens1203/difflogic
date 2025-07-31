@@ -90,9 +90,12 @@ def get_formula_sat_solver(
         if isinstance(layer, GroupSum):
             continue
         x = layer.get_formula(x)
+        print("line 93: x", x)
+        assert x is not None, "Layer returned None"
         for idx in tqdm(range(len(x))):
             x[idx] = deduplicator.deduplicate(x[idx], all)
             all.add(x[idx])
+            assert x[idx] is not None, "Deduplicator returned None"
 
     return x, inputs
 
