@@ -47,6 +47,7 @@ class OneExperiment:
             Args["Deduplicate"] = True  # TODO: find ways to store global args
 
         self.get_model(args)
+
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
         self.get_explainer()
 
@@ -77,6 +78,7 @@ class OneExperiment:
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
+        print("In Run_Experiment")
         self.encoding.print()
         self.get_explainer()
 
@@ -251,6 +253,7 @@ class OneExperiment:
             self.results.store_encoding(self.encoding)
 
         if self.verbose:
+            print("In Get_Encoding")
             self.encoding.print()
             self.logger.info("\n")
 
