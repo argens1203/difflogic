@@ -20,7 +20,7 @@ class SolverWithDeduplication(Solver):
 
     def add_clause(self, clause: list[Formula]):
         # print("Adding clause: ", clause)
-        logger.debug(clause)
+        # logger.debug(clause)
         if Atom(True) in [x.simplified() for x in clause]:
             # print("Clause contains True, skipping")
             return
@@ -34,15 +34,15 @@ class SolverWithDeduplication(Solver):
         filtered = list(filter(lambda z: z is not None and len(z) > 0, clauses))
         assert None not in filtered, "None found in filtered clauses"
 
-        logger.debug("Appending formula: %s", filtered)
+        # logger.debug("Appending formula: %s", filtered)
         self.solver.append_formula(filtered)
 
     def deduplicate_constant(self, f: Formula):
         with self.use_context() as vpool:
-            print("------- deduplicating constant ------", f)
+            # print("------- deduplicating constant ------", f)
             auxvar = Atom(("constant", f))
             auxvar_id = vpool.id(auxvar)
-            print("Added auxvar to vpool", auxvar, auxvar_id)
+            # print("Added auxvar to vpool", auxvar, auxvar_id)
 
             self.add_clause([auxvar, f])
             self.add_clause([Neg(auxvar), Neg(f)])
@@ -63,7 +63,11 @@ class SolverWithDeduplication(Solver):
 
     def deduplicate_pair(self, f: Formula, prev: Formula):
         with self.use_context() as vpool:
-            print("------- deduplicating pair ------", f, prev)
+            if len(str(f)) <= len(str(prev)):
+                return None
+
+            # print("------- deduplicating pair ------", f, prev)
+
             auxvar = Atom(("pair", f, prev))
             auxvar_id = vpool.id(auxvar)
             # self.add_clause([auxvar])
@@ -89,13 +93,14 @@ class SolverWithDeduplication(Solver):
     def deduplicate(self, f: Formula, previous: Set[Formula]):
         c = self.deduplicate_constant(f)
         if c is not None:
-            logger.debug(f"Deduplicated {f} to {c}")
+            # logger.debug(f"Deduplicated {f} to {c}")
             return c
 
         for p in previous:
             g = self.deduplicate_pair(f, p)
             if g is not None:
-                logger.debug(f"Deduplicated {f} with {p} to {g}")
-        logger.debug(str(f))
+                # logger.debug(f"Deduplicated {f} with {p} to {g}")
+                return g
+        # logger.debug(str(f))
         assert "None" not in str(f), "Deduplication returned None for formula"
         return f
