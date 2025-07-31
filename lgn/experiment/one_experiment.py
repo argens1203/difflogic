@@ -76,9 +76,11 @@ class OneExperiment:
         Stat.start_memory_usage()
 
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
+        print("line 79")
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
         print("In Run_Experiment")
+        print(id(self.encoding))
         self.encoding.print()
         self.get_explainer()
 
@@ -254,8 +256,11 @@ class OneExperiment:
 
         if self.verbose:
             print("In Get_Encoding")
+            print(id(self.encoding))
             self.encoding.print()
-            self.logger.info("\n")
+            print("Second print")
+            self.encoding.print()
+        print("line 262")
 
     def get_explainer(self):
         self.explainer = Explainer(self.encoding)
