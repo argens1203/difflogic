@@ -21,99 +21,6 @@ fp_type = torch.float32
 logger = logging.getLogger(__name__)
 
 
-def get_formula_bdd(
-    model,
-    input_dim,
-    Dataset: AutoTransformer,
-    # TODO: second return is actually list[Atom] but cannot be defined as such
-) -> tuple[list[Formula], list[Formula]]:
-    x: list[Formula] = [Atom(i + 1) for i in range(input_dim)]
-    inputs = x
-
-    logger.debug("Deduplicating...")
-    solver = BDDSolver.from_inputs(inputs=x)
-    solver.set_ohe(Dataset.get_attribute_ranges())
-
-    all = set()
-    for i in x:
-        all.add(i)
-    Stats["deduplication"] = 0
-
-    for i, layer in enumerate(model):
-        logger.debug("Layer %d: %s", i, layer)
-        assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-        if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
-            continue
-        x = layer.get_formula(x)
-        for idx in tqdm(range(len(x))):
-            x[idx] = solver.deduplicate(x[idx], all)
-            all.add(x[idx])
-
-    return x, inputs
-
-
-def get_formula_base(
-    model,
-    input_dim,
-    # TODO: second return is actually list[Atom] but cannot be defined as such
-) -> tuple[list[Formula], list[Formula]]:
-    x = [Atom(i + 1) for i in range(input_dim)]
-    inputs = x
-
-    logger.debug("Not deduplicating...")
-
-    for layer in model:
-        assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-        if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
-            continue
-        x = layer.get_formula(x)
-
-    return x, inputs
-
-
-def get_formula_sat_solver(
-    model,
-    input_dim,
-    deduplicator: SolverWithDeduplication,
-) -> tuple[list[Formula], list[Formula]]:
-    x = [Atom(i + 1) for i in range(input_dim)]
-    inputs = x
-
-    logger.debug("Deduplicating with SAT solver ...")
-    all = set()
-    for i in x:
-        all.add(i)
-    Stats["deduplication"] = 0
-
-    for layer in model:
-        assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-        if isinstance(layer, GroupSum):
-            continue
-        x = layer.get_formula(x)
-        assert x is not None, "Layer returned None"
-        for idx in tqdm(range(len(x))):
-            x[idx] = deduplicator.deduplicate(x[idx], all)
-            all.add(x[idx])
-            assert x[idx] is not None, "Deduplicator returned None"
-
-    return x, inputs
-
-
-def get_formula(
-    model,
-    input_dim,
-    Dataset: AutoTransformer,
-    deduplicator=None,
-    # TODO: second return is actually list[Atom] but cannot be defined as such
-) -> tuple[list[Formula], list[Formula]]:
-    if deduplicator is not None:
-        return get_formula_sat_solver(model, input_dim, deduplicator)
-    if Args["Deduplicate"]:
-        return get_formula_bdd(model, input_dim, Dataset)
-
-    return get_formula_base(model, input_dim)
-
-
 class Encoding:
     def __init__(
         self,
@@ -142,13 +49,37 @@ class Encoding:
             "eq_size": len(self.eq_constraints.clauses),
         }
 
+    def get_formula(
+        self,
+        model,
+        input_dim,
+        Dataset: AutoTransformer,
+        deduplicator: SolverWithDeduplication,
+        # TODO: second return is actually list[Atom] but cannot be defined as such
+    ) -> tuple[list[Formula], list[Formula]]:
+        with self.use_context():
+            x = [Atom(i + 1) for i in range(input_dim)]
+            inputs = x
+
+            logger.debug("Not deduplicating...")
+
+            for layer in model:
+                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
+                if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
+                    continue
+                x = layer.get_formula(x)
+
+        self.formula = x
+        self.input_handles = inputs
+
     def initialize_formula(
         self, model, input_dim, Dataset: AutoTransformer, deduplicator=None
     ):
+        self.get_formula(model, input_dim, Dataset, deduplicator=deduplicator)
+        self.populate_clauses()
+
+    def populate_clauses(self):
         with self.use_context() as vpool:
-            self.formula, self.input_handles = get_formula(
-                model, input_dim, Dataset, deduplicator=deduplicator
-            )
             self.input_ids = [vpool.id(h) for h in self.input_handles]
             self.cnf = CNF()
             self.output_ids = []
@@ -267,6 +198,75 @@ class Encoding:
 
     def __del__(self):
         Formula.cleanup(id(self))
+
+
+class BddEncoding(Encoding):
+    def get_formula(
+        self,
+        model,
+        input_dim,
+        Dataset: AutoTransformer,
+        deduplicator: SolverWithDeduplication,
+        # TODO: second return is actually list[Atom] but cannot be defined as such
+    ):
+        with self.use_context():
+            x: list[Formula] = [Atom(i + 1) for i in range(input_dim)]
+            inputs = x
+
+            logger.debug("Deduplicating...")
+            solver = BDDSolver.from_inputs(inputs=x)
+            solver.set_ohe(Dataset.get_attribute_ranges())
+
+            all = set()
+            for i in x:
+                all.add(i)
+            Stats["deduplication"] = 0
+
+            for i, layer in enumerate(model):
+                logger.debug("Layer %d: %s", i, layer)
+                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
+                if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
+                    continue
+                x = layer.get_formula(x)
+                for idx in tqdm(range(len(x))):
+                    x[idx] = solver.deduplicate(x[idx], all)
+                    all.add(x[idx])
+
+        self.formula = x
+        self.input_handles = inputs
+
+
+class SatEncoding(Encoding):
+    def get_formula(
+        self,
+        model,
+        input_dim,
+        Dataset: AutoTransformer,
+        deduplicator: SolverWithDeduplication,
+    ):
+        with self.use_context():
+            x = [Atom(i + 1) for i in range(input_dim)]
+            inputs = x
+
+            logger.debug("Deduplicating with SAT solver ...")
+            all = set()
+            for i in x:
+                all.add(i)
+            Stats["deduplication"] = 0
+
+            for layer in model:
+                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
+                if isinstance(layer, GroupSum):
+                    continue
+                x = layer.get_formula(x)
+                assert x is not None, "Layer returned None"
+                for idx in tqdm(range(len(x))):
+                    x[idx] = deduplicator.deduplicate(x[idx], all)
+                    all.add(x[idx])
+                    assert x[idx] is not None, "Deduplicator returned None"
+
+        self.formula = x
+        self.input_handles = inputs
 
 
 class PseudoModel:

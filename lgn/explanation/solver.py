@@ -23,7 +23,6 @@ class Solver:
         self._append_formula(encoding.eq_constraints.clauses)
         # NEW
         Formula.attach_vpool(self._copy_vpool(encoding), id(self))
-
         self.enc_type = encoding.get_enc_type()
 
     def set_cardinality(self, lits, bound):
@@ -97,4 +96,5 @@ class Solver:
 
     def delete(self):
         self.solver.delete()
-        Formula.cleanup(id(self))
+        # Formula.cleanup(id(self))
+        # TODO: reactivate this after refactoring clause from formula
