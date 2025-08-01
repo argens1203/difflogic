@@ -9,12 +9,12 @@ from constant import Stats
 
 from lgn.dataset import AutoTransformer
 from lgn.deduplicator import SolverWithDeduplication
-from .encoding import Encoding
+from .encoding import Encoder
 
 logger = logging.getLogger(__name__)
 
 
-class SatEncoding(Encoding):
+class SatEncoder(Encoder):
     def get_formula(
         self,
         model,

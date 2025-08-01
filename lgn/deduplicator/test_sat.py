@@ -6,6 +6,7 @@ import pytest
 from constant import Stats
 from lgn.dataset.iris import IrisDataset
 from lgn.dataset.loader import new_load_dataset
+from lgn.encoding.encoding import Encoder
 from lgn.encoding.sat import SolverWithDeduplication
 from lgn.util.util import get_results
 from .bdd import BDDSolver, xor
@@ -41,7 +42,7 @@ class TestSat(unittest.TestCase):
         _, __, ___, dataset = new_load_dataset(args)
         model, loss_fn, optim = get_model(args, get_results(0, args))
 
-        self.encoding = Encoding(model, IrisDataset())
+        self.encoding = Encoder().get_staticmodel, IrisDataset())
         Stats["deduplication"] = 0
 
     def test_xxx(self):

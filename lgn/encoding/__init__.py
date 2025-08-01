@@ -1,3 +1,3 @@
-from .encoding import Encoding
-from .bdd_encoding import BddEncoding
-from .sat_encoding import SatEncoding
+from .encoding import Encoder
+from .bdd_encoding import BddEncoder
+from .sat_encoding import SatEncoder

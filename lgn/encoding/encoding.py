@@ -18,39 +18,51 @@ fp_type = torch.float32
 logger = logging.getLogger(__name__)
 
 
-class Encoding:
-    def __init__(
+class Encoder:
+    def get_static(
         self,
         model,
         Dataset: AutoTransformer,
         fp_type=fp_type,
         **kwargs,
     ):
-        self.enc_type = kwargs.get("enc_type", EncType.totalizer)
-        self.vpool_context = id(self)
+        enc_type = kwargs.get("enc_type", EncType.totalizer)
+        vpool_context = id(self)
+        self.vpool_context = vpool_context
+
         input_dim = Dataset.get_input_dim()
         class_dim = Dataset.get_num_of_classes()
 
         deduplicator = kwargs.get("deduplicator", None)
 
-        self.formula, self.input_handles = self.get_formula(
+        formula, input_handles = self.get_formula(
             model, input_dim, Dataset, deduplicator=deduplicator
         )
-        self.input_ids, self.cnf, self.output_ids, self.special = self.populate_clauses(
-            input_handles=self.input_handles, formula=self.formula
+        input_ids, cnf, output_ids, special = self.populate_clauses(
+            input_handles=input_handles, formula=formula
         )
 
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
-        self.eq_constraints, self.parts = self.initialize_ohe(
-            Dataset, self.input_ids, self.enc_type
-        )
+        eq_constraints, parts = self.initialize_ohe(Dataset, input_ids, enc_type)
 
-        self.input_dim = input_dim
-        self.class_dim = class_dim
-        self.fp_type = fp_type
-        self.Dataset = Dataset
+        return Static(
+            parts=parts,
+            cnf=cnf,
+            eq_constraints=eq_constraints,
+            input_dim=input_dim,
+            fp_type=fp_type,
+            Dataset=Dataset,
+            class_dim=class_dim,
+            input_ids=input_ids,
+            output_ids=output_ids,
+            formula=formula,
+            input_handles=input_handles,
+            special=special,
+            enc_type=enc_type,
+            vpool_context=vpool_context,
+        )
 
     def get_formula(
         self,
@@ -121,6 +133,49 @@ class Encoding:
         logger.debug("eq_constraints: %s", eq_constraints.clauses)
 
         return eq_constraints, parts
+
+    @contextmanager
+    def use_context(self):
+        prev = Formula._context
+        try:
+            Formula.set_context(self.vpool_context)
+            yield Formula.export_vpool(active=True)
+        finally:
+            Formula.set_context(prev)
+
+
+class Static:
+    def __init__(
+        self,
+        parts,
+        cnf,
+        eq_constraints,
+        input_dim,
+        fp_type,
+        Dataset,
+        class_dim,
+        input_ids,
+        output_ids,
+        formula,
+        input_handles,
+        special,
+        enc_type,
+        vpool_context,
+    ):
+        self.parts = parts
+        self.cnf = cnf
+        self.eq_constraints = eq_constraints
+        self.input_dim = input_dim
+        self.fp_type = fp_type
+        self.Dataset = Dataset
+        self.class_dim = class_dim
+        self.input_ids = input_ids
+        self.output_ids = output_ids
+        self.formula = formula
+        self.input_handles = input_handles
+        self.special = special
+        self.enc_type = enc_type
+        self.vpool_context = vpool_context
 
     def get_parts(self):
         return self.parts
@@ -207,4 +262,5 @@ class Encoding:
             Formula.set_context(prev)
 
     def __del__(self):
-        Formula.cleanup(id(self))
+        pass
+        # Formula.cleanup(self.vpool_context)
