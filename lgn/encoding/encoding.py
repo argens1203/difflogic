@@ -1,7 +1,5 @@
 import logging
 import torch
-from typing import List
-from tqdm import tqdm
 
 from contextlib import contextmanager
 
@@ -10,10 +8,10 @@ from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
 
-from constant import device, Args, Stats
 
 from lgn.dataset import AutoTransformer
-from lgn.deduplicator import BDDSolver, SolverWithDeduplication
+from lgn.deduplicator import SolverWithDeduplication
+from .pseudo_model import PseudoModel
 
 fp_type = torch.float32
 
@@ -197,142 +195,3 @@ class Encoding:
 
     def __del__(self):
         Formula.cleanup(id(self))
-
-
-class BddEncoding(Encoding):
-    def get_formula(
-        self,
-        model,
-        input_dim,
-        Dataset: AutoTransformer,
-        deduplicator: SolverWithDeduplication,
-        # TODO: second return is actually list[Atom] but cannot be defined as such
-    ):
-        with self.use_context():
-            x: list[Formula] = [Atom(i + 1) for i in range(input_dim)]
-            inputs = x
-
-            logger.debug("Deduplicating...")
-            solver = BDDSolver.from_inputs(inputs=x)
-            solver.set_ohe(Dataset.get_attribute_ranges())
-
-            all = set()
-            for i in x:
-                all.add(i)
-            Stats["deduplication"] = 0
-
-            for i, layer in enumerate(model):
-                logger.debug("Layer %d: %s", i, layer)
-                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-                if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
-                    continue
-                x = layer.get_formula(x)
-                for idx in tqdm(range(len(x))):
-                    x[idx] = solver.deduplicate(x[idx], all)
-                    all.add(x[idx])
-
-        self.formula = x
-        self.input_handles = inputs
-
-
-class SatEncoding(Encoding):
-    def get_formula(
-        self,
-        model,
-        input_dim,
-        Dataset: AutoTransformer,
-        deduplicator: SolverWithDeduplication,
-    ):
-        with self.use_context():
-            x = [Atom(i + 1) for i in range(input_dim)]
-            inputs = x
-
-            logger.debug("Deduplicating with SAT solver ...")
-            all = set()
-            for i in x:
-                all.add(i)
-            Stats["deduplication"] = 0
-
-            for layer in model:
-                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-                if isinstance(layer, GroupSum):
-                    continue
-                x = layer.get_formula(x)
-                assert x is not None, "Layer returned None"
-                for idx in tqdm(range(len(x))):
-                    x[idx] = deduplicator.deduplicate(x[idx], all)
-                    all.add(x[idx])
-                    assert x[idx] is not None, "Deduplicator returned None"
-
-        self.formula = x
-        self.input_handles = inputs
-
-
-class PseudoModel:
-    def __init__(self, input_handles, formula, class_dim):
-        self.input_handles = input_handles
-        self.formula = formula
-        self.class_dim = class_dim
-
-    def __call__(self, x: torch.Tensor, logit=False):
-        """
-        This methods returns the class label given the input. Or returns the votes for each class if logit is set to True.
-
-        param: x: input
-        type: torch.Tensor (batch_size, input_dim)
-
-        param: logit: if True, returns votes for each class
-        type: bool
-
-        returns: class label or votes
-        rtype: torch.Tensor (batch_size) or torch.Tensor (batch_size, no_of_classes)
-        """
-        bool_outputs = (
-            torch.tensor(
-                [
-                    [
-                        (
-                            0
-                            if f.simplified(
-                                assumptions=[
-                                    ~inp if feat == 0 else inp
-                                    for feat, inp in zip(features, self.input_handles)
-                                ]
-                            )
-                            # TODO: better way of checking?
-                            == Atom(False)
-                            else 1
-                        )
-                        for f in self.formula
-                    ]
-                    for features in x
-                ]
-            )
-            .to(device)
-            .int()
-        )
-        votes = PseudoModel._count_votes(bool_outputs, self.class_dim)
-
-        if logit:
-            return votes
-
-        cls_label = votes.argmax().int()
-        logger.debug("Class Label: %d", cls_label)
-        return cls_label
-
-    def _count_votes(logits: torch.Tensor, no_of_classes: int):
-        """
-        This methods takes a binary input and returns the number of 1s in each class.
-
-        param: logits: binary input
-        type: torch.Tensor (batch_size, no_of_classes * votes_per_class)
-
-        returns: votes
-        rtype: torch.Tensor (batch_size, no_of_classes)
-        """
-        assert logits.shape[1] % no_of_classes == 0
-
-        votes_per_class = logits.shape[1] // no_of_classes
-        reshaped = logits.view(len(logits), -1, votes_per_class)
-
-        return reshaped.sum(dim=2)

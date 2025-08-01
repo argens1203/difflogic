@@ -3,8 +3,7 @@ import logging
 import numpy as np
 import torch
 from tqdm import tqdm
-from lgn.encoding import Encoding
-from lgn.encoding.encoding import SatEncoding
+from lgn.encoding import Encoding, SatEncoding
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
