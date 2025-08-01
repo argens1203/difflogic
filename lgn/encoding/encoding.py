@@ -231,6 +231,8 @@ class Encoding:
 
     def print(self, print_vpool=False):
         with self.use_context() as vpool:
+            print("self_id", id(self))
+            print("vpool_id", id(vpool))
             print("==== Formula ==== ")
             for f in self.formula:
                 print(
@@ -247,8 +249,8 @@ class Encoding:
 
             if print_vpool:
                 print("==== IDPool ====")
-                for f, id in vpool.obj2id.items():
-                    print(id, f)
+                for f, e in vpool.obj2id.items():
+                    print(e, f)
 
     def get_enc_type(self):
         return self.enc_type
