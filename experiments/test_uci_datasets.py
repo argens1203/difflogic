@@ -1,8 +1,10 @@
 import unittest
 import numpy as np
+import pytest
 from uci_datasets import IrisDataset
 
 
+@pytest.mark.skip("dataset no longer used")
 class TestIrisDataset(unittest.TestCase):
     def test_convert_sample_to_feature_vector(self):
         sample = ["5.1", "3.5", "1.4", "0.2", "Iris-setosa"]

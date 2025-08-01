@@ -1,4 +1,5 @@
 import torch
+from pysat.formula import Formula
 
 # import difflogic_cuda
 import numpy as np
@@ -215,7 +216,7 @@ class LogicLayer(torch.nn.Module):
         else:
             raise ValueError(connections)
 
-    def get_formula(self, x):
+    def get_formula(self, x) -> list[Formula]:
         # weights = torch.nn.functional.one_hot(self.weights.argmax(-1), 16).to(
         # torch.float32
         # repr = [

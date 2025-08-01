@@ -23,11 +23,11 @@ from .one_experiment import OneExperiment
 
 
 class Experiment:
-    # def __init__(self):
-    # self.logger = logging.getLogger()
-
     def __init__(self):
-        pass
+        self.logger = logging.getLogger()
+
+    # def __init__(self):
+    #     pass
 
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
@@ -36,6 +36,9 @@ class Experiment:
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
             "verbose": True,
+            "save_model": True,
+            "load_model": True,
+            "deduplicate": True,
         }
         args = {
             **vars(default_args),

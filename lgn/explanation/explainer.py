@@ -1,7 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import logging
 from typing import Set
 
-from lgn.encoding import Encoding
+if TYPE_CHECKING:
+    from lgn.encoding import Encoding
 from lgn.util import Stat
 from lgn.util import (
     Partial_Inp_Set,
@@ -231,7 +235,8 @@ class Explainer:
         return tmp_input
 
     # NEW
-    def remove_part(inp, part):
+    @staticmethod
+    def remove_part(inp: set[int], part: list[int]) -> set[int]:
         to_remove = set()
         for i in part:
             to_remove.add(i)

@@ -25,6 +25,7 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
+from lgn.encoding.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
@@ -46,6 +47,7 @@ class OneExperiment:
             Args["Deduplicate"] = True  # TODO: find ways to store global args
 
         self.get_model(args)
+
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
         self.get_explainer()
 
@@ -74,8 +76,11 @@ class OneExperiment:
         Stat.start_memory_usage()
 
         self.get_encoding(enc_type=get_enc_type(args.enc_type))
+        print("line 79")
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
+        print("In Run_Experiment")
+        print(id(self.encoding))
         self.encoding.print()
         self.get_explainer()
 
@@ -207,8 +212,10 @@ class OneExperiment:
                 )
                 print("Model loaded successfully")
             except Exception as e:
+                print(f"Error loading model: {e}")
                 self.train_model(args, model, loss_fn, optim)
                 self.eval_model(args, model)
+                torch.save(model.state_dict(), args.model_path)
 
         elif args.save_model:
             self.train_model(args, model, loss_fn, optim)
@@ -236,14 +243,24 @@ class OneExperiment:
 
     def get_encoding(self, enc_type):
         self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)
-        # Validator.validate_with_truth_table(encoding=encoding, model=model)
+        deduplicator = SolverWithDeduplication(self.encoding)
+        self.encoding = Encoding(
+            self.model,
+            self.dataset,
+            enc_type=enc_type,
+            deduplicator=deduplicator,
+        )
 
         if self.results is not None:
             self.results.store_encoding(self.encoding)
 
         if self.verbose:
+            print("In Get_Encoding")
+            print(id(self.encoding))
             self.encoding.print()
-            self.logger.info("\n")
+        print("Second print")
+        self.encoding.print()
+        print("line 262")
 
     def get_explainer(self):
         self.explainer = Explainer(self.encoding)

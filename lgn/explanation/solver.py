@@ -1,11 +1,15 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lgn.encoding import Encoding
+
 import logging
 from contextlib import contextmanager
 
 from pysat.solvers import Solver as BaseSolver
 from pysat.card import CardEnc, EncType
 from pysat.formula import Formula, IDPool
-
-from lgn.encoding import Encoding
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +39,7 @@ class Solver:
             self._append_formula(clauses)
         return self
 
-    def solve(self, assumptions=[]):
+    def solve(self, assumptions: list[int] = []):
         return self.solver.solve(assumptions=assumptions)
 
     def get_model(self):
