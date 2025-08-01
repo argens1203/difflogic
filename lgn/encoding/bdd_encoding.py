@@ -46,5 +46,4 @@ class BddEncoding(Encoding):
                     x[idx] = solver.deduplicate(x[idx], all)
                     all.add(x[idx])
 
-        self.formula = x
-        self.input_handles = inputs
+        return x, inputs

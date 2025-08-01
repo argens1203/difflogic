@@ -66,37 +66,42 @@ class Encoding:
                     continue
                 x = layer.get_formula(x)
 
-        self.formula = x
-        self.input_handles = inputs
+        return x, inputs
 
     def initialize_formula(
         self, model, input_dim, Dataset: AutoTransformer, deduplicator=None
     ):
-        self.get_formula(model, input_dim, Dataset, deduplicator=deduplicator)
-        self.populate_clauses()
+        self.formula, self.input_handles = self.get_formula(
+            model, input_dim, Dataset, deduplicator=deduplicator
+        )
+        self.input_ids, self.cnf, self.output_ids, self.special = self.populate_clauses(
+            input_handles=self.input_handles, formula=self.formula
+        )
 
-    def populate_clauses(self):
+    def populate_clauses(self, input_handles, formula):
         with self.use_context() as vpool:
-            self.input_ids = [vpool.id(h) for h in self.input_handles]
-            self.cnf = CNF()
-            self.output_ids = []
-            self.special = dict()
+            input_ids = [vpool.id(h) for h in input_handles]
+            cnf = CNF()
+            output_ids = []
+            special = dict()
             # adding the clauses to a global CNF
-            for f in [Or(Atom(False), f.simplified()) for f in self.formula]:
+            for f in [Or(Atom(False), f.simplified()) for f in formula]:
                 f.clausify()
-                self.cnf.extend(list(f)[:-1])
+                cnf.extend(list(f)[:-1])
                 logger.debug("Formula: %s", f)
                 logger.debug("CNF Clauses: %s", f.clauses)
                 logger.debug("Simplified: %s", f.simplified())
-                logger.debug("CNF Clauses: %s", self.cnf.clauses)
+                logger.debug("CNF Clauses: %s", cnf.clauses)
                 idx = 0
                 if f.clauses[-1][1] is None:
-                    self.special[idx] = f.simplified()
-                self.output_ids.append(f.clauses[-1][1])
+                    special[idx] = f.simplified()
+                output_ids.append(f.clauses[-1][1])
                 idx += 1
 
                 logger.debug("=== === === ===")
-            logger.debug("CNF Clauses: %s", self.cnf.clauses)
+            logger.debug("CNF Clauses: %s", cnf.clauses)
+
+        return input_ids, cnf, output_ids, special
 
     def initialize_ohe(self, Dataset: AutoTransformer):
         self.eq_constraints = CNF()

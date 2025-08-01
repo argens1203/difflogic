@@ -43,5 +43,4 @@ class SatEncoding(Encoding):
                     all.add(x[idx])
                     assert x[idx] is not None, "Deduplicator returned None"
 
-        self.formula = x
-        self.input_handles = inputs
+        return x, inputs
