@@ -13,8 +13,7 @@ from difflogic import LogicLayer, GroupSum
 from constant import device, Args, Stats
 
 from lgn.dataset import AutoTransformer
-from .bdd import BDDSolver
-from lgn.encoding.sat import SolverWithDeduplication
+from lgn.deduplicator import BDDSolver, SolverWithDeduplication
 
 fp_type = torch.float32
 

@@ -26,7 +26,7 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
-from lgn.encoding.sat import SolverWithDeduplication
+from lgn.deduplicator.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
