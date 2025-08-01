@@ -30,7 +30,7 @@ class Validator:
         with torch.no_grad(), encoding.use_context():
             model.train(False)
             for x, _ in data:
-                x = x.to(encoding.fp_type).to(device)
+                x = x.to(encoding.get_fp_type()).to(device)
 
                 logit = model(x)
                 p_logit = encoding.as_model()(x, logit=True)
@@ -51,8 +51,8 @@ class Validator:
         with torch.no_grad(), encoding.use_context():
             model.train(False)
 
-            for x, _ in get_truth_table_loader(input_dim=encoding.input_dim):
-                x = x.to(encoding.fp_type).to(device)
+            for x, _ in get_truth_table_loader(input_dim=encoding.get_input_dim()):
+                x = x.to(encoding.get_fp_type()).to(device)
 
                 logit = model(x)
                 p_logit = encoding.as_model()(x, logit=True)

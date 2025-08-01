@@ -18,9 +18,9 @@ class Solver:
     def __init__(self, encoding: Encoding):
         self.solver = BaseSolver()
         self.encoding = encoding
-        self._append_formula(encoding.cnf.clauses)
+        self._append_formula(encoding.get_cnf_clauses())
         # NEW
-        self._append_formula(encoding.eq_constraints.clauses)
+        self._append_formula(encoding.get_eq_constraints_clauses())
         self.vpool_context = id(encoding)
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))

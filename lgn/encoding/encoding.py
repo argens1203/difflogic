@@ -31,17 +31,46 @@ class Encoding:
         class_dim = Dataset.get_num_of_classes()
 
         deduplicator = kwargs.get("deduplicator", None)
-        self.initialize_formula(model, input_dim, Dataset, deduplicator=deduplicator)
+
+        self.formula, self.input_handles = self.get_formula(
+            model, input_dim, Dataset, deduplicator=deduplicator
+        )
+        self.input_ids, self.cnf, self.output_ids, self.special = self.populate_clauses(
+            input_handles=self.input_handles, formula=self.formula
+        )
+
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
-        self.initialize_ohe(Dataset)
+        self.eq_constraints, self.parts = self.initialize_ohe(
+            Dataset, self.input_ids, self.enc_type
+        )
 
         self.input_dim = input_dim
         self.class_dim = class_dim
         self.fp_type = fp_type
         self.Dataset = Dataset
-        self.stats = {
+
+    def get_parts(self):
+        return self.parts
+
+    def get_cnf_clauses(self):
+        return self.cnf.clauses
+
+    def get_eq_constraints_clauses(self):
+        return self.eq_constraints.clauses
+
+    def get_input_dim(self):
+        return self.input_dim
+
+    def get_fp_type(self):
+        return self.fp_type
+
+    def get_dataset(self):
+        return self.Dataset
+
+    def get_stats(self):
+        return {
             "cnf_size": len(self.cnf.clauses),
             "eq_size": len(self.eq_constraints.clauses),
         }
@@ -68,16 +97,6 @@ class Encoding:
 
         return x, inputs
 
-    def initialize_formula(
-        self, model, input_dim, Dataset: AutoTransformer, deduplicator=None
-    ):
-        self.formula, self.input_handles = self.get_formula(
-            model, input_dim, Dataset, deduplicator=deduplicator
-        )
-        self.input_ids, self.cnf, self.output_ids, self.special = self.populate_clauses(
-            input_handles=self.input_handles, formula=self.formula
-        )
-
     def populate_clauses(self, input_handles, formula):
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
@@ -103,26 +122,28 @@ class Encoding:
 
         return input_ids, cnf, output_ids, special
 
-    def initialize_ohe(self, Dataset: AutoTransformer):
-        self.eq_constraints = CNF()
-        self.parts: list[list[int]] = []
+    def initialize_ohe(self, Dataset: AutoTransformer, input_ids, enc_type):
+        eq_constraints = CNF()
+        parts: list[list[int]] = []
         with self.use_context() as vpool:
             start = 0
-            logger.debug("full_input_ids: %s", self.input_ids)
+            logger.debug("full_input_ids: %s", input_ids)
             for step in Dataset.get_attribute_ranges():
                 logger.debug("Step: %d", step)
-                logger.debug("input_ids: %s", self.input_ids[start : start + step])
-                part = self.input_ids[start : start + step]
-                self.eq_constraints.extend(
+                logger.debug("input_ids: %s", input_ids[start : start + step])
+                part = input_ids[start : start + step]
+                eq_constraints.extend(
                     CardEnc.equals(
                         lits=part,
                         vpool=vpool,
-                        encoding=self.enc_type,
+                        encoding=enc_type,
                     )
                 )
                 start += step
-                self.parts.append(part)
-        logger.debug("eq_constraints: %s", self.eq_constraints.clauses)
+                parts.append(part)
+        logger.debug("eq_constraints: %s", eq_constraints.clauses)
+
+        return eq_constraints, parts
 
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
@@ -142,19 +163,6 @@ class Encoding:
         return self.Dataset.get_attribute_ranges()
 
     def as_model(self):
-        """
-        The method returns a callable model which predicts the class labels given instances.
-
-        :return: labels
-        :rtype: torch.Tensor (batch_size)
-
-        Example:
-
-        .. code-block:: python
-            >>> x = Torch.tensor([[1, 0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 1, 1, 0, 0, 1]])
-            >>> encoding.as_model()(x)
-            'Torch.tensor([0, 1])'
-        """
         model_args = {
             "input_handles": self.input_handles,
             "formula": self.formula,
