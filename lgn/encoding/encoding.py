@@ -27,6 +27,7 @@ class Encoding:
         **kwargs,
     ):
         self.enc_type = kwargs.get("enc_type", EncType.totalizer)
+        self.vpool_context = id(self)
         input_dim = Dataset.get_input_dim()
         class_dim = Dataset.get_num_of_classes()
 
@@ -50,30 +51,6 @@ class Encoding:
         self.class_dim = class_dim
         self.fp_type = fp_type
         self.Dataset = Dataset
-
-    def get_parts(self):
-        return self.parts
-
-    def get_cnf_clauses(self):
-        return self.cnf.clauses
-
-    def get_eq_constraints_clauses(self):
-        return self.eq_constraints.clauses
-
-    def get_input_dim(self):
-        return self.input_dim
-
-    def get_fp_type(self):
-        return self.fp_type
-
-    def get_dataset(self):
-        return self.Dataset
-
-    def get_stats(self):
-        return {
-            "cnf_size": len(self.cnf.clauses),
-            "eq_size": len(self.eq_constraints.clauses),
-        }
 
     def get_formula(
         self,
@@ -145,6 +122,30 @@ class Encoding:
 
         return eq_constraints, parts
 
+    def get_parts(self):
+        return self.parts
+
+    def get_cnf_clauses(self):
+        return self.cnf.clauses
+
+    def get_eq_constraints_clauses(self):
+        return self.eq_constraints.clauses
+
+    def get_input_dim(self):
+        return self.input_dim
+
+    def get_fp_type(self):
+        return self.fp_type
+
+    def get_dataset(self):
+        return self.Dataset
+
+    def get_stats(self):
+        return {
+            "cnf_size": len(self.cnf.clauses),
+            "eq_size": len(self.eq_constraints.clauses),
+        }
+
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
@@ -198,10 +199,9 @@ class Encoding:
 
     @contextmanager
     def use_context(self):
-        hashable = id(self)
         prev = Formula._context
         try:
-            Formula.set_context(hashable)
+            Formula.set_context(self.vpool_context)
             yield Formula.export_vpool(active=True)
         finally:
             Formula.set_context(prev)
