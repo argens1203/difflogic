@@ -66,7 +66,7 @@ class Converter:
         else:
             raise ValueError(f"Unknown attribute {attr}")
 
-    def fit_attr(self, data, attr):
+    def fit_attr(self, data, attr) -> int:
         converter = self.convertors[attr]
 
         if attr in self.continuous_attributes:
@@ -129,5 +129,5 @@ class Converter:
         return self.transform(data)
 
     # -- Getters -- #
-    def get_n_classes(self):
+    def get_n_classes(self) -> list[int]:
         return self.n_classes
