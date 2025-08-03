@@ -89,7 +89,7 @@ class Experiment:
                 **dataset_args,
                 **{"dataset": datasets},
             }
-            for dedup in [True, False]:
+            for dedup in ["bdd", "sat", None]:
                 args["deduplicate"] = dedup
                 args["experiment_id"] = experiment_id
                 results = self.run(args)

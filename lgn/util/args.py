@@ -1,4 +1,5 @@
 import argparse
+from typing import Optional
 
 
 def get_args():
@@ -145,7 +146,12 @@ def get_args():
         help="Encoding type for the model",
     )
 
-    parser.add_argument("--deduplicate", action="store_true", default=False)
+    parser.add_argument(
+        "--deduplicate",
+        type=str,
+        default=None,
+        choices=["sat", "bdd"],
+    )
 
     parser.add_argument(
         "--max_time",
@@ -193,7 +199,7 @@ class TrainingArgs:
 @dataclass
 class ExplainerArgs:
     enc_type: str = "tot"
-    deduplicate: bool = False
+    deduplicate: Optional[str] = None
     xnum: int = 1000
     max_time: int = 3600
 

@@ -20,7 +20,6 @@ class BddEncoder(Encoder):
         model,
         input_dim,
         Dataset: AutoTransformer,
-        deduplicator: SatDeduplicator,
         # TODO: second return is actually list[Atom] but cannot be defined as such
     ):
         with self.use_context():
