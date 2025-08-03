@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import torch
 from tqdm import tqdm
-from lgn.encoding import Encoder, SatEncoder, SolverWithDeduplication
+from lgn.encoding import Encoder, SatEncoder, SatDeduplicator
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
@@ -241,30 +241,19 @@ class OneExperiment:
         return self.model
 
     def get_encoding(self, enc_type):
-        self.encoding = Encoder().get_static(
-            self.model, self.dataset, enc_type=enc_type
-        )
-        deduplicator = SolverWithDeduplication(self.encoding)
-
         self.encoding = SatEncoder().get_static(
             self.model,
             self.dataset,
             enc_type=enc_type,
-            deduplicator=deduplicator,
         )
 
         if self.results is not None:
             self.results.store_encoding(self.encoding)
 
         if self.verbose:
-            print("In Get_Encoding")
-            print(id(self.encoding))
             self.encoding.print()
-
-        deduplicator.delete()
-        print("Second print")
-        self.encoding.print()
-        print("line 262")
+        print(Stats["deduplication"])
+        input()
 
     def get_explainer(self):
         self.explainer = Explainer(self.encoding)

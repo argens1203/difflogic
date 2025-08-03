@@ -8,7 +8,7 @@ from difflogic import LogicLayer, GroupSum
 from constant import Stats
 
 from lgn.dataset import AutoTransformer
-from ..deduplicator import BDDSolver, SolverWithDeduplication
+from ..deduplicator import BDDSolver, SatDeduplicator
 from .encoder import Encoder
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class BddEncoder(Encoder):
         model,
         input_dim,
         Dataset: AutoTransformer,
-        deduplicator: SolverWithDeduplication,
+        deduplicator: SatDeduplicator,
         # TODO: second return is actually list[Atom] but cannot be defined as such
     ):
         with self.use_context():

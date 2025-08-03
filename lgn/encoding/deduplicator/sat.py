@@ -14,10 +14,7 @@ from constant import Stats
 logger = logging.getLogger(__name__)
 
 
-class SolverWithDeduplication(Solver):
-    def __init__(self, encoding: Encoding):
-        super().__init__(encoding)
-
+class DeduplicationMixin:
     def add_clause(self, clause: list[Formula]):
         # print("Adding clause: ", clause)
         # logger.debug(clause)
@@ -107,3 +104,7 @@ class SolverWithDeduplication(Solver):
         # logger.debug(str(f))
         assert "None" not in str(f), "Deduplication returned None for formula"
         return f
+
+
+class SatDeduplicator(Solver, DeduplicationMixin):
+    pass

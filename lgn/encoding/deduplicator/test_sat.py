@@ -7,7 +7,7 @@ from constant import Stats
 from lgn.dataset.iris import IrisDataset
 from lgn.dataset.loader import new_load_dataset
 from lgn.encoding import Encoder
-from lgn.deduplicator import SolverWithDeduplication
+from lgn.deduplicator import SatDeduplicator
 from lgn.util.util import get_results
 from .bdd import BDDSolver, xor
 
@@ -46,7 +46,7 @@ class TestSat(unittest.TestCase):
         Stats["deduplication"] = 0
 
     def test_xxx(self):
-        sswd = SolverWithDeduplication(self.encoding)
+        sswd = SatDeduplicator(self.encoding)
 
         res = sswd.deduplicate_constant(Atom(True))
         print("deduplication result", res)

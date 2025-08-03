@@ -9,7 +9,7 @@ from difflogic import LogicLayer, GroupSum
 
 
 from lgn.dataset import AutoTransformer
-from ..deduplicator import SolverWithDeduplication
+from ..deduplicator import SatDeduplicator
 from lgn.encoding import Encoding
 from ..context import Context
 
@@ -68,7 +68,7 @@ class Encoder:
         model,
         input_dim,
         Dataset: AutoTransformer,
-        deduplicator: SolverWithDeduplication,
+        deduplicator: SatDeduplicator,
         # TODO: second return is actually list[Atom] but cannot be defined as such
     ) -> tuple[list[Formula], list[Formula]]:
         with self.use_context():
