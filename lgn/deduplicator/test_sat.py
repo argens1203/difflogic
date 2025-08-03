@@ -6,8 +6,8 @@ import pytest
 from constant import Stats
 from lgn.dataset.iris import IrisDataset
 from lgn.dataset.loader import new_load_dataset
-from lgn.encoding.encoding import Encoder
-from lgn.encoding.sat import SolverWithDeduplication
+from lgn.encoding import Encoder
+from lgn.deduplicator import SolverWithDeduplication
 from lgn.util.util import get_results
 from .bdd import BDDSolver, xor
 
@@ -42,7 +42,7 @@ class TestSat(unittest.TestCase):
         _, __, ___, dataset = new_load_dataset(args)
         model, loss_fn, optim = get_model(args, get_results(0, args))
 
-        self.encoding = Encoder().get_staticmodel, IrisDataset())
+        self.encoding = Encoder().get_static(model, IrisDataset())
         Stats["deduplication"] = 0
 
     def test_xxx(self):
@@ -50,11 +50,11 @@ class TestSat(unittest.TestCase):
 
         res = sswd.deduplicate_constant(Atom(True))
         print("deduplication result", res)
-        assert res == PYSAT_TRUE, "Expected True for constant True"
+        assert res == True, "Expected True for constant True"
 
         res = sswd.deduplicate_constant(Atom(False))
         print("deduplication result", res)
-        assert res == PYSAT_FALSE, "Expected False for constant False"
+        assert res == False, "Expected False for constant False"
 
         res = sswd.deduplicate_constant(Atom("lksjflsdkfj"))
         print("deduplication result", res)

@@ -9,7 +9,7 @@ from constant import Stats
 
 from lgn.dataset import AutoTransformer
 from lgn.deduplicator import SolverWithDeduplication
-from .encoding import Encoder
+from .encoder import Encoder
 
 logger = logging.getLogger(__name__)
 
