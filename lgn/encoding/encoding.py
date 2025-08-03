@@ -1,6 +1,3 @@
-from contextlib import contextmanager
-
-from pysat.formula import Formula
 from .pseudo_model import PseudoModel
 
 
@@ -20,7 +17,7 @@ class Encoding:
         input_handles,
         special,
         enc_type,
-        vpool_context,
+        context,
     ):
         self.parts = parts
         self.cnf = cnf
@@ -35,7 +32,7 @@ class Encoding:
         self.input_handles = input_handles
         self.special = special
         self.enc_type = enc_type
-        self.vpool_context = vpool_context
+        self.context = context
 
     def get_parts(self):
         return self.parts
@@ -112,15 +109,8 @@ class Encoding:
     def get_enc_type(self):
         return self.enc_type
 
-    @contextmanager
-    def use_context(self):
-        prev = Formula._context
-        try:
-            Formula.set_context(self.vpool_context)
-            yield Formula.export_vpool(active=True)
-        finally:
-            Formula.set_context(prev)
-
     def __del__(self):
         pass
-        # Formula.cleanup(self.vpool_context)
+
+    def use_context(self):
+        return self.context.use_vpool()

@@ -21,7 +21,7 @@ class Solver:
         self._append_formula(encoding.get_cnf_clauses())
         # NEW
         self._append_formula(encoding.get_eq_constraints_clauses())
-        self.vpool_context = encoding.vpool_context
+        self.vpool_context = encoding.context.get_vpool_context()
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
         self.enc_type = encoding.get_enc_type()

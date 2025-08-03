@@ -1,7 +1,6 @@
 import logging
 import torch
 
-from contextlib import contextmanager
 
 from pysat.formula import Formula, Atom, CNF, Or
 from pysat.card import CardEnc, EncType
@@ -10,8 +9,9 @@ from difflogic import LogicLayer, GroupSum
 
 
 from lgn.dataset import AutoTransformer
-from lgn.deduplicator import SolverWithDeduplication
+from ..deduplicator import SolverWithDeduplication
 from lgn.encoding import Encoding
+from ..context import Context
 
 fp_type = torch.float32
 
@@ -27,8 +27,7 @@ class Encoder:
         **kwargs,
     ):
         enc_type = kwargs.get("enc_type", EncType.totalizer)
-        vpool_context = id(self)
-        self.vpool_context = vpool_context
+        self.context = Context()
 
         input_dim = Dataset.get_input_dim()
         class_dim = Dataset.get_num_of_classes()
@@ -61,7 +60,7 @@ class Encoder:
             input_handles=input_handles,
             special=special,
             enc_type=enc_type,
-            vpool_context=vpool_context,
+            context=self.context,
         )
 
     def get_formula(
@@ -134,11 +133,5 @@ class Encoder:
 
         return eq_constraints, parts
 
-    @contextmanager
     def use_context(self):
-        prev = Formula._context
-        try:
-            Formula.set_context(self.vpool_context)
-            yield Formula.export_vpool(active=True)
-        finally:
-            Formula.set_context(prev)
+        return self.context.use_vpool()

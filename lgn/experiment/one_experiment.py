@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import torch
 from tqdm import tqdm
-from lgn.encoding import Encoder, SatEncoder
+from lgn.encoding import Encoder, SatEncoder, SolverWithDeduplication
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
@@ -25,7 +25,6 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
-from lgn.deduplicator.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
