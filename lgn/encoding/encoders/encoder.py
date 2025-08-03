@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class Encoder:
-    def get_static(
+    def get_encoding(
         self,
         model,
         Dataset: AutoTransformer,

@@ -42,7 +42,7 @@ class TestSat(unittest.TestCase):
         _, __, ___, dataset = new_load_dataset(args)
         model, loss_fn, optim = get_model(args, get_results(0, args))
 
-        self.encoding = Encoder().get_static(model, IrisDataset())
+        self.encoding = Encoder().get_encoding(model, IrisDataset())
         Stats["deduplication"] = 0
 
     def test_xxx(self):

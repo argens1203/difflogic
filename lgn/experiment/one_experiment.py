@@ -238,7 +238,7 @@ class OneExperiment:
         elif deduplication == "bdd":
             _Encoder = BddEncoder
 
-        self.encoding = _Encoder().get_static(
+        self.encoding = _Encoder().get_encoding(
             self.model,
             self.dataset,
             enc_type=enc_type,

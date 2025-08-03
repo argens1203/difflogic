@@ -22,8 +22,10 @@ fp_type = torch.float32
 
 
 class SatEncoder(Encoder):
-    def get_static(self, model, Dataset: AutoTransformer, fp_type=fp_type, **kwargs):
-        first_encoding = Encoder().get_static(model, Dataset, fp_type=fp_type, **kwargs)
+    def get_encoding(self, model, Dataset: AutoTransformer, fp_type=fp_type, **kwargs):
+        first_encoding = Encoder().get_encoding(
+            model, Dataset, fp_type=fp_type, **kwargs
+        )
         deduplicator = SatDeduplicator(first_encoding)
 
         enc_type = kwargs.get("enc_type", EncType.totalizer)

@@ -38,7 +38,7 @@ class Experiment:
             "verbose": True,
             "save_model": True,
             "load_model": True,
-            "deduplicate": True,
+            "deduplicate": "sat",  # 'bdd', 'sat', None
         }
         args = {
             **vars(default_args),
