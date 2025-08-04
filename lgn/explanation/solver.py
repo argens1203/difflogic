@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Solver:
     def __init__(self, encoding: Encoding):
-        self.solver = BaseSolver()
+        self.solver = BaseSolver(name="g3")  # g42, cd19 > m22 # TODO: try other solvers
         self.encoding = encoding
         self._append_formula(encoding.get_cnf_clauses())
         # NEW
