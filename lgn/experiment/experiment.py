@@ -120,56 +120,71 @@ class Experiment:
             with open("allres.txt", mode="w") as f:
                 f.write(json.dumps(all_res, indent=4))
 
-    def experiment(self, datasets=None, experiment_ids=None):
+    def experiment(self, datasets=[], base_experiment_id=10000):
         all_res = []
-        for dataset, experiment_id in zip(datasets, experiment_ids):
-            dataset_args = Settings.get_settings(
-                # dataset_name=dataset, paper=True, minimal=True
-                dataset_name=dataset,
-                paper=False,
-                minimal=True,
-            )
-            exp_args = {
-                "eval_freq": 1000,
-                "model_path": dataset + "_" + "model.pth",
-                "explain_all": True,
-                "deduplicate": True,
-                "verbose": False,
-                "xnum": 30,
-                # 'explain_timeout': 100,
-                # TODO: add timeout
-            }
-            args = {
-                **vars(default_args),
-                **exp_args,
-                **dataset_args,
-                **{"dataset": dataset},
-            }
-            args["experiment_id"] = experiment_id
-            results = self.run(args)
-            all_res.append(
-                {
-                    "dataset": dataset,
+        experiment_id = base_experiment_id
+        for dataset in datasets:
+            for deduplicate in ["sat", "bdd"]:
+                experiment_id += 1
+                dataset_args = Settings.get_settings(
+                    # dataset_name=dataset, paper=True, minimal=True
+                    dataset_name=dataset,
+                    paper=False,
+                    minimal=True,
+                )
+                exp_args = {
+                    "eval_freq": 1000,
+                    "model_path": dataset + "_" + "model.pth",
+                    "explain_all": False,
+                    "explain_one": True,
+                    "deduplicate": deduplicate,
+                    "verbose": False,
+                    "xnum": 30,
+                    "load_model": True,
+                    "save_model": True,
                     "experiment_id": experiment_id,
-                    "training_acc": results.train_acc_eval_mode[-1],
-                    "test_acc": results.test_acc_eval_mode[-1],
-                    # "formulas": results.formulas,
-                    "model": {
-                        "num_neurons": results.args["num_neurons"],
-                        "num_layers": results.args["num_layers"],
-                    },
-                    "encoding": {
-                        "encoding_time": results.encoding_time_taken,
-                        "cnf_size": results.cnf_size,
-                        "eq_size": results.eq_size,
-                        "deduplication": results.deduplication,
-                    },
-                    "xnum": results.args["xnum"],
-                    "mean_explain_time": results.mean_explain_time,
-                    "mean_explain_count": results.mean_explain_count,
-                    "memory_usage": results.memory_usage,
+                    # 'explain_timeout': 100,
+                    # TODO: add timeout
                 }
-            )
+                args = {
+                    **vars(default_args),
+                    **exp_args,
+                    **dataset_args,
+                    **{"dataset": dataset},
+                }
+                args["experiment_id"] = experiment_id
+                results = self.run(args)
+                all_res.append(
+                    {
+                        "dataset": dataset,
+                        "experiment_id": experiment_id,
+                        # "training_acc": (
+                        #     results.train_acc_eval_mode[-1]
+                        #     if results.train_acc_eval_mode
+                        #     else None
+                        # ),
+                        # "test_acc": (
+                        #     results.test_acc_eval_mode[-1]
+                        #     if results.test_acc_eval_mode
+                        #     else None
+                        # ),
+                        # "formulas": results.formulas,
+                        "model": {
+                            "num_neurons": results.args["num_neurons"],
+                            "num_layers": results.args["num_layers"],
+                        },
+                        "encoding": {
+                            "encoding_time": results.encoding_time_taken,
+                            "cnf_size": results.cnf_size,
+                            "eq_size": results.eq_size,
+                            "deduplication": results.deduplication,
+                        },
+                        "xnum": results.args["xnum"],
+                        "mean_explain_time": results.mean_explain_time,
+                        "mean_explain_count": results.mean_explain_count,
+                        "memory_usage": results.memory_usage,
+                    }
+                )
         with open("allres.txt", mode="w") as f:
             f.write(json.dumps(all_res, indent=4))
 

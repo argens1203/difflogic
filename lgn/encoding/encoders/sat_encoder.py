@@ -35,7 +35,7 @@ class SatEncoder(Encoder):
         class_dim = Dataset.get_num_of_classes()
 
         formula, input_handles = self.get_formula(
-            model, input_dim, Dataset, deduplicator=deduplicator
+            model, input_dim, deduplicator=deduplicator
         )
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles=input_handles, formula=formula
@@ -65,7 +65,6 @@ class SatEncoder(Encoder):
         self,
         model,
         input_dim,
-        Dataset: AutoTransformer,
         deduplicator: SatDeduplicator,
     ):
         with self.use_context():

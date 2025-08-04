@@ -34,9 +34,7 @@ class Encoder:
 
         deduplicator = kwargs.get("deduplicator", None)
 
-        formula, input_handles = self.get_formula(
-            model, input_dim, Dataset, deduplicator=deduplicator
-        )
+        formula, input_handles = self.get_formula(model, input_dim, Dataset)
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles=input_handles, formula=formula
         )
@@ -68,7 +66,6 @@ class Encoder:
         model,
         input_dim,
         Dataset: AutoTransformer,
-        deduplicator: SatDeduplicator,
         # TODO: second return is actually list[Atom] but cannot be defined as such
     ) -> tuple[list[Formula], list[Formula]]:
         with self.use_context():
