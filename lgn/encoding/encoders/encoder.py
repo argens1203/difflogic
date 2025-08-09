@@ -40,6 +40,16 @@ class Encoder:
 
         eq_constraints, parts = self.initialize_ohe(Dataset, input_ids, enc_type)
 
+        print("formula", formula)
+        print("input_handles", input_handles)
+        print("input_ids", input_ids)
+        print("cnf", cnf)
+        print("output_ids", output_ids)
+        print("special", special)
+        print("eq_constraints", eq_constraints)
+        print("parts", parts)
+        input("Press Enter to continue...")
+
         return Encoding(
             parts=parts,
             cnf=cnf,
@@ -86,6 +96,7 @@ class Encoder:
             output_ids = []
             special = dict()
             # adding the clauses to a global CNF
+            idx = 0
             for f in [Or(Atom(False), f.simplified()) for f in formula]:
                 f.clausify()
                 cnf.extend(list(f)[:-1])
@@ -95,11 +106,10 @@ class Encoder:
                 logger.debug("CNF Clauses: %s", cnf.clauses)
                 # print("(Populate Clauses) vpool", vpool.id2obj.items())
                 # input()
-                idx = 0
                 if f.clauses[-1][1] is None:
                     special[idx] = f.simplified()
-                output_ids.append(f.clauses[-1][1])
                 idx += 1
+                output_ids.append(f.clauses[-1][1])
 
                 logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
