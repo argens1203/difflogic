@@ -1,16 +1,17 @@
 import random
 import logging
+from typing import Optional
 import numpy as np
 import torch
 from tqdm import tqdm
-from lgn.encoding import Encoding
+from lgn.encoding import Encoder, SatEncoder, BddEncoder
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
 from lgn.util import get_results, Stat
-from constant import Args, device
+from constant import device
 
 from constant import Stats
 import time
@@ -25,15 +26,12 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
-from lgn.encoding.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
 class OneExperiment:
     def __init__(self, args):
         self.logger = logging.getLogger()
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
 
         eid = args.experiment_id if args.experiment_id is not None else 0
         self.results = get_results(eid, args)
@@ -43,12 +41,11 @@ class OneExperiment:
         self.verbose = args.verbose
 
     def run_presentation(self, args):
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
-
         self.get_model(args)
 
-        self.get_encoding(enc_type=get_enc_type(args.enc_type))
+        self.get_encoding(
+            enc_type=get_enc_type(args.enc_type), deduplication=args.deduplicate
+        )
         self.get_explainer()
 
         if args.explain is not None:
@@ -65,22 +62,15 @@ class OneExperiment:
 
     def run_experiment(self, args):
         # Asserts that results is not None, and enforces that entire test_set is explained
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
-        else:
-            Args["Deduplicate"] = False
-        Stats["deduplication"] = []
-
         self.get_model(args)
 
         Stat.start_memory_usage()
 
-        self.get_encoding(enc_type=get_enc_type(args.enc_type))
-        print("line 79")
+        self.get_encoding(
+            enc_type=get_enc_type(args.enc_type), deduplication=args.deduplicate
+        )
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
-        print("In Run_Experiment")
-        print(id(self.encoding))
         self.encoding.print()
         self.get_explainer()
 
@@ -241,26 +231,23 @@ class OneExperiment:
         self.model = model
         return self.model
 
-    def get_encoding(self, enc_type):
-        self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)
-        deduplicator = SolverWithDeduplication(self.encoding)
-        self.encoding = Encoding(
+    def get_encoding(self, enc_type, deduplication: Optional[str] = None):
+        _Encoder = Encoder
+        if deduplication == "sat":
+            _Encoder = SatEncoder
+        elif deduplication == "bdd":
+            _Encoder = BddEncoder
+
+        self.encoding = _Encoder().get_encoding(
             self.model,
             self.dataset,
             enc_type=enc_type,
-            deduplicator=deduplicator,
         )
 
         if self.results is not None:
             self.results.store_encoding(self.encoding)
-
         if self.verbose:
-            print("In Get_Encoding")
-            print(id(self.encoding))
             self.encoding.print()
-        print("Second print")
-        self.encoding.print()
-        print("line 262")
 
     def get_explainer(self):
         self.explainer = Explainer(self.encoding)

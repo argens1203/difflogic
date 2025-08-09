@@ -14,10 +14,7 @@ from constant import Stats
 logger = logging.getLogger(__name__)
 
 
-class SolverWithDeduplication(Solver):
-    def __init__(self, encoding: Encoding):
-        super().__init__(encoding)
-
+class DeduplicationMixin:
     def add_clause(self, clause: list[Formula]):
         # print("Adding clause: ", clause)
         # logger.debug(clause)
@@ -51,13 +48,13 @@ class SolverWithDeduplication(Solver):
                 # print("is constant false", f)
                 self.add_clause([auxvar])
                 Stats["deduplication"] += 1
-                return Atom(False)
+                return False
 
             if not self.solver.solve(assumptions=[auxvar_id]):
                 # print("is constant true", f)
                 self.add_clause([Neg(auxvar)])
                 Stats["deduplication"] += 1
-                return Atom(True)
+                return True
 
             return None
 
@@ -81,12 +78,12 @@ class SolverWithDeduplication(Solver):
             if not self.solver.solve(assumptions=[-auxvar_id]):
                 self.add_clause([auxvar])
                 Stats["deduplication"] += 1
-                return prev
+                return True
 
             if not self.solver.solve(assumptions=[auxvar_id]):
                 self.add_clause([Neg(auxvar)])
                 Stats["deduplication"] += 1
-                return Neg(prev)
+                return False
 
         return None
 
@@ -94,13 +91,20 @@ class SolverWithDeduplication(Solver):
         c = self.deduplicate_constant(f)
         if c is not None:
             # logger.debug(f"Deduplicated {f} to {c}")
-            return c
+            return Atom(c)
 
         for p in previous:
             g = self.deduplicate_pair(f, p)
             if g is not None:
                 # logger.debug(f"Deduplicated {f} with {p} to {g}")
-                return g
+                if g is True:
+                    return p
+                else:
+                    return Neg(p)
         # logger.debug(str(f))
         assert "None" not in str(f), "Deduplication returned None for formula"
         return f
+
+
+class SatDeduplicator(Solver, DeduplicationMixin):
+    pass

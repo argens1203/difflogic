@@ -16,14 +16,14 @@ logger = logging.getLogger(__name__)
 
 class Solver:
     def __init__(self, encoding: Encoding):
-        self.solver = BaseSolver()
+        self.solver = BaseSolver(name="g3")  # g42, cd19 > m22 # TODO: try other solvers
         self.encoding = encoding
-        self._append_formula(encoding.cnf.clauses)
+        self._append_formula(encoding.get_cnf_clauses())
         # NEW
-        self._append_formula(encoding.eq_constraints.clauses)
+        self._append_formula(encoding.get_eq_constraints_clauses())
+        self.vpool_context = encoding.context.get_vpool_context()
         # NEW
-        Formula.attach_vpool(self._copy_vpool(encoding), id(self))
-
+        # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
         self.enc_type = encoding.get_enc_type()
 
     def set_cardinality(self, lits, bound):
@@ -73,21 +73,11 @@ class Solver:
         self.solver.append_formula(clauses)
         return self
 
-    def _copy_vpool(self, encoding: Encoding):
-        with encoding.use_context() as vpool:
-            id_pool = IDPool()
-            id_pool.top = vpool.top
-            id_pool.obj2id = vpool.obj2id.copy()
-            id_pool.id2obj = vpool.id2obj.copy()
-            id_pool._occupied = vpool._occupied.copy()
-            return id_pool
-
     @contextmanager
     def use_context(self):
-        hashable = id(self)
         prev = Formula._context
         try:
-            Formula.set_context(hashable)
+            Formula.set_context(self.vpool_context)
             yield Formula.export_vpool(active=True)
         finally:
             Formula.set_context(prev)
@@ -97,4 +87,5 @@ class Solver:
 
     def delete(self):
         self.solver.delete()
-        Formula.cleanup(id(self))
+        # Sovler rides on Encoding vpool, so we don't need to delete it
+        # Formula.cleanup(id(self))

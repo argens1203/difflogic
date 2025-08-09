@@ -14,7 +14,7 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
 
 DEBUG = True
 
-Args = {"Deduplicate": False, "Debug": True}
+Args = {"Debug": True}
 Stats = {
     "deduplication": [],
 }

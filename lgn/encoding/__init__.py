@@ -1,2 +1,3 @@
 from .encoding import Encoding
-from .validator import Validator
+from .encoders import Encoder, BddEncoder, SatEncoder
+from .deduplicator import SatDeduplicator

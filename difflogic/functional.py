@@ -32,9 +32,9 @@ def bit_add(*args):
 
 def idx_to_formula(a, b, i):
     if i == 0:
-        return Atom(False)
+        return Atom(False)  # 0
     if i == 1:
-        return And(a, b)
+        return And(a, b)  # 2
     if i == 2:
         return Neg(Implies(a, b))
     if i == 3:
@@ -44,9 +44,9 @@ def idx_to_formula(a, b, i):
     if i == 5:
         return b
     if i == 6:
-        return XOr(a, b)
+        return XOr(a, b)  # 4
     if i == 7:
-        return Or(a, b)
+        return Or(a, b)  # 1
     if i == 8:
         return Neg(Or(a, b))
     if i == 9:

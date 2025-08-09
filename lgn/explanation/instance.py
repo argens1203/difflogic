@@ -85,7 +85,7 @@ class Instance:
     @staticmethod
     def from_encoding(encoding: Encoding, feat=None, raw=None, inp=None):
         if feat is None:
-            feat = encoding.Dataset.transform_feature(np.array([raw]))[0]
+            feat = encoding.get_dataset().transform_feature(np.array([raw]))[0]
         raw_inp, feat = Instance.fill_missing(inp=inp, feat=feat)
 
         grouped_inp = set()
@@ -101,7 +101,7 @@ class Instance:
             grouped_inp=grouped_inp,
             raw_inp=raw_inp,
             predicted_class=pred_class,
-            Dataset=encoding.Dataset,
+            Dataset=encoding.get_dataset(),
         )
 
     @staticmethod

@@ -225,7 +225,7 @@ class Explainer:
         :return: AXP
         """
         tmp_input = inp.copy()
-        for part in self.encoding.parts:
+        for part in self.encoding.get_parts():
             logger.debug("Testing removal of input %s", part)
             tt_input = Explainer.remove_part(tmp_input, part)
             if not self.oracle.is_solvable(pred_class=predicted_cls, inp=tt_input):
