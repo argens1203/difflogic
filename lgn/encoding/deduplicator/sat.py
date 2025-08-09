@@ -1,14 +1,9 @@
 from __future__ import annotations
 import logging
-from typing import TYPE_CHECKING
-from pysat.formula import Formula, Atom, CNF, Or, Neg, PYSAT_TRUE, PYSAT_FALSE, Implies
+from pysat.formula import Formula, Atom, Or, Neg
 
 from typing import Set
 
-from lgn.explanation.solver import Solver
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
 from constant import Stats
 
 logger = logging.getLogger(__name__)
