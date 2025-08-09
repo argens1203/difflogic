@@ -68,11 +68,8 @@ class OneExperiment:
 
         return None
 
-    def run_experiment(self, args):
-        # Asserts that results is not None, and enforces that entire test_set is explained
+    def compare_encoders(self, args):
         model = self.get_model(args)
-
-        Stat.start_memory_usage()
 
         encoding2 = self.get_encoding(
             model=model, enc_type=get_enc_type(args.enc_type), deduplication="bdd"
@@ -83,9 +80,6 @@ class OneExperiment:
         encoding1 = self.get_encoding(
             model=model, enc_type=get_enc_type(args.enc_type), deduplication=None
         )
-        # encoding1 = self.get_encoding(
-        #     enc_type=get_enc_type(args.enc_type), deduplication=None
-        # )
 
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=self.test_loader
@@ -106,16 +100,30 @@ class OneExperiment:
         Validator.validate_encodings_with_truth_table(
             encoding1=encoding2, encoding2=encoding3, dataset=self.dataset
         )
-        # Doesn't work when using OHE to deduplicate
+
+        input("All encodings are valid. Press Enter to continue...")
+
+    def run_experiment(self, args):
+        # Asserts that results is not None, and enforces that entire test_set is explained
+        model = self.get_model(args)
+
+        Stat.start_memory_usage()
+
+        encoding = self.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=args.deduplicate,
+        )
+
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
-        encoding1.print()
-        explainer = self.get_explainer(encoding1)
+        encoding.print()
+        explainer = self.get_explainer(encoding)
 
         total_time_taken, exp_count, count = self.explain_dataloader(
             self.test_loader,
             args,
             explainer=explainer,
-            encoding=encoding1,
+            encoding=encoding,
             is_train=False,
         )
         # ============= ============= ============= ============= ============= ============= ============= =============

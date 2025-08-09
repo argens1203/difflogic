@@ -54,8 +54,10 @@ class Experiment:
 
         setup_logger(args)
         seed_all(args.seed)
-        results = OneExperiment(args).run_experiment(args)
-        return results
+        OneExperiment(args).compare_encoders(args)
+
+        # results = OneExperiment(args).run_experiment(args)
+        # return results
 
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
