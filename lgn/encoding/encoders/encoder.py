@@ -9,7 +9,6 @@ from difflogic import LogicLayer, GroupSum
 
 
 from lgn.dataset import AutoTransformer
-from ..deduplicator import SatDeduplicator
 from lgn.encoding import Encoding
 from ..context import Context
 
@@ -29,12 +28,9 @@ class Encoder:
         enc_type = kwargs.get("enc_type", EncType.totalizer)
         self.context = Context()
 
-        input_dim = Dataset.get_input_dim()
-        class_dim = Dataset.get_num_of_classes()
-
-        deduplicator = kwargs.get("deduplicator", None)
-
-        formula, input_handles = self.get_formula(model, input_dim, Dataset)
+        formula, input_handles = self.get_formula(
+            model, Dataset.get_input_dim(), Dataset
+        )
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles=input_handles, formula=formula
         )
@@ -48,10 +44,8 @@ class Encoder:
             parts=parts,
             cnf=cnf,
             eq_constraints=eq_constraints,
-            input_dim=input_dim,
             fp_type=fp_type,
             Dataset=Dataset,
-            class_dim=class_dim,
             input_ids=input_ids,
             output_ids=output_ids,
             formula=formula,
@@ -68,7 +62,7 @@ class Encoder:
         Dataset: AutoTransformer,
         # TODO: second return is actually list[Atom] but cannot be defined as such
     ) -> tuple[list[Formula], list[Formula]]:
-        with self.use_context():
+        with self.use_context() as vpool:
             x = [Atom(i + 1) for i in range(input_dim)]
             inputs = x
 
@@ -80,9 +74,12 @@ class Encoder:
                     continue
                 x = layer.get_formula(x)
 
+                print("(Encoder): vpool", vpool.id2obj.items())
+
         return x, inputs
 
     def populate_clauses(self, input_handles, formula):
+        print("formula.length", len(formula))
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
             cnf = CNF()
@@ -96,6 +93,8 @@ class Encoder:
                 logger.debug("CNF Clauses: %s", f.clauses)
                 logger.debug("Simplified: %s", f.simplified())
                 logger.debug("CNF Clauses: %s", cnf.clauses)
+                # print("(Populate Clauses) vpool", vpool.id2obj.items())
+                # input()
                 idx = 0
                 if f.clauses[-1][1] is None:
                     special[idx] = f.simplified()

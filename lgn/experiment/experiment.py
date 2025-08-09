@@ -38,7 +38,8 @@ class Experiment:
             "verbose": True,
             "save_model": True,
             "load_model": True,
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "deduplicate": None,  # 'bdd', 'sat', None
+            "experiment_id": 10000,
         }
         args = {
             **vars(default_args),
@@ -192,6 +193,9 @@ class Experiment:
 
     def run(self, args):
         args = argparse.Namespace(**args)
+        print("args:", args)
+        input("Press Enter to continue...")
+
         setup_logger(args)
         seed_all(args.seed)
         # one = OneExperiment(args)

@@ -7,10 +7,8 @@ class Encoding:
         parts,
         cnf,
         eq_constraints,
-        input_dim,
         fp_type,
         Dataset,
-        class_dim,
         input_ids,
         output_ids,
         formula,
@@ -22,10 +20,8 @@ class Encoding:
         self.parts = parts
         self.cnf = cnf
         self.eq_constraints = eq_constraints
-        self.input_dim = input_dim
         self.fp_type = fp_type
         self.Dataset = Dataset
-        self.class_dim = class_dim
         self.input_ids = input_ids
         self.output_ids = output_ids
         self.formula = formula
@@ -33,6 +29,8 @@ class Encoding:
         self.special = special
         self.enc_type = enc_type
         self.context = context
+        self.input_dim = Dataset.get_input_dim()
+        self.class_dim = Dataset.get_num_of_classes()
 
     def get_parts(self):
         return self.parts
