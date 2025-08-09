@@ -76,6 +76,9 @@ class OneExperiment:
         encoding1 = self.get_encoding(
             enc_type=get_enc_type(args.enc_type), deduplication=None
         )
+        # encoding1 = self.get_encoding(
+        #     enc_type=get_enc_type(args.enc_type), deduplication=None
+        # )
 
         # Validator.validate_encodings_with_data(
         #     encoding1=encoding1, encoding2=encoding2, dataloader=self.test_loader
@@ -85,6 +88,16 @@ class OneExperiment:
         # )
         # Validator.validate_encodings_with_data(
         #     encoding1=encoding2, encoding2=encoding3, dataloader=self.test_loader
+        # )
+
+        # Validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding1, encoding2=encoding2, dataset=self.dataset
+        # )
+        # Validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding1, encoding2=encoding3, dataset=self.dataset
+        # )
+        # Validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding2, encoding2=encoding3, dataset=self.dataset
         # )
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)

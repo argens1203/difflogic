@@ -60,3 +60,58 @@ def remove_none(lst):
         else:
             indices.append(idx)
     return ret, indices
+
+
+def get_onehot_loader(input_dim, attribute_ranges, batch_size=10):
+    """
+    This generator yields all possible one-hot encoded inputs for given attribute ranges.
+    Each attribute range gets exactly one 1, representing a one-hot encoding.
+
+    Args:
+        input_dim: Total input dimension (should equal sum of attribute_ranges)
+        attribute_ranges: List of ints representing size of each attribute group
+        batch_size: Number of samples per batch
+
+    Returns: (x, None)
+
+    Example:
+
+    .. code-block:: python
+        >>> # For 2 attributes of size 2 and 3 respectively
+        >>> loader = get_onehot_loader(input_dim=5, attribute_ranges=[2, 3], batch_size=2)
+        >>> instances = next(loader)
+        >>> print(instances)
+        (tensor([[1, 0, 1, 0, 0],
+                [1, 0, 0, 1, 0]]), None)
+    """
+    assert (
+        sum(attribute_ranges) == input_dim
+    ), f"Sum of attribute_ranges ({sum(attribute_ranges)}) must equal input_dim ({input_dim})"
+
+    # Calculate total number of possible combinations
+    total_combinations = 1
+    for range_size in attribute_ranges:
+        total_combinations *= range_size
+
+    count = 0
+
+    def get_onehot_combination(combo_idx):
+        """Convert combination index to one-hot encoded vector"""
+        result = [0] * input_dim
+        offset = 0
+
+        for range_size in attribute_ranges:
+            # Get which position in this attribute range should be 1
+            position_in_range = combo_idx % range_size
+            result[offset + position_in_range] = 1
+            offset += range_size
+            combo_idx //= range_size
+
+        return result
+
+    while count < total_combinations:
+        batch = []
+        for i in range(count, min(count + batch_size, total_combinations)):
+            batch.append(get_onehot_combination(i))
+        count += batch_size
+        yield torch.tensor(batch), None

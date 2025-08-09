@@ -29,6 +29,34 @@ class Experiment:
     # def __init__(self):
     #     pass
 
+    def _debug(self, dataset=None):
+        dataset = dataset if dataset is not None else "iris"
+        dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
+        exp_args = {
+            "eval_freq": 1000,
+            "model_path": dataset + "_" + "model.pth",
+            "verbose": True,
+            "save_model": True,
+            "load_model": True,
+            "deduplicate": None,  # 'bdd', 'sat', None
+            "experiment_id": 10000,
+        }
+        args = {
+            **vars(default_args),
+            **exp_args,
+            **dataset_args,
+            **{"dataset": dataset},
+        }
+
+        args = argparse.Namespace(**args)
+        print("args:", args)
+        input("Press Enter to continue...")
+
+        setup_logger(args)
+        seed_all(args.seed)
+        results = OneExperiment(args).run_experiment(args)
+        return results
+
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
@@ -198,11 +226,7 @@ class Experiment:
 
         setup_logger(args)
         seed_all(args.seed)
-        # one = OneExperiment(args)
-        # return one.run_presentation
-        args.experiment_id = 0
-        one = OneExperiment(args)
-        results = one.run_experiment(args)
+        results = OneExperiment(args).run_experiment(args)
         return results
 
     def find_model(self):

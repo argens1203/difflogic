@@ -2,8 +2,11 @@ import torch
 import logging
 
 from constant import device
+from lgn.dataset.auto_transformer import AutoTransformer
+from lgn.dataset.custom_dataset import CustomDataset
 from lgn.encoding import Encoding
-from lgn.util import get_truth_table_loader
+from lgn.util import get_truth_table_loader, stat
+from lgn.util.util import get_onehot_loader
 
 logger = logging.getLogger(__name__)
 
@@ -80,3 +83,23 @@ class Validator:
                 logit = model(x)
                 p_logit = encoding.as_model()(x, logit=True)
                 assert logit.equal(p_logit)
+
+    @staticmethod
+    def validate_encodings_with_truth_table(
+        encoding1: Encoding, encoding2: Encoding, dataset: AutoTransformer
+    ):
+        logger.info("Checking encodings with truth table")
+        for x, _ in get_onehot_loader(
+            input_dim=dataset.get_input_dim(),
+            attribute_ranges=dataset.get_attribute_ranges(),
+        ):
+            x = x.to(encoding1.get_fp_type()).to(device)
+            logit1 = encoding1.as_model()(x, logit=True)
+            logit2 = encoding2.as_model()(x, logit=True)
+
+            assert logit1.equal(logit2), (
+                f"Logits are not equal for input {x}:\n"
+                f"Encoding 1: {logit1}\n"
+                f"Encoding 2: {logit2}"
+            )
+        logger.info("Encodings validated successfully with truth table")

@@ -5,7 +5,7 @@ if __name__ == "__main__":
     # experiment.get_and_retest_model()
 
     # experiment.run_with_cmd()
-    experiment.debug(dataset="iris")
+    experiment._debug(dataset="iris")
     # experiment.debug(dataset="monk1")
     # experiment.debug(dataset="monk2")
     # experiment.debug(dataset="monk3")
