@@ -8,7 +8,6 @@ from difflogic import LogicLayer, GroupSum
 from constant import Stats
 
 from lgn.dataset import AutoTransformer
-from ..deduplicator import BDDSolver, SatDeduplicator
 from .encoder import Encoder
 
 logger = logging.getLogger(__name__)

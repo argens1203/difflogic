@@ -104,7 +104,3 @@ class DeduplicationMixin:
         # logger.debug(str(f))
         assert "None" not in str(f), "Deduplication returned None for formula"
         return f
-
-
-class SatDeduplicator(Solver, DeduplicationMixin):
-    pass
