@@ -58,11 +58,11 @@ class AutoTransformer(ABC):
     # -- Getters -- #
     @classmethod
     def get_attribute_ranges(cls) -> list[int]:
-        return cls.converter.get_n_classes()
+        return cls.converter.get_attr_domains()
 
     @classmethod
     def get_input_dim(cls):
-        return sum(cls.converter.get_n_classes())
+        return sum(cls.converter.get_attr_domains())
 
     @classmethod
     def get_num_of_classes(cls):

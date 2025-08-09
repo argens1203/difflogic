@@ -41,7 +41,7 @@ class Converter:
         self.setup_convertors()
 
         self.ohe = None  # Note: OneHotEncoder is not initialized until fit is called
-        self.n_classes = []
+        self.attr_domain = []
 
     def setup_convertors(self):
         for attr in self.attributes:
@@ -117,17 +117,16 @@ class Converter:
         return data
 
     def fit(self, data):
-        n_classes = []
+        self.attr_domains = []
         for i, attr in enumerate(self.attributes):
             n = self.fit_attr(data[:, i], attr)
-            n_classes.append(n)
-
-        self.n_classes = n_classes
+            self.attr_domains.append(n)
 
     def fit_transform(self, data):
         self.fit(data)
         return self.transform(data)
 
     # -- Getters -- #
-    def get_n_classes(self) -> list[int]:
-        return self.n_classes
+    def get_attr_domains(self) -> list[int]:
+        """Returns the number of unique values for each attribute."""
+        return self.attr_domains

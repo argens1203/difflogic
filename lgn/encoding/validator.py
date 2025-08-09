@@ -9,12 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class Validator:
-    def validate(self, model, data=None):
+    @staticmethod
+    def validate(encoding, model, data=None):
         if data != None:
-            Validator.validate_with_data(encoding=self, model=model, data=data)
+            Validator.validate_with_data(encoding=encoding, model=model, data=data)
         else:
-            Validator.validate_with_truth_table(encoding=self, model=model)
+            Validator.validate_with_truth_table(encoding=encoding, model=model)
 
+    @staticmethod
     def validate_with_data(encoding: Encoding, model, data):
         """
         The method ensures that the encoding is correct by comparing the output of the encoding with that of the model
@@ -36,6 +38,27 @@ class Validator:
                 p_logit = encoding.as_model()(x, logit=True)
                 assert logit.equal(p_logit)
 
+    @staticmethod
+    def validate_encodings_with_data(
+        encoding1: Encoding, encoding2: Encoding, dataloader
+    ):
+        logger.info("Checking encodings with data")
+
+        with torch.no_grad():
+            for x, label, idx in dataloader:
+                x = x.to(encoding1.get_fp_type()).to(device)
+                logit1 = encoding1.as_model()(x, logit=True)
+                logit2 = encoding2.as_model()(x, logit=True)
+
+                assert logit1.equal(logit2), (
+                    f"Logits are not equal for input {idx}:\n"
+                    f"Encoding 1: {logit1}\n"
+                    f"Encoding 2: {logit2}"
+                )
+
+        logger.info("Encodings validated successfully with data")
+
+    @staticmethod
     def validate_with_truth_table(encoding: Encoding, model: torch.nn.Module):
         """
         The method ensures that the encoding is correct by comparing the output of the encoding with that of the model

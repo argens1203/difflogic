@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from lgn.encoding import Encoder, SatEncoder, BddEncoder
+from lgn.encoding.validator import Validator
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
@@ -66,9 +67,25 @@ class OneExperiment:
 
         Stat.start_memory_usage()
 
-        self.get_encoding(
-            enc_type=get_enc_type(args.enc_type), deduplication=args.deduplicate
+        # encoding2 = self.get_encoding(
+        #     enc_type=get_enc_type(args.enc_type), deduplication="bdd"
+        # )
+        # encoding3 = self.get_encoding(
+        #     enc_type=get_enc_type(args.enc_type), deduplication="sat"
+        # )
+        encoding1 = self.get_encoding(
+            enc_type=get_enc_type(args.enc_type), deduplication=None
         )
+
+        # Validator.validate_encodings_with_data(
+        #     encoding1=encoding1, encoding2=encoding2, dataloader=self.test_loader
+        # )
+        # Validator.validate_encodings_with_data(
+        #     encoding1=encoding1, encoding2=encoding3, dataloader=self.test_loader
+        # )
+        # Validator.validate_encodings_with_data(
+        #     encoding1=encoding2, encoding2=encoding3, dataloader=self.test_loader
+        # )
         # Doesn't work when using OHE to deduplicate
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
         self.encoding.print()
@@ -248,6 +265,8 @@ class OneExperiment:
             self.results.store_encoding(self.encoding)
         if self.verbose:
             self.encoding.print()
+
+        return self.encoding
 
     def get_explainer(self):
         self.explainer = Explainer(self.encoding)
