@@ -103,6 +103,9 @@ class OneExperiment:
 
         input("All encodings are valid. Press Enter to continue...")
 
+        encoding2.print()
+        encoding3.print()
+
     def run_experiment(self, args):
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = self.get_model(args)

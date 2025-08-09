@@ -9,6 +9,7 @@ from constant import Stats
 
 from lgn.dataset import AutoTransformer
 from .encoder import Encoder
+from lgn.encoding.deduplicator import BDDSolver
 
 logger = logging.getLogger(__name__)
 
