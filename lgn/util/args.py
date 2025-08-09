@@ -177,14 +177,33 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DatasetArgs:
-    num_neurons: int = None
-    num_layers: int = None
+class ExperimentArgs:
+    experiment_id: int = None
+    dataset: str = "iris"
+    verbose: bool = False
+    save_model: bool = True
+    load_model: bool = True
+    model_path: str = "model.pth"
+
+
+@dataclass
+class SettingsArgs:
+    seed: int = 0
+    packbits_eval: bool = False
+    compile_model: bool = False
+    implementation: str = "cuda"
+
+
+@dataclass
+class PySatArgs:
+    enc_type: str = "tot"
 
 
 @dataclass
 class ModelArgs:
     connections: str = "unique"
+    num_neurons: int = None
+    num_layers: int = None
 
 
 @dataclass
@@ -194,56 +213,32 @@ class TrainingArgs:
     grad_factor: float = 1.0
     batch_size: int = 128
     training_bit_count: int = 32  # Torch floating point precision
+    eval_freq: int = 2000
+    num_iterations: int = 100_000
+
+
+@dataclass
+class EncodingArgs:
+    deduplicate: Optional[str] = None
 
 
 @dataclass
 class ExplainerArgs:
-    enc_type: str = "tot"
-    deduplicate: Optional[str] = None
     xnum: int = 1000
     max_time: int = 3600
-
-
-@dataclass
-class ExperimentArgs:
-    experiment_id: int = None
-    dataset: str = "iris"
-
-
-@dataclass
-class PresentationArgs:
-    verbose: bool = False
-    save_model: bool = True
-    load_model: bool = True
-    model_path: str = "model.pth"
-
-
-@dataclass
-class CmdSandboxArgs:
     explain: str = None
     explain_all: bool = False
     explain_one: bool = False
 
 
 @dataclass
-class SettingsArgs:
-    seed: int = 0
-    eval_freq: int = 2000
-    num_iterations: int = 100_000
-    packbits_eval: bool = False
-    compile_model: bool = False
-    implementation: str = "cuda"
-
-
-@dataclass
 class DefaultArgs(
-    DatasetArgs,
+    ExperimentArgs,
+    SettingsArgs,
+    PySatArgs,
     ModelArgs,
     TrainingArgs,
+    EncodingArgs,
     ExplainerArgs,
-    ExperimentArgs,
-    PresentationArgs,
-    CmdSandboxArgs,
-    SettingsArgs,
 ):
     pass

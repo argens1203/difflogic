@@ -56,8 +56,8 @@ class Experiment:
         seed_all(args.seed)
         OneExperiment(args).compare_encoders(args)
 
-        # results = OneExperiment(args).run_experiment(args)
-        # return results
+        results = OneExperiment(args).run_experiment(args)
+        return results
 
     def debug(self, dataset=None):
         dataset = dataset if dataset is not None else "iris"
