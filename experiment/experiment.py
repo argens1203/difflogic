@@ -19,6 +19,7 @@ from .util import DefaultArgs
 from .settings import Settings
 
 default_args = DefaultArgs()
+
 from .one_experiment import OneExperiment
 
 
@@ -30,6 +31,8 @@ class Experiment:
     #     pass
 
     def _debug(self, dataset=None):
+        print("default_args:", default_args)
+        print("default_args:", vars(default_args))
         dataset = dataset if dataset is not None else "iris"
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
