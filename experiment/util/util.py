@@ -4,8 +4,18 @@ from constant import device
 from pysat.formula import Atom
 from .results_json import ResultsJSON
 from pysat.card import EncType
+import numpy as np
+import random
 
 logger = logging.getLogger(__name__)
+
+torch.set_num_threads(1)  # ???
+
+
+def seed_all(seed=0):
+    torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
 
 
 def get_enc_type(enc_type):

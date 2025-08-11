@@ -10,10 +10,6 @@ class SettingsArgs:
     implementation: str = "cuda"
 
 
-print("SettingsArgs", SettingsArgs())
-print("SettingsArgs", vars(SettingsArgs()))
-
-
 def add_settings_args(parser: argparse.ArgumentParser):
     parser.add_argument("--seed", "-s", type=int, default=0, help="seed (default: 0)")
     parser.add_argument(
