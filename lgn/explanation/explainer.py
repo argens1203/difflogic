@@ -6,7 +6,7 @@ from typing import Set
 
 if TYPE_CHECKING:
     from lgn.encoding import Encoding
-from experiment.util import Stat
+from experiment.context import Context
 from experiment.util import (
     Partial_Inp_Set,
     Transformed_Partial_Inp_Set,
@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class Explainer:
-    def __init__(self, encoding: Encoding):
+    def __init__(self, encoding: Encoding, ctx: Context):
         self.encoding = encoding
-        self.oracle = MulticlassSolver(encoding=encoding)
+        self.oracle = MulticlassSolver(encoding=encoding, ctx=ctx)
 
     def explain(self, instance: Instance):
         pred_class = instance.get_predicted_class()
@@ -244,10 +244,6 @@ class Explainer:
         return inp - to_remove
 
     # NEW
-
-    def __del__(self):
-        logger.debug("Cache Hit: %s", str(Stat.cache_hit))
-        logger.debug("Cache Miss: %s", str(Stat.cache_miss))
 
     def explain_both_and_assert(self, instance, xnum=1000):
         self.explain(instance)

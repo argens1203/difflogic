@@ -5,7 +5,7 @@ import pytest
 
 from constant import Stats
 from lgn.dataset.iris import IrisDataset
-from lgn.dataset.loader import new_load_dataset
+from lgn.dataset.loader import load_dataset
 from lgn.encoding import Encoder
 from lgn.deduplicator import SatDeduplicator
 from lgn.util.util import get_results
@@ -39,7 +39,7 @@ class TestSat(unittest.TestCase):
             **{"dataset": dataset},
         }
         args = argparse.Namespace(**args)
-        _, __, ___, dataset = new_load_dataset(args)
+        _, __, ___, dataset = load_dataset(args)
         model, loss_fn, optim = get_model(args, get_results(0, args))
 
         self.encoding = Encoder().get_encoding(model, IrisDataset())

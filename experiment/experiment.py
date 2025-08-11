@@ -8,7 +8,6 @@ from experiment.encode import Encode
 from experiment.model import Model
 from lgn.encoding import Validator
 from lgn.explanation import Explainer
-from .util import Stat
 
 from constant import Stats
 from .explain import Explain
@@ -44,10 +43,7 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        print("args:", args)
-        input("Press Enter to continue...")
-
-        Experiment.compare_encoders(args)
+        # Experiment.compare_encoders(args)
 
         results = Experiment.run(args)
 
@@ -150,7 +146,7 @@ class Experiment:
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = Model.get_model(args, ctx=ctx)
 
-        Stat.start_memory_usage()
+        ctx.start_memory_usage()
 
         encoding = Encode.get_encoding(
             model=model,
@@ -161,7 +157,7 @@ class Experiment:
 
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
         encoding.print()
-        explainer = Explainer(encoding)
+        explainer = Explainer(encoding, ctx=ctx)
 
         total_time_taken, exp_count, count = Explain.explain_dataloader(
             ctx.test_loader,
@@ -173,12 +169,12 @@ class Experiment:
         )
         # ============= ============= ============= ============= ============= ============= ============= =============
 
-        ctx.results.store_explanation_stat(exp_count / count, Stats["deduplication"])
+        ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
         ctx.results.store_resource_usage(
-            total_time_taken / exp_count, Stat.get_memory_usage()
+            total_time_taken / exp_count, ctx.get_memory_usage()
         )
         ctx.results.store_counts(count, exp_count)
-        Stat.end_memory_usage()
+        ctx.end_memory_usage()
         ctx.results.save()
 
         return ctx.results
@@ -186,6 +182,9 @@ class Experiment:
     @staticmethod
     def compare_encoders(args):
         args = DefaultArgs(**args)
+        print("args:", args)
+        input("Press Enter to continue...")
+
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
 

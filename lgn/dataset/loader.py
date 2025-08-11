@@ -19,7 +19,7 @@ def get_raw(raw, train, test):
     return get_raw_data
 
 
-def new_load_dataset(args):
+def load_dataset(args):
     if args.dataset == "adult":
         train_set = AdultDataset(split="train")
         test_set = AdultDataset(split="test")
