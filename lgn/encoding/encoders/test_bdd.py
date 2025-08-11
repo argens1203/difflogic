@@ -1,66 +1,16 @@
 import unittest
-import argparse
-
-import pytest
 
 from constant import Stats
-from lgn.dataset.iris import IrisDataset
-from lgn.dataset.loader import new_load_dataset
-from lgn.encoding import Encoder
-from lgn.deduplicator import SatDeduplicator
-from lgn.util.util import get_results
-from .bdd import BDDSolver, xor
+from .bdd_deduplicator import BDDSolver, xor
 
-from pysat.formula import Atom, Or, XOr, And
-from lgn.encoding import Encoding
-from lgn.model.model import get_model
-from lgn.experiment.settings import Settings
-from pysat.formula import PYSAT_FALSE, PYSAT_TRUE
-from lgn.util import DefaultArgs
-
-default_args = DefaultArgs()
+from pysat.formula import Formula, Atom, CNF, Or, XOr, And
 
 
-class TestSat(unittest.TestCase):
-    def setup_method(self, method):
-        dataset = "iris"
-        dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
-        exp_args = {
-            "eval_freq": 1000,
-            "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
-            "save_model": True,
-            "load_model": True,
-        }
-        args = {
-            **vars(default_args),
-            **exp_args,
-            **dataset_args,
-            **{"dataset": dataset},
-        }
-        args = argparse.Namespace(**args)
-        _, __, ___, dataset = new_load_dataset(args)
-        model, loss_fn, optim = get_model(args, get_results(0, args))
-
-        self.encoding = Encoder().get_encoding(model, IrisDataset())
+class TestBdd(unittest.TestCase):
+    @classmethod
+    def setup_class(cls):
         Stats["deduplication"] = 0
 
-    def test_xxx(self):
-        sswd = SatDeduplicator(self.encoding)
-
-        res = sswd.deduplicate_constant(Atom(True))
-        print("deduplication result", res)
-        assert res == True, "Expected True for constant True"
-
-        res = sswd.deduplicate_constant(Atom(False))
-        print("deduplication result", res)
-        assert res == False, "Expected False for constant False"
-
-        res = sswd.deduplicate_constant(Atom("lksjflsdkfj"))
-        print("deduplication result", res)
-        assert res is None, "Expected None for Variable 1"
-
-    @pytest.mark.skip("wip")
     def test_solver_equiv(self):
         solver = BDDSolver([1, 2, 3, 4])
         bdd = solver.bdd
@@ -71,7 +21,6 @@ class TestSat(unittest.TestCase):
         assert solver.is_equiv(u, v) is True
         assert solver.is_equiv2(u, v) is True
 
-    @pytest.mark.skip("wip")
     def test_ohe_positive_cases(self):
         solver = BDDSolver([1, 2, 3, 4])
         solver.set_ohe([2, 2])
@@ -86,7 +35,6 @@ class TestSat(unittest.TestCase):
         b = bdd.var(3) & bdd.var(4)
         assert solver.is_equiv(a, b) is True
 
-    @pytest.mark.skip("wip")
     def test_ohe_not_overly_restrictive(self):
         solver = BDDSolver([1, 2, 3, 4])
         solver.set_ohe([2, 2])
@@ -105,7 +53,6 @@ class TestSat(unittest.TestCase):
         y = xor(bdd.var(1), bdd.var(2)) | bdd.var(3)
         assert solver.is_equiv(x, y) is True
 
-    @pytest.mark.skip("wip")
     def test_ohe_with_more_features(self):
         solver = BDDSolver([1, 2, 3, 4, 5])
         solver.set_ohe([5])
@@ -124,7 +71,6 @@ class TestSat(unittest.TestCase):
         p = ~bdd.var(2) & ~bdd.var(3) & ~bdd.var(4) & ~bdd.var(5)
         assert solver.is_equiv(p, bdd.false) is False
 
-    @pytest.mark.skip("wip")
     def test_deduplicate(self):
         solver = BDDSolver([1, 2, 3, 4])
         solver.set_ohe([2, 2])

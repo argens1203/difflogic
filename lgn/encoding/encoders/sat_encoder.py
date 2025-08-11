@@ -10,7 +10,7 @@ from constant import Stats
 from pysat.solvers import Solver as BaseSolver
 
 from lgn.dataset import AutoTransformer
-from lgn.encoding.deduplicator.sat import DeduplicationMixin
+from .sat_deduplicator import DeduplicationMixin
 from .encoder import Encoder
 from ..context import Context
 from ..encoding import Encoding
