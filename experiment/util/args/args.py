@@ -1,5 +1,5 @@
 import argparse
-from dataclasses import dataclass
+from attr import dataclass
 
 from .encoding_args import *
 from .experiment_args import *

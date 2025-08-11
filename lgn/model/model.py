@@ -1,5 +1,5 @@
 import torch
-from dataclasses import dataclass
+from attr import dataclass
 
 from difflogic import LogicLayer, GroupSum
 

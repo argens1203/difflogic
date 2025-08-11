@@ -13,8 +13,6 @@ from constant import Stats
 from .explain import Explain
 from .context import Context
 
-from .util import get_enc_type
-
 
 from .util import DefaultArgs
 from .settings import Settings
@@ -150,13 +148,10 @@ class Experiment:
 
         encoding = Encode.get_encoding(
             model=model,
-            enc_type=get_enc_type(args.enc_type),
-            deduplication=args.deduplicate,
+            args=args,
             ctx=ctx,
         )
 
-        # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
-        encoding.print()
         explainer = Explainer(encoding, ctx=ctx)
 
         total_time_taken, exp_count, count = Explain.explain_dataloader(
@@ -188,22 +183,24 @@ class Experiment:
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
 
+        args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
             model=model,
-            enc_type=get_enc_type(args.enc_type),
-            deduplication="bdd",
+            args=args,
             ctx=ctx,
         )
+
+        args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
             model=model,
-            enc_type=get_enc_type(args.enc_type),
-            deduplication="sat",
+            args=args,
             ctx=ctx,
         )
+
+        args.deduplicate = None
         encoding1 = Encode.get_encoding(
             model=model,
-            enc_type=get_enc_type(args.enc_type),
-            deduplication=None,
+            args=args,
             ctx=ctx,
         )
 

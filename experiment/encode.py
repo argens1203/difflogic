@@ -1,20 +1,30 @@
-from typing import Optional
+from attr import dataclass
+from typing import Union
+from experiment.util.args.encoding_args import EncodingArgs
+from experiment.util.args.pysat_args import PySatArgs
 from lgn.encoding import Encoder, SatEncoder, BddEncoder
+from .context import Context
+from .util import get_enc_type
+
+
+@dataclass
+class Args(EncodingArgs, PySatArgs):
+    pass
 
 
 class Encode:
     @staticmethod
-    def get_encoding(model, enc_type, ctx, deduplication: Optional[str] = None):
+    def get_encoding(model, args: Args, ctx: Context):
         _Encoder = Encoder
-        if deduplication == "sat":
+        if args.deduplicate == "sat":
             _Encoder = SatEncoder
-        elif deduplication == "bdd":
+        elif args.deduplicate == "bdd":
             _Encoder = BddEncoder
 
         encoding = _Encoder().get_encoding(
             model,
             ctx.dataset,
-            enc_type=enc_type,
+            enc_type=get_enc_type(args.enc_type),
         )
 
         if ctx.results is not None:

@@ -31,7 +31,7 @@ class Validator:
         """
         logger.info("Checking model with data")
 
-        with torch.no_grad(), encoding.use_context():
+        with torch.no_grad():
             model.train(False)
             for x, _ in data:
                 x = x.to(encoding.get_fp_type()).to(device)
@@ -73,7 +73,7 @@ class Validator:
         """
         logger.info("Checking model with truth table")
 
-        with torch.no_grad(), encoding.use_context():
+        with torch.no_grad():
             model.train(False)
 
             for x, _ in get_truth_table_loader(input_dim=encoding.get_input_dim()):
