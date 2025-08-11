@@ -88,7 +88,7 @@ class Settings:
 
     # Our setup for debugging
     dataset_neurons = [
-        ("iris", 24),
+        ("iris", 12),
         ("caltech101", 41 * 101),
         ("adult", 58),
         ("monk1", 10),
