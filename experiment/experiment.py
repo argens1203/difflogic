@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 import torch
 import json
-from lgn.util import get_args, setup_logger
+from .util import get_args, setup_logger
 
 torch.set_num_threads(1)  # ???
 
@@ -15,7 +15,7 @@ def seed_all(seed=0):
     np.random.seed(seed)
 
 
-from lgn.util import DefaultArgs
+from .util import DefaultArgs
 from .settings import Settings
 
 default_args = DefaultArgs()

@@ -5,9 +5,7 @@ from pysat.examples.hitman import Hitman
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
-from lgn.util import (
-    Inp,
-    Partial_Inp,
+from experiment.util import (
     Htype,
     Partial_Inp_Set,
     Transformed_Partial_Inp_Set,

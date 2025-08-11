@@ -6,8 +6,8 @@ from typing import Set
 
 if TYPE_CHECKING:
     from lgn.encoding import Encoding
-from lgn.util import Stat
-from lgn.util import (
+from experiment.util import Stat
+from experiment.util import (
     Partial_Inp_Set,
     Transformed_Partial_Inp_Set,
 )

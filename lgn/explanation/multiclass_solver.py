@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 import logging
 
-from lgn.util import remove_none, Stat, Cached
+from experiment.util import remove_none, Stat, Cached
 
 from .solver import Solver
 

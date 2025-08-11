@@ -6,7 +6,12 @@ if TYPE_CHECKING:
 
 from typing import List, Set, FrozenSet
 
-from lgn.util import feat_to_input, input_to_feat, Partial_Inp, One_Indexed_Single_Inp
+from experiment.util import (
+    feat_to_input,
+    input_to_feat,
+    Partial_Inp,
+    One_Indexed_Single_Inp,
+)
 from lgn.dataset import AutoTransformer
 
 from sklearn.preprocessing import KBinsDiscretizer, LabelEncoder

@@ -1,4 +1,4 @@
-from lgn.experiment import Experiment
+from experiment import Experiment
 
 if __name__ == "__main__":
     experiment = Experiment()

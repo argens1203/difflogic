@@ -2,9 +2,22 @@ import logging
 import torch
 from constant import device
 from pysat.formula import Atom
-from lgn.util.results_json import ResultsJSON
+from .results_json import ResultsJSON
+from pysat.card import EncType
 
 logger = logging.getLogger(__name__)
+
+
+def get_enc_type(enc_type):
+    return {
+        "pw": EncType.pairwise,
+        "seqc": EncType.seqcounter,
+        "cardn": EncType.cardnetwrk,
+        "sortn": EncType.sortnetwrk,
+        "tot": EncType.totalizer,
+        "mtot": EncType.mtotalizer,
+        "kmtot": EncType.kmtotalizer,
+    }[enc_type]
 
 
 def feat_to_input(feat):

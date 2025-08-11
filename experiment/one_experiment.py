@@ -10,7 +10,7 @@ from lgn.dataset import (
     new_load_dataset as load_dataset,
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
-from lgn.util import get_results, Stat
+from .util import get_results, Stat, ExplainerArgs, get_enc_type
 from constant import device
 
 from constant import Stats
@@ -23,10 +23,6 @@ def seed_all(seed=0):
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
-
-
-from lgn.util import ExplainerArgs
-from .util import get_enc_type
 
 
 class OneExperiment:

@@ -5,8 +5,7 @@ from constant import device
 from lgn.dataset.auto_transformer import AutoTransformer
 from lgn.dataset.custom_dataset import CustomDataset
 from lgn.encoding import Encoding
-from lgn.util import get_truth_table_loader, stat
-from lgn.util.util import get_onehot_loader
+from experiment.util import get_truth_table_loader, get_onehot_loader
 
 logger = logging.getLogger(__name__)
 
