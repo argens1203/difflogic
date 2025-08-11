@@ -9,7 +9,7 @@ class TrainingArgs:
     grad_factor: float = 1.0
     batch_size: int = 128
     training_bit_count: int = 32  # Torch floating point precision
-    eval_freq: int = 2000
+    eval_freq: int = 1000
     num_iterations: int = 100_000
     valid_set_size: float = 0.0
     extensive_eval: bool = False
@@ -40,7 +40,7 @@ def add_training_args(parser: argparse.ArgumentParser):
         "--eval-freq",
         "-ef",
         type=int,
-        default=2_000,
+        default=1000,
         help="Evaluation frequency (default: 2_000)",
     )
     parser.add_argument(

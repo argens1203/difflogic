@@ -6,6 +6,23 @@ import torch
 import json
 from .util import get_args, setup_logger
 
+import random
+import logging
+import numpy as np
+import torch
+from experiment.encode import Encode
+from experiment.model import Model
+from lgn.encoding import Validator
+from lgn.explanation import Explainer
+from .util import Stat
+
+from constant import Stats
+from .explain import Explain
+from .context import Context
+
+from .util import get_enc_type
+
+
 torch.set_num_threads(1)  # ???
 
 
@@ -20,19 +37,10 @@ from .settings import Settings
 
 default_args = DefaultArgs()
 
-from .one_experiment import OneExperiment
-
 
 class Experiment:
-    def __init__(self):
-        self.logger = logging.getLogger()
-
-    # def __init__(self):
-    #     pass
-
-    def _debug(self, dataset=None):
-        print("default_args:", default_args)
-        print("default_args:", vars(default_args))
+    @staticmethod
+    def debug(dataset=None):
         dataset = dataset if dataset is not None else "iris"
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
@@ -51,57 +59,28 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        args = argparse.Namespace(**args)
         print("args:", args)
         input("Press Enter to continue...")
 
-        setup_logger(args)
-        seed_all(args.seed)
-        OneExperiment.compare_encoders(args)
+        Experiment.compare_encoders(args)
 
-        results = OneExperiment.run_experiment(args)
+        results = Experiment.run(args)
+
         return results
 
-    def debug(self, dataset=None):
-        dataset = dataset if dataset is not None else "iris"
-        dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
-        exp_args = {
-            "eval_freq": 1000,
-            "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
-            "save_model": True,
-            "load_model": True,
-            "deduplicate": None,  # 'bdd', 'sat', None
-            "experiment_id": 10000,
-        }
-        args = {
-            **vars(default_args),
-            **exp_args,
-            **dataset_args,
-            **{"dataset": dataset},
-        }
-        self.run(args)
-
-    # def pseudo_run(self, dataset, model_path):
-    #     num_neurons = Settings.dataset_neurons.get(dataset)
-    #     num_layers = 2
-    #     num_iterations = 2000
-    #     batch_size = 100
-    #     model_path = dataset + "_" + model_path
-    #     eval_freq = 1000
-
-    def run_with_cmd(self):
+    @staticmethod
+    def run_with_cmd():
         args = get_args()
         dataset_args = Settings.debug_network_param.get(args.dataset) or {}
         exp_args = {
-            "eval_freq": 1000,
             "model_path": args.dataset + "_" + "model.pth",
-            "verbose": True,
         }
         args = {**vars(default_args), **exp_args, **dataset_args, **vars(args)}
-        self.run(args)
 
-    def f(self):
+        Experiment.run(args)
+
+    @staticmethod
+    def f():
         experiment_id = 1
         all_res = []
 
@@ -126,7 +105,8 @@ class Experiment:
             for dedup in ["bdd", "sat", None]:
                 args["deduplicate"] = dedup
                 args["experiment_id"] = experiment_id
-                results = self.run(args)
+
+                results = Experiment.run(args)
                 all_res.append(
                     {
                         "dataset": datasets,
@@ -154,7 +134,8 @@ class Experiment:
             with open("allres.txt", mode="w") as f:
                 f.write(json.dumps(all_res, indent=4))
 
-    def experiment(self, datasets=[], base_experiment_id=10000):
+    @staticmethod
+    def experiment(datasets=[], base_experiment_id=10000):
         all_res = []
         experiment_id = base_experiment_id
         for dataset in datasets:
@@ -187,7 +168,8 @@ class Experiment:
                     **{"dataset": dataset},
                 }
                 args["experiment_id"] = experiment_id
-                results = self.run(args)
+
+                results = Experiment.run(args)
                 all_res.append(
                     {
                         "dataset": dataset,
@@ -224,17 +206,8 @@ class Experiment:
 
     ####################################################################################################################
 
-    def run(self, args):
-        args = argparse.Namespace(**args)
-        print("args:", args)
-        input("Press Enter to continue...")
-
-        setup_logger(args)
-        seed_all(args.seed)
-        results = OneExperiment.run_experiment(args)
-        return results
-
-    def find_model(self):
+    @staticmethod
+    def find_model():
         experiement_id = 1000
         best_ids = []
         for dataset in [
@@ -272,10 +245,15 @@ class Experiment:
                         **{"dataset": dataset},
                     }
                     args = argparse.Namespace(**args)
+
                     setup_logger(args)
                     seed_all(args.seed)
                     args.experiment_id = experiement_id
-                    results, model = OneExperiment.find_model(args)
+
+                    ctx = Context(args)
+                    model = Model.get_model(args, ctx=ctx)
+                    ctx.results.save()
+                    results = ctx.results
                     if results.test_acc > best_acc:
                         best_acc = results.test_acc
                         best_eid = experiement_id
@@ -287,7 +265,8 @@ class Experiment:
             f.write(json.dumps(best_ids, indent=4))
         print(best_ids)
 
-    def get_and_retest_model(self):
+    @staticmethod
+    def get_and_retest_model():
         experiement_ids = [1000, 1015, 1031, 1048, 1060]
         output_eid = 500
         for eid in experiement_ids:
@@ -303,9 +282,102 @@ class Experiment:
                     args["xnum"] = 100
                     args["max_time"] = 3600
 
-                    args = argparse.Namespace(**args)
-                    setup_logger(args)
-                    seed_all(args.seed)
-                    res = OneExperiment.run_experiment(args)
+                    Experiment.run(args)
 
                     output_eid += 1
+
+    @staticmethod
+    def run(args):
+        args = argparse.Namespace(**args)
+        print("args:", args)
+        input("Press Enter to continue...")
+
+        setup_logger(args)
+        seed_all(args.seed)
+
+        ctx = Context(args)
+        # Asserts that results is not None, and enforces that entire test_set is explained
+        model = Model.get_model(args, ctx=ctx)
+
+        Stat.start_memory_usage()
+
+        encoding = Encode.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=args.deduplicate,
+            ctx=ctx,
+        )
+
+        # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
+        encoding.print()
+        explainer = Explainer(encoding)
+
+        total_time_taken, exp_count, count = Explain.explain_dataloader(
+            ctx.test_loader,
+            args,
+            explainer=explainer,
+            encoding=encoding,
+            is_train=False,
+            ctx=ctx,
+        )
+        # ============= ============= ============= ============= ============= ============= ============= =============
+
+        ctx.results.store_explanation_stat(exp_count / count, Stats["deduplication"])
+        ctx.results.store_resource_usage(
+            total_time_taken / exp_count, Stat.get_memory_usage()
+        )
+        ctx.results.store_counts(count, exp_count)
+        Stat.end_memory_usage()
+        ctx.results.save()
+
+        return ctx.results
+
+    @staticmethod
+    def compare_encoders(args):
+        args = argparse.Namespace(**args)
+        ctx = Context(args)
+        model = Model.get_model(args, ctx=ctx)
+
+        encoding2 = Encode.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication="bdd",
+            ctx=ctx,
+        )
+        encoding3 = Encode.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication="sat",
+            ctx=ctx,
+        )
+        encoding1 = Encode.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=None,
+            ctx=ctx,
+        )
+
+        Validator.validate_encodings_with_data(
+            encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
+        )
+        Validator.validate_encodings_with_data(
+            encoding1=encoding1, encoding2=encoding3, dataloader=ctx.test_loader
+        )
+        Validator.validate_encodings_with_data(
+            encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
+        )
+
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
+        )
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
+        )
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
+        )
+
+        input("All encodings are valid. Press Enter to continue...")
+
+        encoding2.print()
+        encoding3.print()

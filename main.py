@@ -1,12 +1,11 @@
 from experiment import Experiment
 
 if __name__ == "__main__":
-    experiment = Experiment()
     # experiment.run_with_cmd()
     # experiment.get_and_retest_model()
 
     # experiment.run_with_cmd()
-    experiment._debug(dataset="iris")
+    Experiment.debug(dataset="iris")
     # experiment.debug(dataset="monk1")
     # experiment.debug(dataset="monk2")
     # experiment.debug(dataset="monk3")
