@@ -2,7 +2,7 @@ import logging
 import torch
 from constant import device
 from pysat.formula import Atom
-from experiments.results_json import ResultsJSON
+from lgn.util.results_json import ResultsJSON
 
 logger = logging.getLogger(__name__)
 
