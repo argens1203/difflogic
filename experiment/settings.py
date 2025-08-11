@@ -103,7 +103,7 @@ class Settings:
             {
                 **{"num_neurons": neurons},
                 **{
-                    "num_layers": 2,
+                    "num_layers": 3,
                     "num_iterations": 2000,
                     "batch_size": 100,
                 },

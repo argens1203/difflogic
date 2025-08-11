@@ -57,9 +57,9 @@ class Experiment:
 
         setup_logger(args)
         seed_all(args.seed)
-        OneExperiment(args).compare_encoders(args)
+        OneExperiment.compare_encoders(args)
 
-        results = OneExperiment(args).run_experiment(args)
+        results = OneExperiment.run_experiment(args)
         return results
 
     def debug(self, dataset=None):
@@ -231,7 +231,7 @@ class Experiment:
 
         setup_logger(args)
         seed_all(args.seed)
-        results = OneExperiment(args).run_experiment(args)
+        results = OneExperiment.run_experiment(args)
         return results
 
     def find_model(self):
@@ -275,7 +275,7 @@ class Experiment:
                     setup_logger(args)
                     seed_all(args.seed)
                     args.experiment_id = experiement_id
-                    results, model = OneExperiment(args).find_model(args)
+                    results, model = OneExperiment.find_model(args)
                     if results.test_acc > best_acc:
                         best_acc = results.test_acc
                         best_eid = experiement_id
@@ -306,6 +306,6 @@ class Experiment:
                     args = argparse.Namespace(**args)
                     setup_logger(args)
                     seed_all(args.seed)
-                    res = OneExperiment(args).run_experiment(args)
+                    res = OneExperiment.run_experiment(args)
 
                     output_eid += 1

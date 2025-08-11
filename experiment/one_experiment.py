@@ -25,7 +25,7 @@ def seed_all(seed=0):
     np.random.seed(seed)
 
 
-class OneExperiment:
+class Context:
     def __init__(self, args):
         self.logger = logging.getLogger()
 
@@ -36,65 +36,87 @@ class OneExperiment:
         )
         self.verbose = args.verbose
 
-    def run_presentation(self, args):
-        model = self.get_model(args)
 
-        encoding = self.get_encoding(
+class OneExperiment:
+    @staticmethod
+    def get_ctx(args):
+        return Context(args)
+
+    @staticmethod
+    def run_presentation(args):
+        ctx = OneExperiment.get_ctx(args)
+
+        model = OneExperiment.get_model(args, ctx=ctx)
+
+        encoding = OneExperiment.get_encoding(
             model=model,
             enc_type=get_enc_type(args.enc_type),
             deduplication=args.deduplicate,
+            ctx=ctx,
         )
-        explainer = self.get_explainer(encoding)
+        explainer = OneExperiment.get_explainer(encoding, ctx=ctx)
 
         if args.explain is not None:
             raw = args.explain.split(",")
-            self.explain_raw(raw, args, explainer, encoding)
+            OneExperiment.explain_raw(raw, args, explainer, encoding, ctx=ctx)
         elif args.explain_all:
-            self.explain_all(args, explainer, encoding)
+            OneExperiment.explain_all(args, explainer, encoding, ctx=ctx)
         elif args.explain_one:
-            self.explain_one(args, explainer, encoding)
+            OneExperiment.explain_one(args, explainer, encoding, ctx=ctx)
         else:
-            self.explain_dataloader(
-                self.test_loader,
+            OneExperiment.explain_dataloader(
+                ctx.test_loader,
                 args,
                 explainer=explainer,
                 encoding=encoding,
                 is_train=False,
+                ctx=ctx,
             )
 
         return None
 
-    def compare_encoders(self, args):
-        model = self.get_model(args)
+    @staticmethod
+    def compare_encoders(args):
+        ctx = OneExperiment.get_ctx(args)
+        model = OneExperiment.get_model(args, ctx=ctx)
 
-        encoding2 = self.get_encoding(
-            model=model, enc_type=get_enc_type(args.enc_type), deduplication="bdd"
+        encoding2 = OneExperiment.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication="bdd",
+            ctx=ctx,
         )
-        encoding3 = self.get_encoding(
-            model=model, enc_type=get_enc_type(args.enc_type), deduplication="sat"
+        encoding3 = OneExperiment.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication="sat",
+            ctx=ctx,
         )
-        encoding1 = self.get_encoding(
-            model=model, enc_type=get_enc_type(args.enc_type), deduplication=None
+        encoding1 = OneExperiment.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=None,
+            ctx=ctx,
         )
 
         Validator.validate_encodings_with_data(
-            encoding1=encoding1, encoding2=encoding2, dataloader=self.test_loader
+            encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
         )
         Validator.validate_encodings_with_data(
-            encoding1=encoding1, encoding2=encoding3, dataloader=self.test_loader
+            encoding1=encoding1, encoding2=encoding3, dataloader=ctx.test_loader
         )
         Validator.validate_encodings_with_data(
-            encoding1=encoding2, encoding2=encoding3, dataloader=self.test_loader
+            encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
 
         Validator.validate_encodings_with_truth_table(
-            encoding1=encoding1, encoding2=encoding2, dataset=self.dataset
+            encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
         )
         Validator.validate_encodings_with_truth_table(
-            encoding1=encoding1, encoding2=encoding3, dataset=self.dataset
+            encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
         )
         Validator.validate_encodings_with_truth_table(
-            encoding1=encoding2, encoding2=encoding3, dataset=self.dataset
+            encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
         )
 
         input("All encodings are valid. Press Enter to continue...")
@@ -102,83 +124,91 @@ class OneExperiment:
         encoding2.print()
         encoding3.print()
 
-    def run_experiment(self, args):
+    @staticmethod
+    def run_experiment(args):
+        ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
-        model = self.get_model(args)
+        model = OneExperiment.get_model(args, ctx=ctx)
 
         Stat.start_memory_usage()
 
-        encoding = self.get_encoding(
+        encoding = OneExperiment.get_encoding(
             model=model,
             enc_type=get_enc_type(args.enc_type),
             deduplication=args.deduplicate,
+            ctx=ctx,
         )
 
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
         encoding.print()
-        explainer = self.get_explainer(encoding)
+        explainer = OneExperiment.get_explainer(encoding, ctx=ctx)
 
-        total_time_taken, exp_count, count = self.explain_dataloader(
-            self.test_loader,
+        total_time_taken, exp_count, count = OneExperiment.explain_dataloader(
+            ctx.test_loader,
             args,
             explainer=explainer,
             encoding=encoding,
             is_train=False,
+            ctx=ctx,
         )
         # ============= ============= ============= ============= ============= ============= ============= =============
 
-        self.results.store_explanation_stat(exp_count / count, Stats["deduplication"])
-        self.results.store_resource_usage(
+        ctx.results.store_explanation_stat(exp_count / count, Stats["deduplication"])
+        ctx.results.store_resource_usage(
             total_time_taken / exp_count, Stat.get_memory_usage()
         )
-        self.results.store_counts(count, exp_count)
+        ctx.results.store_counts(count, exp_count)
         Stat.end_memory_usage()
-        self.results.save()
+        ctx.results.save()
 
-        return self.results
+        return ctx.results
 
-    def find_model(self, args):
-        model = self.get_model(args)
-        self.results.save()
-        return self.results, model
+    @staticmethod
+    def find_model(args, ctx):
+        model = OneExperiment.get_model(args, ctx=ctx)
+        ctx.results.save()
+        return ctx.results, model
 
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
-
-    def explain_raw(self, raw, args, explainer, encoding):
+    @staticmethod
+    def explain_raw(raw, args, explainer, encoding, ctx):
         start = time.time()
-        self.logger.info("Raw: %s\n", raw)
+        ctx.logger.info("Raw: %s\n", raw)
         instance = Instance.from_encoding(encoding=encoding, raw=raw)
         exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
         return time.time() - start, exp_count, 1
 
-    def explain_one(self, args, explainer, encoding):
+    @staticmethod
+    def explain_one(args, explainer, encoding, ctx):
         start = time.time()
 
-        batch, label, idx = next(iter(self.test_loader))
+        batch, label, idx = next(iter(ctx.test_loader))
         for feat, index in zip(batch, idx):
 
-            raw = self.get_raw(index, is_train=False)
-            self.logger.info("Raw: %s\n", raw)
+            raw = ctx.get_raw(index, is_train=False)
+            ctx.logger.info("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
             exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
             return time.time() - start, exp_count, 1
 
-    def explain_all(self, args, explainer, encoding):
+    @staticmethod
+    def explain_all(args, explainer, encoding, ctx):
         all_times = 0
         exp_count = 0
         count = 0
 
         remaining_time = args.max_time
         for data_loader, is_train in zip(
-            [self.train_loader, self.test_loader], [True, False]
+            [ctx.train_loader, ctx.test_loader], [True, False]
         ):
-            t, e, c = self.explain_dataloader(
+            t, e, c = OneExperiment.explain_dataloader(
                 data_loader=data_loader,
                 exp_args=ExplainerArgs(xnum=args.xnum, max_time=remaining_time),
                 is_train=is_train,
                 explainer=explainer,
                 encoding=encoding,
+                ctx=ctx,
             )
             all_times += t
             exp_count += e
@@ -187,12 +217,13 @@ class OneExperiment:
 
         return all_times, exp_count, count
 
+    @staticmethod
     def explain_dataloader(
-        self,
         data_loader,
         exp_args: ExplainerArgs,
         explainer: Explainer,
         encoding,
+        ctx,
         is_train=False,
     ):
         all_times = 0
@@ -204,8 +235,8 @@ class OneExperiment:
         for batch, label, idx in tqdm(data_loader):
             start = time.time()
             for feat, i in tqdm(zip(batch, idx)):
-                raw = self.get_raw(i, is_train=is_train)
-                self.logger.info("Raw: %s\n", raw)
+                raw = ctx.get_raw(i, is_train=is_train)
+                ctx.logger.info("Raw: %s\n", raw)
 
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
                 exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
@@ -223,30 +254,33 @@ class OneExperiment:
 
     # ---- ---- ---- ---- ---- GETTERS ---- ---- ---- ---- ---- #
 
-    def train_model(self, args, model, loss_fn, optim):
+    @staticmethod
+    def train_model(args, model, loss_fn, optim, ctx):
         train_eval(
             args,
-            self.train_loader,
+            ctx.train_loader,
             None,
-            self.test_loader,
+            ctx.test_loader,
             model,
             loss_fn,
             optim,
-            self.results,
+            ctx.results,
         )
 
-    def eval_model(self, args, model):
+    @staticmethod
+    def eval_model(args, model, ctx):
         multi_eval(
             model,
-            self.train_loader,
-            self.test_loader,
+            ctx.train_loader,
+            ctx.test_loader,
             None,
-            results=self.results,
+            results=ctx.results,
             packbits_eval=args.packbits_eval,
         )
 
-    def get_model(self, args):
-        model, loss_fn, optim = get_model(args, self.results)
+    @staticmethod
+    def get_model(args, ctx):
+        model, loss_fn, optim = get_model(args, ctx.results)
         if args.save_model and args.load_model:
             try:
                 model.load_state_dict(
@@ -255,13 +289,13 @@ class OneExperiment:
                 print("Model loaded successfully")
             except Exception as e:
                 print(f"Error loading model: {e}")
-                self.train_model(args, model, loss_fn, optim)
-                self.eval_model(args, model)
+                OneExperiment.train_model(args, model, loss_fn, optim, ctx)
+                OneExperiment.eval_model(args, model, ctx)
                 torch.save(model.state_dict(), args.model_path)
 
         elif args.save_model:
-            self.train_model(args, model, loss_fn, optim)
-            self.eval_model(args, model)
+            OneExperiment.train_model(args, model, loss_fn, optim, ctx)
+            OneExperiment.eval_model(args, model, ctx)
             torch.save(model.state_dict(), args.model_path)
 
         elif args.load_model:
@@ -270,19 +304,20 @@ class OneExperiment:
             )
 
         else:
-            self.train_model(args, model, loss_fn, optim)
-            self.eval_model(args, model)
+            OneExperiment.train_model(args, model, loss_fn, optim, ctx)
+            OneExperiment.eval_model(args, model, ctx)
 
         ####################################################################################################################
-        if self.results is not None:
-            self.results.store_custom("model_complete_time", time.time())
+        if ctx.results is not None:
+            ctx.results.store_custom("model_complete_time", time.time())
 
         if args.compile_model:
-            compile_model(args, model, self.test_loader)
+            compile_model(args, model, ctx.test_loader)
 
         return model
 
-    def get_encoding(self, model, enc_type, deduplication: Optional[str] = None):
+    @staticmethod
+    def get_encoding(model, enc_type, ctx, deduplication: Optional[str] = None):
         _Encoder = Encoder
         if deduplication == "sat":
             _Encoder = SatEncoder
@@ -291,17 +326,18 @@ class OneExperiment:
 
         encoding = _Encoder().get_encoding(
             model,
-            self.dataset,
+            ctx.dataset,
             enc_type=enc_type,
         )
 
-        if self.results is not None:
-            self.results.store_encoding(encoding)
-        if self.verbose:
+        if ctx.results is not None:
+            ctx.results.store_encoding(encoding)
+        if ctx.verbose:
             encoding.print()
 
         return encoding
 
-    def get_explainer(self, encoding):
-        self.explainer = Explainer(encoding)
-        return self.explainer
+    @staticmethod
+    def get_explainer(encoding, ctx):
+        ctx.explainer = Explainer(encoding)
+        return ctx.explainer
