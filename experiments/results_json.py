@@ -66,8 +66,8 @@ class ResultsJSON(object):
     # ---- ADD ONs ---- #
 
     def store_encoding(self, encoding):
-        self.cnf_size = encoding.stats["cnf_size"]
-        self.eq_size = encoding.stats["eq_size"]
+        self.cnf_size = encoding.get_stats()["cnf_size"]
+        self.eq_size = encoding.get_stats()["eq_size"]
         self.formulas = [str(f.simplified()) for f in encoding.formula]
         self.encoding_time = time.time()
         self.encoding_time_taken = self.encoding_time - self.model_complete_time

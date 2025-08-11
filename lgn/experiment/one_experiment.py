@@ -1,16 +1,17 @@
 import random
 import logging
+from typing import Optional
 import numpy as np
 import torch
 from tqdm import tqdm
-from lgn.encoding import Encoding
+from lgn.encoding import Encoder, SatEncoder, BddEncoder, Validator
 from lgn.explanation import Explainer, Instance
 from lgn.dataset import (
     new_load_dataset as load_dataset,
 )
 from lgn.model import get_model, compile_model, train_eval, multi_eval
 from lgn.util import get_results, Stat
-from constant import Args, device
+from constant import device
 
 from constant import Stats
 import time
@@ -25,15 +26,12 @@ def seed_all(seed=0):
 
 
 from lgn.util import ExplainerArgs
-from lgn.encoding.sat import SolverWithDeduplication
 from .util import get_enc_type
 
 
 class OneExperiment:
     def __init__(self, args):
         self.logger = logging.getLogger()
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
 
         eid = args.experiment_id if args.experiment_id is not None else 0
         self.results = get_results(eid, args)
@@ -43,49 +41,93 @@ class OneExperiment:
         self.verbose = args.verbose
 
     def run_presentation(self, args):
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
+        model = self.get_model(args)
 
-        self.get_model(args)
-
-        self.get_encoding(enc_type=get_enc_type(args.enc_type))
-        self.get_explainer()
+        encoding = self.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=args.deduplicate,
+        )
+        explainer = self.get_explainer(encoding)
 
         if args.explain is not None:
             raw = args.explain.split(",")
-            self.explain_raw(raw, args)
+            self.explain_raw(raw, args, explainer, encoding)
         elif args.explain_all:
-            self.explain_all(args)
+            self.explain_all(args, explainer, encoding)
         elif args.explain_one:
-            self.explain_one(args)
+            self.explain_one(args, explainer, encoding)
         else:
-            self.explain_dataloader(self.test_loader, args, is_train=False)
+            self.explain_dataloader(
+                self.test_loader,
+                args,
+                explainer=explainer,
+                encoding=encoding,
+                is_train=False,
+            )
 
         return None
 
+    def compare_encoders(self, args):
+        model = self.get_model(args)
+
+        encoding2 = self.get_encoding(
+            model=model, enc_type=get_enc_type(args.enc_type), deduplication="bdd"
+        )
+        encoding3 = self.get_encoding(
+            model=model, enc_type=get_enc_type(args.enc_type), deduplication="sat"
+        )
+        encoding1 = self.get_encoding(
+            model=model, enc_type=get_enc_type(args.enc_type), deduplication=None
+        )
+
+        Validator.validate_encodings_with_data(
+            encoding1=encoding1, encoding2=encoding2, dataloader=self.test_loader
+        )
+        Validator.validate_encodings_with_data(
+            encoding1=encoding1, encoding2=encoding3, dataloader=self.test_loader
+        )
+        Validator.validate_encodings_with_data(
+            encoding1=encoding2, encoding2=encoding3, dataloader=self.test_loader
+        )
+
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding1, encoding2=encoding2, dataset=self.dataset
+        )
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding1, encoding2=encoding3, dataset=self.dataset
+        )
+        Validator.validate_encodings_with_truth_table(
+            encoding1=encoding2, encoding2=encoding3, dataset=self.dataset
+        )
+
+        input("All encodings are valid. Press Enter to continue...")
+
+        encoding2.print()
+        encoding3.print()
+
     def run_experiment(self, args):
         # Asserts that results is not None, and enforces that entire test_set is explained
-        if args.deduplicate:
-            Args["Deduplicate"] = True  # TODO: find ways to store global args
-        else:
-            Args["Deduplicate"] = False
-        Stats["deduplication"] = []
-
-        self.get_model(args)
+        model = self.get_model(args)
 
         Stat.start_memory_usage()
 
-        self.get_encoding(enc_type=get_enc_type(args.enc_type))
-        print("line 79")
-        # Doesn't work when using OHE to deduplicate
+        encoding = self.get_encoding(
+            model=model,
+            enc_type=get_enc_type(args.enc_type),
+            deduplication=args.deduplicate,
+        )
+
         # Validator.validate_with_truth_table(encoding=self.encoding, model=self.model)
-        print("In Run_Experiment")
-        print(id(self.encoding))
-        self.encoding.print()
-        self.get_explainer()
+        encoding.print()
+        explainer = self.get_explainer(encoding)
 
         total_time_taken, exp_count, count = self.explain_dataloader(
-            self.test_loader, args, is_train=False
+            self.test_loader,
+            args,
+            explainer=explainer,
+            encoding=encoding,
+            is_train=False,
         )
         # ============= ============= ============= ============= ============= ============= ============= =============
 
@@ -100,20 +142,20 @@ class OneExperiment:
         return self.results
 
     def find_model(self, args):
-        self.get_model(args)
+        model = self.get_model(args)
         self.results.save()
-        return self.results, self.model
+        return self.results, model
 
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
 
-    def explain_raw(self, raw, args):
+    def explain_raw(self, raw, args, explainer, encoding):
         start = time.time()
         self.logger.info("Raw: %s\n", raw)
-        instance = Instance.from_encoding(encoding=self.encoding, raw=raw)
-        exp_count = self.explainer.explain_both_and_assert(instance, xnum=args.xnum)
+        instance = Instance.from_encoding(encoding=encoding, raw=raw)
+        exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
         return time.time() - start, exp_count, 1
 
-    def explain_one(self, args):
+    def explain_one(self, args, explainer, encoding):
         start = time.time()
 
         batch, label, idx = next(iter(self.test_loader))
@@ -122,11 +164,11 @@ class OneExperiment:
             raw = self.get_raw(index, is_train=False)
             self.logger.info("Raw: %s\n", raw)
 
-            instance = Instance.from_encoding(encoding=self.encoding, feat=feat)
-            exp_count = self.explainer.explain_both_and_assert(instance, xnum=args.xnum)
+            instance = Instance.from_encoding(encoding=encoding, feat=feat)
+            exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
             return time.time() - start, exp_count, 1
 
-    def explain_all(self, args):
+    def explain_all(self, args, explainer, encoding):
         all_times = 0
         exp_count = 0
         count = 0
@@ -139,6 +181,8 @@ class OneExperiment:
                 data_loader=data_loader,
                 exp_args=ExplainerArgs(xnum=args.xnum, max_time=remaining_time),
                 is_train=is_train,
+                explainer=explainer,
+                encoding=encoding,
             )
             all_times += t
             exp_count += e
@@ -151,6 +195,8 @@ class OneExperiment:
         self,
         data_loader,
         exp_args: ExplainerArgs,
+        explainer: Explainer,
+        encoding,
         is_train=False,
     ):
         all_times = 0
@@ -165,8 +211,8 @@ class OneExperiment:
                 raw = self.get_raw(i, is_train=is_train)
                 self.logger.info("Raw: %s\n", raw)
 
-                instance = Instance.from_encoding(encoding=self.encoding, feat=feat)
-                exp_count_axp_plus_cxp = self.explainer.explain_both_and_assert(
+                instance = Instance.from_encoding(encoding=encoding, feat=feat)
+                exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
                     instance, xnum=exp_args.xnum
                 )
                 exp_count += exp_count_axp_plus_cxp
@@ -238,29 +284,28 @@ class OneExperiment:
         if args.compile_model:
             compile_model(args, model, self.test_loader)
 
-        self.model = model
-        return self.model
+        return model
 
-    def get_encoding(self, enc_type):
-        self.encoding = Encoding(self.model, self.dataset, enc_type=enc_type)
-        deduplicator = SolverWithDeduplication(self.encoding)
-        self.encoding = Encoding(
-            self.model,
+    def get_encoding(self, model, enc_type, deduplication: Optional[str] = None):
+        _Encoder = Encoder
+        if deduplication == "sat":
+            _Encoder = SatEncoder
+        elif deduplication == "bdd":
+            _Encoder = BddEncoder
+
+        encoding = _Encoder().get_encoding(
+            model,
             self.dataset,
             enc_type=enc_type,
-            deduplicator=deduplicator,
         )
 
         if self.results is not None:
-            self.results.store_encoding(self.encoding)
-
+            self.results.store_encoding(encoding)
         if self.verbose:
-            print("In Get_Encoding")
-            print(id(self.encoding))
-            self.encoding.print()
-        print("Second print")
-        self.encoding.print()
-        print("line 262")
+            encoding.print()
 
-    def get_explainer(self):
-        self.explainer = Explainer(self.encoding)
+        return encoding
+
+    def get_explainer(self, encoding):
+        self.explainer = Explainer(encoding)
+        return self.explainer

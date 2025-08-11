@@ -93,7 +93,7 @@ class MulticlassSolver:
 
     # # NEW
     def assert_input_correctness(self, inp):
-        for part in self.encoding.parts:
+        for part in self.encoding.get_parts():
             part_inp = list(filter(lambda x: x in part or -x in part, inp))
             # Skip / Allow if the entire part is not in the input
             if len(part_inp) == 0:

@@ -197,7 +197,9 @@ export TORCH_CUDA_ARCH_LIST="8.9"
 Install python dev `sudo apt-get install python3.12-dev`
 
 python setup.py install
-
+# comment out ext_modules in setup.py
+# then pip install -r requirements.txt
+# then brew install graphviz
 
 ## 
 [Errno 2] No such file or directory: 'dot'
