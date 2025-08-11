@@ -7,10 +7,8 @@ from pysat.formula import Formula
 
 fp_type = torch.float32
 
-logger = logging.getLogger(__name__)
 
-
-class Context:
+class SatContext:
     def __init__(self):
         self.vpool_context = id(self)
 

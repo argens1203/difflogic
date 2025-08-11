@@ -1,5 +1,5 @@
-from sklearn.preprocessing import LabelEncoder, KBinsDiscretizer, OneHotEncoder
 import numpy as np
+from sklearn.preprocessing import LabelEncoder, KBinsDiscretizer, OneHotEncoder
 
 
 class Converter:

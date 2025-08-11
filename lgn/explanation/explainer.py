@@ -1,13 +1,10 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
 import logging
 from typing import Set
 
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
-from experiment.context import Context
-from experiment.util import (
+# if TYPE_CHECKING:
+from lgn.encoding import Encoding
+from experiment.helpers import (
+    Context,
     Partial_Inp_Set,
     Transformed_Partial_Inp_Set,
 )

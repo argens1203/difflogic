@@ -1,15 +1,11 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
+from lgn.encoding import Encoding
 
 import logging
 from contextlib import contextmanager
 
 from pysat.solvers import Solver as BaseSolver
-from pysat.card import CardEnc, EncType
-from pysat.formula import Formula, IDPool
+from pysat.card import CardEnc
+from pysat.formula import Formula
 
 logger = logging.getLogger(__name__)
 

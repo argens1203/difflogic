@@ -1,10 +1,7 @@
 from attr import dataclass
-from typing import Union
-from experiment.util.args.encoding_args import EncodingArgs
-from experiment.util.args.pysat_args import PySatArgs
+from experiment.args import EncodingArgs, PySatArgs
 from lgn.encoding import Encoder, SatEncoder, BddEncoder
-from .context import Context
-from .util import get_enc_type
+from .helpers import Context, get_enc_type
 
 
 @dataclass

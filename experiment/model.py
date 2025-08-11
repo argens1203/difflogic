@@ -1,8 +1,9 @@
+import time
 import torch
-from lgn.model import get_model, compile_model, train_eval, multi_eval
+
 from constant import device
 
-import time
+from lgn.model import get_model, compile_model, train_eval, multi_eval
 
 
 class Model:

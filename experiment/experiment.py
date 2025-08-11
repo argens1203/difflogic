@@ -1,23 +1,21 @@
 import argparse
 import torch
 import json
-from .util import get_args, setup_logger
 
-import torch
-from experiment.encode import Encode
-from experiment.model import Model
+from .args import get_args, DefaultArgs
+from .helpers import Context
+
 from lgn.encoding import Validator
 from lgn.explanation import Explainer
 
-from constant import Stats
 from .explain import Explain
-from .context import Context
-
-
-from .util import DefaultArgs
 from .settings import Settings
+from .encode import Encode
+from .model import Model
 
 default_args = DefaultArgs()
+
+torch.set_num_threads(1)  # ???
 
 
 class Experiment:
@@ -41,7 +39,7 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        # Experiment.compare_encoders(args)
+        Experiment.compare_encoders(args)
 
         results = Experiment.run(args)
 

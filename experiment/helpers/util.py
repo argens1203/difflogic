@@ -1,15 +1,12 @@
 import logging
 import torch
-from constant import device
-from pysat.formula import Atom
-from .results import Results
-from pysat.card import EncType
 import numpy as np
 import random
+from pysat.card import EncType
 
-logger = logging.getLogger(__name__)
+from .results import Results
 
-torch.set_num_threads(1)  # ???
+from constant import device
 
 
 def seed_all(seed=0):

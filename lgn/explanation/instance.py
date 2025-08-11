@@ -1,12 +1,8 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
+from lgn.encoding import Encoding
 
 from typing import List, Set, FrozenSet
 
-from experiment.util import (
+from experiment.helpers import (
     feat_to_input,
     input_to_feat,
     Partial_Inp,

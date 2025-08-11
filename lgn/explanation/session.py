@@ -5,7 +5,7 @@ from pysat.examples.hitman import Hitman
 
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
-from experiment.util import (
+from experiment.helpers import (
     Htype,
     Partial_Inp_Set,
     Transformed_Partial_Inp_Set,
@@ -13,7 +13,7 @@ from experiment.util import (
 
 logger = logging.getLogger(__name__)
 
-from typing import List, Iterator
+from typing import Iterator
 
 
 class Session:

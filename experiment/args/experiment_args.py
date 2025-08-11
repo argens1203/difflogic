@@ -1,10 +1,11 @@
 import argparse
 from attr import dataclass
+from typing import Optional
 
 
 @dataclass
 class ExperimentArgs:
-    experiment_id: int = None
+    experiment_id: Optional[int] = None
     dataset: str = "iris"
     verbose: bool = False
     save_model: bool = True

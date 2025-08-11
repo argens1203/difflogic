@@ -1,4 +1,4 @@
-from experiment import Experiment
+from experiment.experiment import Experiment
 
 if __name__ == "__main__":
     # experiment.run_with_cmd()

@@ -1,7 +1,8 @@
-from tqdm import tqdm
-from lgn.explanation import Explainer, Instance
-from .util import ExplainerArgs
 import time
+from tqdm import tqdm
+
+from lgn.explanation import Explainer, Instance
+from experiment.args import ExplainerArgs
 
 
 class Explain:

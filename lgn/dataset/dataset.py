@@ -1,16 +1,11 @@
 import logging
 import torch
-import torchvision
 
-
-from .binarizer import Binarizer
 from .adult import AdultDataset
 from .monk import MonkDataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
 from .mnist import MNISTDataset
-
-logger = logging.getLogger(__name__)
 
 
 def load_n(loader, n):

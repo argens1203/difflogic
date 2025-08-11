@@ -1,13 +1,8 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
+from lgn.encoding import Encoding
 
 import logging
 
-from experiment.context import Context, Cached_Key
-from experiment.util import remove_none
+from experiment.helpers import Context, Cached_Key, remove_none
 
 from .solver import Solver
 

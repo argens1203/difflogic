@@ -1,12 +1,13 @@
 import argparse
 from attr import dataclass
+from typing import Optional
 
 
 @dataclass
 class ExplainerArgs:
     xnum: int = 1000
     max_time: int = 3600
-    explain: str = None
+    explain: Optional[str] = None
     explain_all: bool = False
     explain_one: bool = False
 

@@ -1,12 +1,13 @@
 import argparse
 from attr import dataclass
+from typing import Optional
 
 
 @dataclass
 class ModelArgs:
     connections: str = "unique"
-    num_neurons: int = None
-    num_layers: int = None
+    num_neurons: Optional[int] = None
+    num_layers: Optional[int] = None
 
 
 def add_model_args(parser: argparse.ArgumentParser):

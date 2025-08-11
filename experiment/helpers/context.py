@@ -1,10 +1,10 @@
 import logging
 import tracemalloc
-from experiment.util import setup_logger, seed_all
-from lgn.dataset import load_dataset
-from .util import get_results
 
-logger = logging.getLogger(__name__)
+from .logging import setup_logger
+from .util import seed_all, get_results
+
+from lgn.dataset import load_dataset
 
 
 class Cached_Key:
@@ -16,7 +16,7 @@ class Context:
         setup_logger(args)
         seed_all(args.seed)
 
-        self.logger = logging.getLogger()
+        self.logger = logging.getLogger(__name__)
 
         eid = args.experiment_id if args.experiment_id is not None else 0
         self.results = get_results(eid, args)
@@ -53,6 +53,6 @@ class Context:
         self.deduplication += 1
 
     def __del__(self):
-        logger.debug("Cache Hit: %s", str(self.cache_hit))
-        logger.debug("Cache Miss: %s", str(self.cache_miss))
-        logger.debug("Deduplication: %s", str(self.deduplication))
+        self.logger.debug("Cache Hit: %s", str(self.cache_hit))
+        self.logger.debug("Cache Miss: %s", str(self.cache_miss))
+        self.logger.debug("Deduplication: %s", str(self.deduplication))

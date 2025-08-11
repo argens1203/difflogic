@@ -1,7 +1,7 @@
 import torch
+
 from .dataset import Caltech101Dataset
 from .mnist import MNISTDataset
-from .binarizer import Binarizer
 from .adult import AdultDataset
 from .monk import Monk1Dataset, Monk2Dataset, Monk3Dataset
 from .iris import IrisDataset

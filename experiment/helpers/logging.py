@@ -1,7 +1,7 @@
 import logging
 import os
 
-from .args import ExperimentArgs
+from experiment.args import ExperimentArgs
 
 LOG_FILE_PATH = "main.log"
 INFO_LOG_FILE_PATH = "main.log.i"

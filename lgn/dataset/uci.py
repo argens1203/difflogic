@@ -1,10 +1,7 @@
-import logging
-import torch
-import numpy as np
+import os
+
 from torch.utils.data import Dataset
 from torchvision.datasets.utils import download_url, check_integrity
-import os
-from sklearn.model_selection import train_test_split
 
 
 class UCIDataset(Dataset):

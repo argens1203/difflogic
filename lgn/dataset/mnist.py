@@ -1,8 +1,9 @@
-from torchvision import transforms
+import torch
 import torchvision.datasets
 
+from torchvision import transforms
+
 from .auto_transformer import AutoTransformer
-import torch
 
 
 class Flatten:
