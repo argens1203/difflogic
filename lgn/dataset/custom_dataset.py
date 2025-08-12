@@ -1,10 +1,9 @@
+import os
+import numpy as np
+from abc import ABC, abstractmethod
+
 from torchvision.datasets.utils import download_url, check_integrity
 from torch.utils.data import Dataset
-import os
-
-import numpy as np
-
-from abc import ABC, abstractmethod
 
 
 class CustomDataset(Dataset, ABC):

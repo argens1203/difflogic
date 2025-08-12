@@ -12,8 +12,6 @@ BITS_TO_TORCH_FLOATING_POINT_TYPE = {
     64: torch.float64,
 }
 
-DEBUG = True
-
 Args = {"Debug": True}
 Stats = {
     "deduplication": [],

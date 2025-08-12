@@ -1,12 +1,13 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
+from lgn.encoding import Encoding
 
 from typing import List, Set, FrozenSet
 
-from lgn.util import feat_to_input, input_to_feat, Partial_Inp, One_Indexed_Single_Inp
+from experiment.helpers import (
+    feat_to_input,
+    input_to_feat,
+    Partial_Inp,
+    One_Indexed_Single_Inp,
+)
 from lgn.dataset import AutoTransformer
 
 from sklearn.preprocessing import KBinsDiscretizer, LabelEncoder

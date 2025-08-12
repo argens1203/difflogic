@@ -1,4 +1,3 @@
-from __future__ import annotations
 import logging
 from pysat.formula import Formula, Atom, Or, Neg
 

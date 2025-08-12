@@ -10,9 +10,9 @@ from constant import Stats
 from pysat.solvers import Solver as BaseSolver
 
 from lgn.dataset import AutoTransformer
-from lgn.encoding.deduplicator.sat import DeduplicationMixin
+from .sat_deduplicator import DeduplicationMixin
 from .encoder import Encoder
-from ..context import Context
+from experiment.helpers import SatContext
 from ..encoding import Encoding
 
 from pysat.formula import Formula
@@ -27,7 +27,7 @@ fp_type = torch.float32
 class SatEncoder(Encoder, DeduplicationMixin):
     def get_encoding(self, model, Dataset: AutoTransformer, fp_type=fp_type, **kwargs):
 
-        self.context = Context()
+        self.context = SatContext()
 
         all = set()
         clauses = []

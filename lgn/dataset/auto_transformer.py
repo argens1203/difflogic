@@ -1,6 +1,7 @@
-from .converter import Converter
 from sklearn.preprocessing import LabelEncoder
 from abc import ABC, abstractmethod
+
+from .converter import Converter
 
 
 class AutoTransformer(ABC):

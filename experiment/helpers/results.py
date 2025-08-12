@@ -4,7 +4,7 @@ import socket
 import os
 
 
-class ResultsJSON(object):
+class Results(object):
 
     def __init__(self, eid: int, path: str):
         self.eid = eid
@@ -56,7 +56,7 @@ class ResultsJSON(object):
         if get_dict:
             return data
 
-        self = ResultsJSON(-1, "")
+        self = Results(-1, "")
         self.__dict__.update(data)
 
         assert eid == self.eid
@@ -90,15 +90,21 @@ class ResultsJSON(object):
     def store_test_acc(self, test_acc):
         self.test_acc = test_acc
 
+    def store_start_time(self, start_time):
+        self.start_time = start_time
+
+    def store_model_ready_time(self, model_ready_time):
+        self.model_ready_time = model_ready_time
+
 
 if __name__ == "__main__":
 
-    r = ResultsJSON(101, "./")
+    r = Results(101, "./")
 
     print(r.__dict__)
 
     r.save()
 
-    r2 = ResultsJSON.load(101, "./")
+    r2 = Results.load(101, "./")
 
     print(r2.__dict__)

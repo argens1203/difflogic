@@ -1,12 +1,8 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from lgn.encoding import Encoding
+from lgn.encoding import Encoding
 
 import logging
 
-from lgn.util import remove_none, Stat, Cached
+from experiment.helpers import Context, Cached_Key, remove_none
 
 from .solver import Solver
 
@@ -14,10 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class MulticlassSolver:
-    def __init__(self, encoding: Encoding):
+    def __init__(self, encoding: Encoding, ctx: Context):
         self.solvers = dict()
         self.encoding = encoding
         self.votes_per_cls = self.encoding.get_votes_per_cls()
+        self.ctx = ctx
 
     ## -- Public -- #
     def is_uniquely_satisfied_by(
@@ -107,10 +104,10 @@ class MulticlassSolver:
     ## -- Private -- #
     def get_solver(self, true_class, adj_class):
         if (true_class, adj_class) in self.solvers:
-            Stat.inc_cache_hit(Cached.SOLVER)
+            self.ctx.inc_cache_hit(Cached_Key.SOLVER)
             return self.solvers[(true_class, adj_class)]
 
-        Stat.inc_cache_miss(Cached.SOLVER)
+        self.ctx.inc_cache_miss(Cached_Key.SOLVER)
 
         solver = Solver(encoding=self.encoding)
 

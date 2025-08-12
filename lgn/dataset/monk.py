@@ -1,7 +1,7 @@
+from abc import ABC, abstractmethod
+
 from .custom_dataset import CustomDataset
 from .auto_transformer import AutoTransformer
-
-from abc import ABC, abstractmethod
 
 
 class MonkDataset(CustomDataset, AutoTransformer, ABC):

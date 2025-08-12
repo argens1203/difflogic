@@ -1,10 +1,30 @@
 import logging
 import torch
-from constant import device
-from pysat.formula import Atom
-from experiments.results_json import ResultsJSON
+import numpy as np
+import random
+from pysat.card import EncType
 
-logger = logging.getLogger(__name__)
+from .results import Results
+
+from constant import device
+
+
+def seed_all(seed=0):
+    torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+
+
+def get_enc_type(enc_type):
+    return {
+        "pw": EncType.pairwise,
+        "seqc": EncType.seqcounter,
+        "cardn": EncType.cardnetwrk,
+        "sortn": EncType.sortnetwrk,
+        "tot": EncType.totalizer,
+        "mtot": EncType.mtotalizer,
+        "kmtot": EncType.kmtotalizer,
+    }[enc_type]
 
 
 def feat_to_input(feat):
@@ -18,12 +38,9 @@ def input_to_feat(inp):
 
 
 def get_results(experiment_id, args):
-    if experiment_id is not None:
-        # assert 520_000 <= experiment_id < 530_000, experiment_id
-        results = ResultsJSON(eid=experiment_id, path="./results/")
-        results.store_args(args)
-        return results
-    return None
+    results = Results(eid=experiment_id, path="./results/")
+    results.store_args(args)
+    return results
 
 
 def get_truth_table_loader(input_dim, batch_size=10):

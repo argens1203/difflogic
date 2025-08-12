@@ -1,16 +1,15 @@
 import logging
 import torch
 
-
 from pysat.formula import Formula, Atom, CNF, Or
 from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
 
-
 from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
-from ..context import Context
+
+from experiment.helpers import SatContext
 
 fp_type = torch.float32
 
@@ -26,7 +25,7 @@ class Encoder:
         **kwargs,
     ):
         enc_type = kwargs.get("enc_type", EncType.totalizer)
-        self.context = Context()
+        self.context = SatContext()
 
         formula, input_handles = self.get_formula(
             model, Dataset.get_input_dim(), Dataset

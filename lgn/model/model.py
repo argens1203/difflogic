@@ -1,22 +1,10 @@
 import torch
-from dataclasses import dataclass
+from attr import dataclass
 
 from difflogic import LogicLayer, GroupSum
 
-from lgn.dataset import input_dim_of_dataset, num_classes_of_dataset, get_dataset
+from lgn.dataset import get_dataset
 from constant import device
-
-
-@dataclass
-class ModelArgs:
-    num_neurons: int
-    num_layers: int
-    grad_factor: float
-    connections: str
-    tau: float
-    learning_rate: float
-    dataset: str
-    verbose: bool = False
 
 
 def get_model(args, results=None):

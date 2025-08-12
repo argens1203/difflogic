@@ -1,9 +1,7 @@
-from torchvision.datasets.utils import download_url, check_integrity
-from torch.utils.data import Dataset, DataLoader
-import os
 import torch.nn.functional as F
-
 import torch
+
+from torch.utils.data import Dataset, DataLoader
 
 
 class Binarizer:

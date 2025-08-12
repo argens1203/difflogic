@@ -1,15 +1,14 @@
 from tqdm import tqdm
 import logging
 
+from difflogic import LogicLayer, GroupSum
 from pysat.formula import Formula, Atom
 
-from difflogic import LogicLayer, GroupSum
-
-from constant import Stats
+from .encoder import Encoder
+from .bdd_deduplicator import BDDSolver
 
 from lgn.dataset import AutoTransformer
-from .encoder import Encoder
-from lgn.encoding.deduplicator import BDDSolver
+from constant import Stats
 
 logger = logging.getLogger(__name__)
 

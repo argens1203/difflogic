@@ -5,8 +5,7 @@ from constant import device
 from lgn.dataset.auto_transformer import AutoTransformer
 from lgn.dataset.custom_dataset import CustomDataset
 from lgn.encoding import Encoding
-from lgn.util import get_truth_table_loader, stat
-from lgn.util.util import get_onehot_loader
+from experiment.helpers import get_truth_table_loader, get_onehot_loader
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,7 @@ class Validator:
         """
         logger.info("Checking model with data")
 
-        with torch.no_grad(), encoding.use_context():
+        with torch.no_grad():
             model.train(False)
             for x, _ in data:
                 x = x.to(encoding.get_fp_type()).to(device)
@@ -74,7 +73,7 @@ class Validator:
         """
         logger.info("Checking model with truth table")
 
-        with torch.no_grad(), encoding.use_context():
+        with torch.no_grad():
             model.train(False)
 
             for x, _ in get_truth_table_loader(input_dim=encoding.get_input_dim()):
