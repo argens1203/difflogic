@@ -30,6 +30,7 @@ class DeduplicationMixin:
 
     def deduplicate_constant(self, f: Formula):
         with self.use_context() as vpool:
+            print("vpool, sat_deduplicator", id(vpool))
             # print("------- deduplicating constant ------", f)
             auxvar = Atom(("constant", f))
             auxvar_id = vpool.id(auxvar)
@@ -54,9 +55,7 @@ class DeduplicationMixin:
 
     def deduplicate_pair(self, f: Formula, prev: Formula):
         with self.use_context() as vpool:
-            if len(str(f)) <= len(str(prev)):
-                return None
-
+            print("vpool, sat_deduplicator", id(vpool))
             # print("------- deduplicating pair ------", f, prev)
 
             auxvar = Atom(("pair", f, prev))
@@ -88,6 +87,8 @@ class DeduplicationMixin:
             return Atom(c)
 
         for p in previous:
+            if len(str(f)) <= len(str(p)):
+                continue
             g = self.deduplicate_pair(f, p)
             if g is not None:
                 # logger.debug(f"Deduplicated {f} with {p} to {g}")

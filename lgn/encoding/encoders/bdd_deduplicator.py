@@ -126,18 +126,14 @@ class BDDSolver:
                 return f
 
         for p in previous:
+            if len(str(f)) <= len(str(p)):
+                continue
             if self.is_equiv(transformed, self.transform(p)):
-                if len(str(f)) >= len(str(p)):
-                    Stats["deduplication"] += 1
-                    return p
-                else:
-                    return f
+                Stats["deduplication"] += 1
+                return p
             elif self.is_neg_equiv(transformed, self.transform(p)):
-                if len(str(f)) >= len(str(p)):
-                    Stats["deduplication"] += 1
-                    return Neg(p)
-                else:
-                    return f
+                Stats["deduplication"] += 1
+                return Neg(p)
         return f
 
     @staticmethod

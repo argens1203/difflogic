@@ -63,6 +63,7 @@ class Model:
         ####################################################################################################################
         if ctx.results is not None:
             ctx.results.store_custom("model_complete_time", time.time())
+            ctx.results.store_model_ready_time()
 
         if args.compile_model:
             compile_model(args, model, ctx.test_loader)

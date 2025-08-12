@@ -29,6 +29,8 @@ class Context:
         self.cache_miss = {Cached_Key.SOLVER: 0}
         self.deduplication = 0
 
+        self.results.store_start_time()
+
     def start_memory_usage(self):
         tracemalloc.start()
 

@@ -2,7 +2,7 @@ from tqdm import tqdm
 import logging
 import torch
 
-from pysat.formula import Atom
+from pysat.formula import Atom, Neg, Implies
 
 from difflogic import LogicLayer, GroupSum
 
@@ -34,6 +34,7 @@ class SatEncoder(Encoder, DeduplicationMixin):
         Stats["deduplication"] = 0
 
         with self.use_context() as vpool:
+            print("vpool, sat_encoder", id(vpool))
             #  GET input handles
             input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
             x = input_handles
@@ -43,14 +44,24 @@ class SatEncoder(Encoder, DeduplicationMixin):
             eq_constraints, parts = self.initialize_ohe(
                 Dataset, input_ids, enc_type=kwargs.get("enc_type", EncType.totalizer)
             )
+            print("eq_constraints", eq_constraints)
+            print("parts", parts)
+            input("Press Enter to continue...")
             self.solver = BaseSolver(name="g3")
             self.solver.append_formula(eq_constraints)  # OHE
+            res = self.deduplicate_pair(Neg(Implies(Atom(3), Atom(4))), Atom(3))
+            assert (
+                res is True
+            ), "Deduplication failed for Neg(Implies(Atom(3), Atom(4)))"
+            input("Press N-TERRRR to continue...")
 
             for layer in model:
                 this_layer = []
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):
                     continue
+                print("before deduplication")
+                layer.print()
                 for f in tqdm(layer.get_formula(x)):
                     f = self.deduplicate(f, all)
                     # print("(Populate Clauses) vpool", vpool.id2obj.items())
@@ -60,6 +71,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     all.add(f)
                     clauses.extend(f.clauses)
                 x = this_layer
+                print("after deduplication")
+                print(x)
+                input("Press Enter to continue...")
 
             clauses = [y.clauses for y in x]
             print("clauses", clauses)

@@ -175,11 +175,11 @@ class Experiment:
     @staticmethod
     def compare_encoders(args):
         args = DefaultArgs(**args)
-        print("args:", args)
-        input("Press Enter to continue...")
 
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
+        for layer in model:
+            layer.print()
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -187,6 +187,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        encoding2.print()
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -194,6 +195,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        encoding3.print()
 
         args.deduplicate = None
         encoding1 = Encode.get_encoding(
@@ -201,6 +203,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        encoding1.print()
 
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
