@@ -8,16 +8,19 @@ from experiment.args import ExplainerArgs
 class Explain:
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
     @staticmethod
-    def explain_raw(raw, args, explainer, encoding, ctx):
+    def explain_raw(
+        args, explainer, encoding, ctx, raw=None, inp=None
+    ) -> tuple[float, int, int]:
         start = time.time()
         ctx.logger.debug("Raw: %s\n", raw)
-        instance = Instance.from_encoding(encoding=encoding, raw=raw)
+        instance = Instance.from_encoding(encoding=encoding, raw=raw, inp=inp)
         exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
         return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_one(args, explainer, encoding, ctx):
+    def explain_one(args, explainer, encoding, ctx) -> tuple[float, int, int]:
         start = time.time()
+        exp_count = -1
 
         batch, label, idx = next(iter(ctx.test_loader))
         for feat, index in zip(batch, idx):
@@ -27,10 +30,12 @@ class Explain:
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
             exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
-            return time.time() - start, exp_count, 1
+            break
+
+        return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_all(args, explainer, encoding, ctx):
+    def explain_all(args, explainer, encoding, ctx) -> tuple[float, int, int]:
         all_times = 0
         exp_count = 0
         count = 0
@@ -62,7 +67,7 @@ class Explain:
         encoding,
         ctx,
         is_train=False,
-    ):
+    ) -> tuple[float, int, int]:
         all_times = 0
         exp_count = 0
         count = 0

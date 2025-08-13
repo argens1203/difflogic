@@ -29,8 +29,11 @@ class Experiment:
             "verbose": "debug",
             "save_model": True,
             "load_model": True,
-            "deduplicate": "bdd",  # 'bdd', 'sat', None
+            "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
+            # "explain_one": True,
+            # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
+            # {2, 3, 6, 8, -7, -5, -4, -1}
         }
         args = {
             **vars(default_args),
@@ -136,7 +139,7 @@ class Experiment:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         print("args:", args)
-        # input("Press Enter to continue...")
+        input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
@@ -153,14 +156,36 @@ class Experiment:
             profile_memory("encoding")
             explainer = Explainer(encoding, ctx=ctx)
 
-            total_time_taken, exp_count, count = Explain.explain_dataloader(
-                ctx.test_loader,
-                args,
-                explainer=explainer,
-                encoding=encoding,
-                is_train=False,
-                ctx=ctx,
-            )
+            print("args", args)
+
+            if args.explain is not None:
+                assert type(args.explain) == str
+                raw = args.explain.split(",")
+                f_exp = lambda: Explain.explain_raw(
+                    args, explainer, encoding, ctx, raw=raw
+                )
+            elif args.explain_inp is not None:
+                inp = args.explain_inp.split(",")
+                inp = [int(i) for i in inp]
+                inp = sorted(inp, key=lambda x: abs(x))
+                f_exp = lambda: Explain.explain_raw(
+                    args, explainer, encoding, ctx, inp=inp
+                )
+            elif args.explain_one:
+                f_exp = lambda: Explain.explain_one(args, explainer, encoding, ctx)
+            elif args.explain_all:
+                f_exp = lambda: Explain.explain_all(args, explainer, encoding, ctx)
+            else:
+                f_exp = lambda: Explain.explain_dataloader(
+                    ctx.test_loader,
+                    args,
+                    explainer=explainer,
+                    encoding=encoding,
+                    is_train=False,
+                    ctx=ctx,
+                )
+
+            total_time_taken, exp_count, count = f_exp()
             # ============= ============= ============= ============= ============= ============= ============= =============
 
             ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)

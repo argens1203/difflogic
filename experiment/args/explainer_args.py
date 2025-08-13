@@ -10,6 +10,7 @@ class ExplainerArgs:
     explain: Optional[str] = None
     explain_all: bool = False
     explain_one: bool = False
+    explain_inp: Optional[str] = None
 
 
 def add_explainer_args(parser: argparse.ArgumentParser):
@@ -24,7 +25,13 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         "--explain",
         type=str,
         default=None,
-        help="Explain the prediction for a given input",
+        help="Explain the prediction for a given input (raw)",
+    )
+    parser.add_argument(
+        "--explain_inp",
+        type=str,
+        default=None,
+        help="Explain the prediction of a given (boolean) input (eg.: 1,-2,3,-4)",
     )
     parser.add_argument(
         "--explain_all",

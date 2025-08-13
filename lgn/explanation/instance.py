@@ -85,7 +85,7 @@ class Instance:
 
     @staticmethod
     def from_encoding(encoding: Encoding, feat=None, raw=None, inp=None):
-        if feat is None:
+        if feat is None and raw is not None:
             feat = encoding.get_dataset().transform_feature(np.array([raw]))[0]
         raw_inp, feat = Instance.fill_missing(inp=inp, feat=feat)
 
