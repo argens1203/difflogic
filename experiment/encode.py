@@ -1,7 +1,11 @@
+import logging
+
 from attr import dataclass
 from experiment.args import EncodingArgs, PySatArgs
 from lgn.encoding import Encoder, SatEncoder, BddEncoder
 from .helpers import Context, get_enc_type
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -14,8 +18,10 @@ class Encode:
     def get_encoding(model, args: Args, ctx: Context):
         _Encoder = Encoder
         if args.deduplicate == "sat":
+            logger.info("Using SAT Encoder")
             _Encoder = SatEncoder
         elif args.deduplicate == "bdd":
+            logger.info("Using BDD Encoder")
             _Encoder = BddEncoder
 
         encoding = _Encoder().get_encoding(
@@ -26,7 +32,7 @@ class Encode:
 
         if ctx.results is not None:
             ctx.results.store_encoding(encoding)
-        if ctx.verbose:
-            encoding.print()
+
+        ctx.debug(encoding.print)
 
         return encoding

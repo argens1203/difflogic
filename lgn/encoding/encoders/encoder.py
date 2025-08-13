@@ -78,7 +78,6 @@ class Encoder:
         return x, inputs
 
     def populate_clauses(self, input_handles, formula):
-        print("formula.length", len(formula))
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
             cnf = CNF()

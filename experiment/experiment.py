@@ -26,7 +26,7 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": False,
+            "verbose": "info",
             "save_model": True,
             "load_model": True,
             "deduplicate": None,  # 'bdd', 'sat', None
@@ -178,8 +178,7 @@ class Experiment:
 
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
-        for layer in model:
-            layer.print()
+        ctx.debug(lambda: [layer.print() for layer in model])
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -187,8 +186,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
-        encoding2.print()
-        input("Press enter to continue...")
+        ctx.debug(encoding2.print)
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -196,8 +194,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
-        encoding3.print()
-        input("Press enter to continue...")
+        ctx.debug(encoding3.print)
 
         assert str(encoding2.formula) == str(encoding3.formula), (
             "Formulas should be equal",
@@ -211,7 +208,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
-        encoding1.print()
+        ctx.debug(encoding1.print)
 
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader

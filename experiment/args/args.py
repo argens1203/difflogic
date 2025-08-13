@@ -26,7 +26,7 @@ def get_args():
 
     args = parser.parse_args()
 
-    if args.verbose:
+    if args.verbose in ["debug", "info"]:
         print(vars(args))
 
     assert (

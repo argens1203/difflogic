@@ -28,7 +28,7 @@ class TestSat(unittest.TestCase):
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
+            "verbose": "info",
             "save_model": True,
             "load_model": True,
         }

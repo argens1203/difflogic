@@ -29,7 +29,7 @@ class Validator:
         .. code-block:: python
             >>> Validator.validate_with_truth_table(encoding=encoding, model=model)
         """
-        logger.info("Checking model with data")
+        logger.info("Checking model with data...")
 
         with torch.no_grad():
             model.train(False)
@@ -44,7 +44,7 @@ class Validator:
     def validate_encodings_with_data(
         encoding1: Encoding, encoding2: Encoding, dataloader
     ):
-        logger.info("Checking encodings with data")
+        logger.info("Checking encodings with data...")
 
         with torch.no_grad():
             for x, label, idx in dataloader:
@@ -58,8 +58,6 @@ class Validator:
                     f"Encoding 2: {logit2}"
                 )
 
-        logger.info("Encodings validated successfully with data")
-
     @staticmethod
     def validate_with_truth_table(encoding: Encoding, model: torch.nn.Module):
         """
@@ -71,7 +69,7 @@ class Validator:
         .. code-block:: python
             >>> Validator.validate_with_truth_table(encoding=encoding, model=model)
         """
-        logger.info("Checking model with truth table")
+        logger.info("Checking model with truth table...")
 
         with torch.no_grad():
             model.train(False)
@@ -87,7 +85,7 @@ class Validator:
     def validate_encodings_with_truth_table(
         encoding1: Encoding, encoding2: Encoding, dataset: AutoTransformer
     ):
-        logger.info("Checking encodings with truth table")
+        logger.info("Checking encodings with truth table...")
         for x, _ in get_onehot_loader(
             input_dim=dataset.get_input_dim(),
             attribute_ranges=dataset.get_attribute_ranges(),
@@ -101,4 +99,3 @@ class Validator:
                 f"Encoding 1: {logit1}\n"
                 f"Encoding 2: {logit2}"
             )
-        logger.info("Encodings validated successfully with truth table")

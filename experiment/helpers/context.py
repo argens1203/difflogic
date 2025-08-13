@@ -1,5 +1,6 @@
 import logging
 import tracemalloc
+from typing import Callable
 
 from .logging import setup_logger
 from .util import seed_all, get_results
@@ -30,6 +31,10 @@ class Context:
         self.deduplication = 0
 
         self.results.store_start_time()
+
+    def debug(self, l: Callable):
+        if self.verbose == "debug":
+            l()
 
     def start_memory_usage(self):
         tracemalloc.start()

@@ -17,6 +17,16 @@ def setup_file_logger_and_remove_log(file_path):
     return logging.FileHandler(file_path)
 
 
+def get_log_level(args: ExperimentArgs):
+    if args.verbose == "debug":
+        return logging.DEBUG
+    elif args.verbose == "info":
+        return logging.INFO
+    elif args.verbose == "warn":
+        return logging.WARN
+    return logging.INFO
+
+
 def setup_logger(args: ExperimentArgs):
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
@@ -24,7 +34,7 @@ def setup_logger(args: ExperimentArgs):
     # Add console handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(default_formatter)
-    console_handler.setLevel(logging.DEBUG if args.verbose else logging.INFO)
+    console_handler.setLevel(get_log_level(args))
     logger.addHandler(console_handler)
 
     # Add detailed file log
