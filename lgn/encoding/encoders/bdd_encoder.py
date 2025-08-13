@@ -4,6 +4,8 @@ import logging
 from difflogic import LogicLayer, GroupSum
 from pysat.formula import Formula, Atom
 
+from experiment.helpers.ordered_set import OrderedSet
+
 from .encoder import Encoder
 from .bdd_deduplicator import BDDSolver
 
@@ -29,7 +31,7 @@ class BddEncoder(Encoder):
             solver = BDDSolver.from_inputs(inputs=x)
             solver.set_ohe(Dataset.get_attribute_ranges())
 
-            all = set()
+            all = OrderedSet()
             for i in x:
                 all.add(i)
             Stats["deduplication"] = 0

@@ -7,7 +7,7 @@ from typing import Optional
 class ExperimentArgs:
     experiment_id: Optional[int] = None
     dataset: str = "iris"
-    verbose: bool = False
+    verbose: str = "info"
     save_model: bool = True
     load_model: bool = True
     model_path: str = "model.pth"
@@ -35,7 +35,11 @@ def add_experiment_args(parser: argparse.ArgumentParser):
         help="the dataset to use",
     )
     parser.add_argument(
-        "--verbose", action="store_true", default=False, help="Sets vebosity"
+        "--verbose",
+        choices=["debug", "info", "warn"],
+        type=str,
+        default="info",
+        help="Sets verbosity",
     )
     parser.add_argument(
         "--save_model", action="store_true", default=True, help="Save the model"

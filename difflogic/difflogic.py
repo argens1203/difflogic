@@ -230,6 +230,14 @@ class LogicLayer(torch.nn.Module):
         ]
         return formulas
 
+    def print(self):
+        ops = [idx_to_op(i) for i in self.weights.argmax(-1)]
+        print("Operations:")
+        idx = 0
+        for op, a, b in zip(ops, *self.indices):
+            print(f" {idx} {op}: {a.item()}, {b.item()}")
+            idx += 1
+
 
 ########################################################################################################################
 
@@ -273,6 +281,9 @@ class GroupSum(torch.nn.Module):
         step_size = len(x) // self.k
         formulas = [bit_add(*[x[i * step_size + j] for j in step_size]) for i in self.k]
         return formulas
+
+    def print(self):
+        print(f"GroupSum: k={self.k}, tau={self.tau}")
 
 
 ########################################################################################################################

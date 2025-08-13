@@ -26,7 +26,7 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
+            "verbose": "info",
             "save_model": True,
             "load_model": True,
             "deduplicate": None,  # 'bdd', 'sat', None
@@ -136,7 +136,7 @@ class Experiment:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         print("args:", args)
-        input("Press Enter to continue...")
+        # input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
@@ -175,11 +175,10 @@ class Experiment:
     @staticmethod
     def compare_encoders(args):
         args = DefaultArgs(**args)
-        print("args:", args)
-        input("Press Enter to continue...")
 
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
+        ctx.debug(lambda: [layer.print() for layer in model])
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -187,12 +186,20 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        ctx.debug(encoding2.print)
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
             model=model,
             args=args,
             ctx=ctx,
+        )
+        ctx.debug(encoding3.print)
+
+        assert str(encoding2.formula) == str(encoding3.formula), (
+            "Formulas should be equal",
+            encoding2.formula,
+            encoding3.formula,
         )
 
         args.deduplicate = None
@@ -201,6 +208,7 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        ctx.debug(encoding1.print)
 
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
@@ -223,6 +231,3 @@ class Experiment:
         )
 
         input("All encodings are valid. Press Enter to continue...")
-
-        encoding2.print()
-        encoding3.print()

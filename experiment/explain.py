@@ -10,7 +10,7 @@ class Explain:
     @staticmethod
     def explain_raw(raw, args, explainer, encoding, ctx):
         start = time.time()
-        ctx.logger.info("Raw: %s\n", raw)
+        ctx.logger.debug("Raw: %s\n", raw)
         instance = Instance.from_encoding(encoding=encoding, raw=raw)
         exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
         return time.time() - start, exp_count, 1
@@ -23,7 +23,7 @@ class Explain:
         for feat, index in zip(batch, idx):
 
             raw = ctx.get_raw(index, is_train=False)
-            ctx.logger.info("Raw: %s\n", raw)
+            ctx.logger.debug("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
             exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
@@ -73,7 +73,7 @@ class Explain:
             start = time.time()
             for feat, i in tqdm(zip(batch, idx)):
                 raw = ctx.get_raw(i, is_train=is_train)
-                ctx.logger.info("Raw: %s\n", raw)
+                ctx.logger.debug("Raw: %s\n", raw)
 
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
                 exp_count_axp_plus_cxp = explainer.explain_both_and_assert(

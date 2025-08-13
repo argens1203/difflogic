@@ -25,7 +25,7 @@ class Explainer:
         pred_class = instance.get_predicted_class()
         inp = instance.get_input()
 
-        logger.info("Explaining Input: %s", inp)
+        logger.debug("Explaining Input: %s", inp)
 
         logger.debug("Predicted Class - %s", pred_class)
 
@@ -34,7 +34,7 @@ class Explainer:
         ), "Assertion Error: " + str(inp)
 
         axp = self.reduce_axp(inp, pred_class)
-        logger.info("One AXP: %s", axp)
+        logger.debug("One AXP: %s", axp)
         return axp
 
     def _enumerate_unit_mcs(session: Session):
@@ -248,22 +248,22 @@ class Explainer:
         axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum)
         cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum)
 
-        logger.info("Input: %s", instance.get_input())
-        logger.info(
+        logger.debug("Input: %s", instance.get_input())
+        logger.debug(
             "AXPs: %s",
             str([sorted(one) for one in sorted(axps, key=lambda x: (len(x), x[0]))]),
         )
-        logger.info(
+        logger.debug(
             "Duals: %s",
             str(
                 [sorted(one) for one in sorted(axp_dual, key=lambda x: (len(x), x[0]))]
             ),
         )
-        logger.info(
+        logger.debug(
             "CXPs: %s",
             str([sorted(one) for one in sorted(cxps, key=lambda x: (len(x), x[0]))]),
         )
-        logger.info(
+        logger.debug(
             "Duals: %s",
             str(
                 [sorted(one) for one in sorted(cxp_dual, key=lambda x: (len(x), x[0]))]
@@ -292,11 +292,9 @@ class Explainer:
         axps = [instance.verbose(axp) for axp in axps]
         cxps = [instance.verbose(cxp) for cxp in cxps]
         for i, axp in enumerate(axps):
-            logger.info("AXP #%d: %s", i, axp)
+            logger.debug("AXP #%d: %s", i, axp)
         for i, cxp in enumerate(cxps):
-            logger.info("CXP #%d: %s", i, cxp)
-        # logger.info("AXPs: %s", str(axps))
-        # logger.info("CXPs: %s", str(cxps))
-        logger.info("\n")
+            logger.debug("CXP #%d: %s", i, cxp)
+        logger.debug("\n")
 
         return len(axps) + len(axp_dual)

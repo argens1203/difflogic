@@ -90,11 +90,11 @@ class Results(object):
     def store_test_acc(self, test_acc):
         self.test_acc = test_acc
 
-    def store_start_time(self, start_time):
-        self.start_time = start_time
+    def store_start_time(self):
+        self.start_time = time.time()
 
-    def store_model_ready_time(self, model_ready_time):
-        self.model_ready_time = model_ready_time
+    def store_model_ready_time(self):
+        self.model_ready_time = time.time()
 
 
 if __name__ == "__main__":

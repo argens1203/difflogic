@@ -39,16 +39,6 @@ class Encoder:
 
         eq_constraints, parts = self.initialize_ohe(Dataset, input_ids, enc_type)
 
-        print("formula", formula)
-        print("input_handles", input_handles)
-        print("input_ids", input_ids)
-        print("cnf", cnf)
-        print("output_ids", output_ids)
-        print("special", special)
-        print("eq_constraints", eq_constraints)
-        print("parts", parts)
-        input("Press Enter to continue...")
-
         return Encoding(
             parts=parts,
             cnf=cnf,
@@ -88,7 +78,6 @@ class Encoder:
         return x, inputs
 
     def populate_clauses(self, input_handles, formula):
-        print("formula.length", len(formula))
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
             cnf = CNF()

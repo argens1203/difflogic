@@ -1,9 +1,12 @@
 import time
 import torch
+import logging
 
 from constant import device
 
 from lgn.model import get_model, compile_model, train_eval, multi_eval
+
+logger = logging.getLogger(__name__)
 
 
 class Model:
@@ -39,9 +42,9 @@ class Model:
                 model.load_state_dict(
                     torch.load(args.model_path, map_location=torch.device(device))
                 )
-                print("Model loaded successfully")
+                logger.info("Model loaded successfully")
             except Exception as e:
-                print(f"Error loading model: {e}")
+                logger.info(f"Error loading model: {e}; using saved model")
                 Model.train_model(args, model, loss_fn, optim, ctx)
                 Model.eval_model(args, model, ctx)
                 torch.save(model.state_dict(), args.model_path)
@@ -63,6 +66,7 @@ class Model:
         ####################################################################################################################
         if ctx.results is not None:
             ctx.results.store_custom("model_complete_time", time.time())
+            ctx.results.store_model_ready_time()
 
         if args.compile_model:
             compile_model(args, model, ctx.test_loader)

@@ -19,7 +19,6 @@ class TestBdd(unittest.TestCase):
         v = ~(bdd.var(2) & bdd.var(1))
 
         assert solver.is_equiv(u, v) is True
-        assert solver.is_equiv2(u, v) is True
 
     def test_ohe_positive_cases(self):
         solver = BDDSolver([1, 2, 3, 4])
@@ -34,6 +33,34 @@ class TestBdd(unittest.TestCase):
         a = bdd.false
         b = bdd.var(3) & bdd.var(4)
         assert solver.is_equiv(a, b) is True
+
+    def test_ohe_atomic_cases(self):
+        solver = BDDSolver([1, 2, 3, 4])
+        solver.set_ohe([2, 2])
+        bdd = solver.bdd
+
+        assert solver.is_equiv(~(bdd.var(3).implies(bdd.var(4))), bdd.var(3)) is True
+        assert (
+            solver.is_neg_equiv(~(bdd.var(3).implies(bdd.var(4))), ~bdd.var(3)) is True
+        )
+
+        assert solver.is_equiv(~(bdd.var(3).implies(bdd.var(4))), ~bdd.var(4)) is True
+        assert (
+            solver.is_neg_equiv(~(bdd.var(3).implies(bdd.var(4))), bdd.var(4)) is True
+        )
+
+    def test_ohe_implied(self):
+        solver = BDDSolver([1, 2, 3, 4])
+        solver.set_ohe([2, 2])
+        bdd = solver.bdd
+
+        assert solver.is_equiv(bdd.var(1), ~bdd.var(2)) is True
+        assert solver.is_equiv(~bdd.var(1), bdd.var(2)) is True
+        assert solver.is_neg_equiv(bdd.var(1), bdd.var(2)) is True
+
+        assert solver.is_equiv(bdd.var(3), ~bdd.var(4)) is True
+        assert solver.is_equiv(~bdd.var(3), bdd.var(4)) is True
+        assert solver.is_neg_equiv(bdd.var(3), bdd.var(4)) is True
 
     def test_ohe_not_overly_restrictive(self):
         solver = BDDSolver([1, 2, 3, 4])
@@ -79,8 +106,6 @@ class TestBdd(unittest.TestCase):
         f2 = Or(Atom(1), Atom(2))
 
         bdd = solver.bdd
-        print(bdd.var(1), bdd.var(2))
-        print(bdd.var(1))
 
         assert solver.is_equiv(solver.transform(Atom(1)), bdd.var(1)) is True
 

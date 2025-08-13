@@ -7,7 +7,7 @@ from constant import Stats
 from lgn.dataset.iris import IrisDataset
 from lgn.dataset.loader import load_dataset
 from lgn.encoding import Encoder
-from lgn.deduplicator import SatDeduplicator
+from .sat_deduplicator import DeduplicationMixin
 from lgn.util.util import get_results
 from .bdd_deduplicator import BDDSolver, xor
 
@@ -28,7 +28,7 @@ class TestSat(unittest.TestCase):
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
+            "verbose": "info",
             "save_model": True,
             "load_model": True,
         }
