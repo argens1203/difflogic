@@ -2,13 +2,14 @@ from tqdm import tqdm
 import logging
 import torch
 
-from pysat.formula import Atom, Neg, Implies
+from pysat.formula import Atom, Neg, Implies, Or
 
 from difflogic import LogicLayer, GroupSum
 
 from constant import Stats
 from pysat.solvers import Solver as BaseSolver
 
+from experiment.helpers.ordered_set import OrderedSet
 from lgn.dataset import AutoTransformer
 from .sat_deduplicator import DeduplicationMixin
 from .encoder import Encoder
@@ -29,7 +30,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
         self.context = SatContext()
 
-        all = set()
         clauses = []
         Stats["deduplication"] = 0
 
@@ -37,6 +37,11 @@ class SatEncoder(Encoder, DeduplicationMixin):
             print("vpool, sat_encoder", id(vpool))
             #  GET input handles
             input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
+            all = OrderedSet()
+            for i in input_handles:
+                all.add(i)
+            print("all", all)
+            input("Press Enter to continue...")
             x = input_handles
 
             # Get solver
@@ -49,11 +54,14 @@ class SatEncoder(Encoder, DeduplicationMixin):
             input("Press Enter to continue...")
             self.solver = BaseSolver(name="g3")
             self.solver.append_formula(eq_constraints)  # OHE
-            res = self.deduplicate_pair(Neg(Implies(Atom(3), Atom(4))), Atom(3))
-            assert (
-                res is True
-            ), "Deduplication failed for Neg(Implies(Atom(3), Atom(4)))"
-            input("Press N-TERRRR to continue...")
+            # # res = self.deduplicate_pair(Or(Atom(3), Neg(Atom(4))), Atom(3))
+            # res = self.deduplicate_pair(Neg(Implies(Atom(3), Atom(4))), Atom(3))
+
+            # print("res", res)
+            # assert (
+            #     res is True
+            # ), "Deduplication failed for Neg(Implies(Atom(3), Atom(4)))"
+            # input("Press N-TERRRR to continue...")
 
             for layer in model:
                 this_layer = []

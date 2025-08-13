@@ -1,5 +1,5 @@
 import logging
-from pysat.formula import Formula, Atom, Or, Neg
+from pysat.formula import Formula, Atom, Or, Neg, CNF
 
 from typing import Set
 
@@ -12,29 +12,33 @@ class DeduplicationMixin:
     def add_clause(self, clause: list[Formula]):
         # print("Adding clause: ", clause)
         # logger.debug(clause)
-        if Atom(True) in [x.simplified() for x in clause]:
-            # print("Clause contains True, skipping")
-            return
+        # if Atom(True) in [x.simplified() for x in clause]:
+        #     # print("Clause contains True, skipping")
+        #     return
 
-        f = Or(*[x.simplified() for x in clause])
-        f.clausify()
-        # logger.debug("f.clauses", f.clauses)
+        f = Or(*[x for x in clause])
+        # l = [list(x) for x in clause]
+        # print("clause", clause)
+        # print("list(l)", l)
+        # cnf = CNF()
+        # print("list(f)", list(f))
+        # cnf.extend(list(f))
+        # print("cnf.clauses", cnf.clauses)
 
-        clauses = list(filter(lambda x: x is not None, f.clauses))
-        clauses = list(map(lambda x: list(filter(lambda y: y is not None, x)), clauses))
-        filtered = list(filter(lambda z: z is not None and len(z) > 0, clauses))
-        assert None not in filtered, "None found in filtered clauses"
+        # clauses = list(filter(lambda x: x is not None, f.clauses))
+        # clauses = list(map(lambda x: list(filter(lambda y: y is not None, x)), clauses))
+        # filtered = list(filter(lambda z: z is not None and len(z) > 0, clauses))
+        assert None not in f, "None found in filtered clauses"
+        for x in f:
+            assert None not in x, "None found in filtered clauses"
 
         # logger.debug("Appending formula: %s", filtered)
-        self.solver.append_formula(filtered)
+        self.solver.append_formula(list(f))
 
     def deduplicate_constant(self, f: Formula):
         with self.use_context() as vpool:
-            print("vpool, sat_deduplicator", id(vpool))
-            # print("------- deduplicating constant ------", f)
-            auxvar = Atom(("constant", f))
+            auxvar = Atom((vpool._next()))
             auxvar_id = vpool.id(auxvar)
-            # print("Added auxvar to vpool", auxvar, auxvar_id)
 
             self.add_clause([auxvar, f])
             self.add_clause([Neg(auxvar), Neg(f)])
@@ -55,13 +59,8 @@ class DeduplicationMixin:
 
     def deduplicate_pair(self, f: Formula, prev: Formula):
         with self.use_context() as vpool:
-            print("vpool, sat_deduplicator", id(vpool))
-            # print("------- deduplicating pair ------", f, prev)
-
-            auxvar = Atom(("pair", f, prev))
+            auxvar = Atom((vpool._next()))
             auxvar_id = vpool.id(auxvar)
-            # self.add_clause([auxvar])
-            # self.add_clause([Neg(auxvar)])
 
             self.add_clause([Neg(auxvar), Neg(f), prev])
             self.add_clause([Neg(auxvar), f, Neg(prev)])
@@ -83,7 +82,6 @@ class DeduplicationMixin:
     def deduplicate(self, f: Formula, previous: Set[Formula]):
         c = self.deduplicate_constant(f)
         if c is not None:
-            # logger.debug(f"Deduplicated {f} to {c}")
             return Atom(c)
 
         for p in previous:
@@ -91,11 +89,9 @@ class DeduplicationMixin:
                 continue
             g = self.deduplicate_pair(f, p)
             if g is not None:
-                # logger.debug(f"Deduplicated {f} with {p} to {g}")
                 if g is True:
                     return p
                 else:
                     return Neg(p)
-        # logger.debug(str(f))
         assert "None" not in str(f), "Deduplication returned None for formula"
         return f

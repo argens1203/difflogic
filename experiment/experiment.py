@@ -26,7 +26,7 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": True,
+            "verbose": False,
             "save_model": True,
             "load_model": True,
             "deduplicate": None,  # 'bdd', 'sat', None
@@ -136,7 +136,7 @@ class Experiment:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         print("args:", args)
-        input("Press Enter to continue...")
+        # input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
@@ -188,6 +188,7 @@ class Experiment:
             ctx=ctx,
         )
         encoding2.print()
+        input("Press enter to continue...")
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -196,6 +197,7 @@ class Experiment:
             ctx=ctx,
         )
         encoding3.print()
+        input("Press enter to continue...")
 
         args.deduplicate = None
         encoding1 = Encode.get_encoding(

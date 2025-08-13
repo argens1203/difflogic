@@ -17,12 +17,6 @@ class BDDSolver:
         # self.bdd.declare(*variables)
         self.ohe = None
 
-    def is_equiv2(self, a: Function, b: Function) -> bool:
-        if self.ohe is None:
-            return a.equiv(b) == self.bdd.true
-        else:
-            return a.equiv(b) & self.ohe == self.bdd.true
-
     def is_equiv(self, a: Function, b: Function) -> bool:
         if self.ohe is None:
             return xor(a, b) == self.bdd.false
@@ -30,10 +24,7 @@ class BDDSolver:
             return xor(a, b) & self.ohe == self.bdd.false
 
     def is_neg_equiv(self, a: Function, b: Function) -> bool:
-        if self.ohe is None:
-            return xor(a, b) == self.bdd.true
-        else:
-            return xor(a, b) & self.ohe == self.bdd.true
+        return self.is_equiv(~a, b)
 
     def dump_list(self, roots: list[Function], filename: str = "example.png"):
         self.bdd.dump(filename, roots=roots)
@@ -70,7 +61,6 @@ class BDDSolver:
 
         self.ohe = exp
 
-        self.dump(self.ohe, "ohe.png")
         return self
 
     def transform(self, formula: Formula) -> Function:

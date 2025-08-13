@@ -1,4 +1,4 @@
-from experiment.util import TrainingArgs
+from experiment.args import TrainingArgs
 
 
 class TrainingContext:

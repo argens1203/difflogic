@@ -49,7 +49,7 @@ def get_model(args, results=None):
     model = model.to(device)
 
     print(model)
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
     if results is not None:
         results.store_results({"model_str": str(model)})
 

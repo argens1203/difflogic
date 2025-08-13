@@ -47,7 +47,7 @@ class Encoder:
         print("special", special)
         print("eq_constraints", eq_constraints)
         print("parts", parts)
-        input("Press Enter to continue...")
+        # input("Press Enter to continue...")
 
         return Encoding(
             parts=parts,
