@@ -51,7 +51,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
             for layer in model:
                 this_layer = []
-                print("layer")
                 layer.print()
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):
@@ -61,7 +60,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     f.clausify()
                     this_layer.append(f)
                     if f != Atom(True) and f != Atom(False):
-                        print("f", f)
                         all.add(f)
                     clauses.extend(f.clauses)
                 x = this_layer

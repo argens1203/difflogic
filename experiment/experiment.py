@@ -29,10 +29,10 @@ class Experiment:
             "verbose": "debug",
             "save_model": True,
             "load_model": True,
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "explain_one": True,
-            # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
+            "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
         }
         args = {
@@ -165,6 +165,8 @@ class Experiment:
                     args, explainer, encoding, ctx, raw=raw
                 )
             elif args.explain_inp is not None:
+                print("is here")
+                input("Press enter to continue")
                 inp = args.explain_inp.split(",")
                 inp = [int(i) for i in inp]
                 inp = sorted(inp, key=lambda x: abs(x))
