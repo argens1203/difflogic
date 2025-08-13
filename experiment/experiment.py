@@ -199,6 +199,12 @@ class Experiment:
         encoding3.print()
         input("Press enter to continue...")
 
+        assert str(encoding2.formula) == str(encoding3.formula), (
+            "Formulas should be equal",
+            encoding2.formula,
+            encoding3.formula,
+        )
+
         args.deduplicate = None
         encoding1 = Encode.get_encoding(
             model=model,
@@ -228,6 +234,3 @@ class Experiment:
         )
 
         input("All encodings are valid. Press Enter to continue...")
-
-        encoding2.print()
-        encoding3.print()

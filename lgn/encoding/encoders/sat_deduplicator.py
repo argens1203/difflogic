@@ -10,24 +10,8 @@ logger = logging.getLogger(__name__)
 
 class DeduplicationMixin:
     def add_clause(self, clause: list[Formula]):
-        # print("Adding clause: ", clause)
-        # logger.debug(clause)
-        # if Atom(True) in [x.simplified() for x in clause]:
-        #     # print("Clause contains True, skipping")
-        #     return
-
         f = Or(*[x for x in clause])
-        # l = [list(x) for x in clause]
-        # print("clause", clause)
-        # print("list(l)", l)
-        # cnf = CNF()
-        # print("list(f)", list(f))
-        # cnf.extend(list(f))
-        # print("cnf.clauses", cnf.clauses)
 
-        # clauses = list(filter(lambda x: x is not None, f.clauses))
-        # clauses = list(map(lambda x: list(filter(lambda y: y is not None, x)), clauses))
-        # filtered = list(filter(lambda z: z is not None and len(z) > 0, clauses))
         assert None not in f, "None found in filtered clauses"
         for x in f:
             assert None not in x, "None found in filtered clauses"

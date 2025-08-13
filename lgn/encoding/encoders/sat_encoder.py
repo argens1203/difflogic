@@ -54,37 +54,25 @@ class SatEncoder(Encoder, DeduplicationMixin):
             input("Press Enter to continue...")
             self.solver = BaseSolver(name="g3")
             self.solver.append_formula(eq_constraints)  # OHE
-            # # res = self.deduplicate_pair(Or(Atom(3), Neg(Atom(4))), Atom(3))
-            # res = self.deduplicate_pair(Neg(Implies(Atom(3), Atom(4))), Atom(3))
-
-            # print("res", res)
-            # assert (
-            #     res is True
-            # ), "Deduplication failed for Neg(Implies(Atom(3), Atom(4)))"
-            # input("Press N-TERRRR to continue...")
 
             for layer in model:
                 this_layer = []
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):
                     continue
-                print("before deduplication")
-                layer.print()
+                # print("before deduplication")
+                # layer.print()
                 for f in tqdm(layer.get_formula(x)):
                     f = self.deduplicate(f, all)
-                    # print("(Populate Clauses) vpool", vpool.id2obj.items())
-                    # input()
                     f.clausify()
                     this_layer.append(f)
                     all.add(f)
                     clauses.extend(f.clauses)
                 x = this_layer
-                print("after deduplication")
-                print(x)
-                input("Press Enter to continue...")
+                # print("after deduplication")
+                # print(x)
 
-            clauses = [y.clauses for y in x]
-            print("clauses", clauses)
+            print("x", x)
 
             input_ids, cnf, output_ids, special = self.populate_clauses(
                 input_handles=input_handles, formula=x

@@ -40,8 +40,8 @@ class BddEncoder(Encoder):
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)
-                print("before deduplication")
-                layer.print()
+                # print("before deduplication")
+                # layer.print()
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
                     continue
@@ -49,8 +49,10 @@ class BddEncoder(Encoder):
                 for idx in tqdm(range(len(x))):
                     x[idx] = solver.deduplicate(x[idx], all)
                     all.add(x[idx])
-                print("after deduplication")
-                print(x)
+                # print("after deduplication")
+                # print(x)
                 # input("Press Enter to continue...")
+
+            print("x", x)
 
         return x, inputs

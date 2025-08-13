@@ -39,16 +39,6 @@ class Encoder:
 
         eq_constraints, parts = self.initialize_ohe(Dataset, input_ids, enc_type)
 
-        print("formula", formula)
-        print("input_handles", input_handles)
-        print("input_ids", input_ids)
-        print("cnf", cnf)
-        print("output_ids", output_ids)
-        print("special", special)
-        print("eq_constraints", eq_constraints)
-        print("parts", parts)
-        # input("Press Enter to continue...")
-
         return Encoding(
             parts=parts,
             cnf=cnf,
