@@ -1,5 +1,6 @@
 import logging
 import tracemalloc
+from contextlib import contextmanager
 from typing import Callable
 
 from .logging import setup_logger
@@ -35,6 +36,21 @@ class Context:
     def debug(self, l: Callable):
         if self.verbose == "debug":
             l()
+
+    @contextmanager
+    def use_memory_profile(self):
+        try:
+            tracemalloc.start()
+            yield lambda label: self.store_memory_peak(label)
+        finally:
+            tracemalloc.stop()
+
+    def store_memory_peak(self, label=None):
+        current, peak = tracemalloc.get_traced_memory()
+        print("current", current)
+        print("peak", peak)
+        self.results.store_custom(f"memory/{label}", peak)
+        tracemalloc.reset_peak()
 
     def start_memory_usage(self):
         tracemalloc.start()

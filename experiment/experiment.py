@@ -26,10 +26,10 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": "info",
+            "verbose": "debug",
             "save_model": True,
             "load_model": True,
-            "deduplicate": None,  # 'bdd', 'sat', None
+            "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
         }
         args = {
@@ -39,7 +39,7 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        Experiment.compare_encoders(args)
+        # Experiment.compare_encoders(args)
 
         results = Experiment.run(args)
 
@@ -142,32 +142,32 @@ class Experiment:
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = Model.get_model(args, ctx=ctx)
 
-        ctx.start_memory_usage()
+        with ctx.use_memory_profile() as profile_memory:
+            # ctx.start_memory_usage()
 
-        encoding = Encode.get_encoding(
-            model=model,
-            args=args,
-            ctx=ctx,
-        )
+            encoding = Encode.get_encoding(
+                model=model,
+                args=args,
+                ctx=ctx,
+            )
+            profile_memory("encoding")
+            explainer = Explainer(encoding, ctx=ctx)
 
-        explainer = Explainer(encoding, ctx=ctx)
+            total_time_taken, exp_count, count = Explain.explain_dataloader(
+                ctx.test_loader,
+                args,
+                explainer=explainer,
+                encoding=encoding,
+                is_train=False,
+                ctx=ctx,
+            )
+            # ============= ============= ============= ============= ============= ============= ============= =============
 
-        total_time_taken, exp_count, count = Explain.explain_dataloader(
-            ctx.test_loader,
-            args,
-            explainer=explainer,
-            encoding=encoding,
-            is_train=False,
-            ctx=ctx,
-        )
-        # ============= ============= ============= ============= ============= ============= ============= =============
-
-        ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
-        ctx.results.store_resource_usage(
-            total_time_taken / exp_count, ctx.get_memory_usage()
-        )
-        ctx.results.store_counts(count, exp_count)
-        ctx.end_memory_usage()
+            ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
+            ctx.results.store_resource_usage(total_time_taken / exp_count, -1)
+            profile_memory("explanation")
+            ctx.results.store_counts(count, exp_count)
+        # ctx.end_memory_usage()
         ctx.results.save()
 
         return ctx.results
