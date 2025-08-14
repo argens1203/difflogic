@@ -26,7 +26,7 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "verbose": "info",
-            "deduplicate": "bdd",  # 'bdd', 'sat', None
+            "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
             "load_model": True,
@@ -52,8 +52,8 @@ class Experiment:
 
         results = Experiment.run(args)
 
-        args["deduplicate"] = "sat"
-        results = Experiment.run(args)
+        # args["deduplicate"] = "sat"
+        # results = Experiment.run(args)
 
         return results
 
