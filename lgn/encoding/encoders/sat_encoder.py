@@ -25,7 +25,7 @@ fp_type = torch.float32
 
 class SatEncoder(Encoder, DeduplicationMixin):
     def get_encoding(self, model, Dataset: AutoTransformer, fp_type=fp_type, **kwargs):
-
+        solver_type = kwargs.get("solver_type", "g3")
         self.context = SatContext()
 
         clauses = []
@@ -43,7 +43,7 @@ class SatEncoder(Encoder, DeduplicationMixin):
             eq_constraints, parts = self.initialize_ohe(
                 Dataset, input_ids, enc_type=kwargs.get("enc_type", EncType.totalizer)
             )
-            self.solver = BaseSolver(name="g3")
+            self.solver = BaseSolver(name=solver_type)
             self.solver.append_formula(eq_constraints)  # OHE
 
             for layer in model:

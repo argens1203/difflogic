@@ -28,6 +28,7 @@ class Encode:
             model,
             ctx.dataset,
             enc_type=get_enc_type(args.enc_type),
+            solver_type=args.solver_type,
         )
 
         if ctx.results is not None:
