@@ -148,3 +148,4 @@ class MulticlassSolver:
         for _, solver in self.solvers.items():
             solver.delete()
         logger.debug("Deleted all solvers")
+        # pass

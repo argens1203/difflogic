@@ -5,7 +5,7 @@ import json
 from .args import get_args, DefaultArgs
 from .helpers import Context
 
-from lgn.encoding import Validator
+from lgn.encoding import Validator, encoding
 from lgn.explanation import Explainer
 
 from .explain import Explain
@@ -32,7 +32,7 @@ class Experiment:
             "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "explain_one": True,
-            "explain_inp": "1,3,6,7,-2,-4,-5,-8",
+            # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
         }
         args = {
@@ -42,11 +42,11 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        # Experiment.compare_encoders(args)
+        Experiment.compare_encoders(args)
 
-        results = Experiment.run(args)
+        # results = Experiment.run(args)
 
-        return results
+        # return results
 
     @staticmethod
     def run_with_cmd():
@@ -165,8 +165,6 @@ class Experiment:
                     args, explainer, encoding, ctx, raw=raw
                 )
             elif args.explain_inp is not None:
-                print("is here")
-                input("Press enter to continue")
                 inp = args.explain_inp.split(",")
                 inp = [int(i) for i in inp]
                 inp = sorted(inp, key=lambda x: abs(x))
@@ -207,6 +205,14 @@ class Experiment:
         model = Model.get_model(args, ctx=ctx)
         ctx.debug(lambda: [layer.print() for layer in model])
 
+        args.deduplicate = None
+        encoding1 = Encode.get_encoding(
+            model=model,
+            args=args,
+            ctx=ctx,
+        )
+        ctx.debug(encoding1.print)
+
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
             model=model,
@@ -229,14 +235,6 @@ class Experiment:
             encoding3.formula,
         )
 
-        args.deduplicate = None
-        encoding1 = Encode.get_encoding(
-            model=model,
-            args=args,
-            ctx=ctx,
-        )
-        ctx.debug(encoding1.print)
-
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
         )
@@ -257,4 +255,14 @@ class Experiment:
             encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
         )
 
-        input("All encodings are valid. Press Enter to continue...")
+        explainer = Explainer(encoding1, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding1, ctx)
+        f_exp()
+
+        explainer = Explainer(encoding2, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding2, ctx)
+        f_exp()
+
+        explainer = Explainer(encoding3, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding3, ctx)
+        f_exp()

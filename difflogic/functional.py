@@ -44,7 +44,7 @@ def idx_to_formula(a, b, i):
     if i == 5:
         return b
     if i == 6:
-        return XOr(a, b)  # 4
+        return Or(And(a, Neg(b)), And(b, Neg(a)))  # 4
     if i == 7:
         return Or(a, b)  # 1
     if i == 8:

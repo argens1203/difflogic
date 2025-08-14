@@ -15,8 +15,11 @@ class Solver:
         self.solver = BaseSolver(name="g3")  # g42, cd19 > m22 # TODO: try other solvers
         self.encoding = encoding
         self._append_formula(encoding.get_cnf_clauses())
+        # print("cnf", encoding.get_cnf_clauses())
         # NEW
         self._append_formula(encoding.get_eq_constraints_clauses())
+        # print("eq_constraints", encoding.get_eq_constraints_clauses())
+
         self.vpool_context = encoding.context.get_vpool_context()
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
