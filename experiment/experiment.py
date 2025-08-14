@@ -5,7 +5,7 @@ import json
 from .args import get_args, DefaultArgs
 from .helpers import Context
 
-from lgn.encoding import Validator
+from lgn.encoding import Validator, encoding
 from lgn.explanation import Explainer
 
 from .explain import Explain
@@ -26,11 +26,14 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "model_path": dataset + "_" + "model.pth",
-            "verbose": "info",
+            "verbose": "debug",
             "save_model": True,
             "load_model": True,
-            "deduplicate": None,  # 'bdd', 'sat', None
+            "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
+            # "explain_one": True,
+            # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
+            # {2, 3, 6, 8, -7, -5, -4, -1}
         }
         args = {
             **vars(default_args),
@@ -41,9 +44,9 @@ class Experiment:
 
         Experiment.compare_encoders(args)
 
-        results = Experiment.run(args)
+        # results = Experiment.run(args)
 
-        return results
+        # return results
 
     @staticmethod
     def run_with_cmd():
@@ -136,38 +139,60 @@ class Experiment:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         print("args:", args)
-        # input("Press Enter to continue...")
+        input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = Model.get_model(args, ctx=ctx)
 
-        ctx.start_memory_usage()
+        with ctx.use_memory_profile() as profile_memory:
+            # ctx.start_memory_usage()
 
-        encoding = Encode.get_encoding(
-            model=model,
-            args=args,
-            ctx=ctx,
-        )
+            encoding = Encode.get_encoding(
+                model=model,
+                args=args,
+                ctx=ctx,
+            )
+            profile_memory("encoding")
+            explainer = Explainer(encoding, ctx=ctx)
 
-        explainer = Explainer(encoding, ctx=ctx)
+            print("args", args)
 
-        total_time_taken, exp_count, count = Explain.explain_dataloader(
-            ctx.test_loader,
-            args,
-            explainer=explainer,
-            encoding=encoding,
-            is_train=False,
-            ctx=ctx,
-        )
-        # ============= ============= ============= ============= ============= ============= ============= =============
+            if args.explain is not None:
+                assert type(args.explain) == str
+                raw = args.explain.split(",")
+                f_exp = lambda: Explain.explain_raw(
+                    args, explainer, encoding, ctx, raw=raw
+                )
+            elif args.explain_inp is not None:
+                inp = args.explain_inp.split(",")
+                inp = [int(i) for i in inp]
+                inp = sorted(inp, key=lambda x: abs(x))
+                f_exp = lambda: Explain.explain_raw(
+                    args, explainer, encoding, ctx, inp=inp
+                )
+            elif args.explain_one:
+                f_exp = lambda: Explain.explain_one(args, explainer, encoding, ctx)
+            elif args.explain_all:
+                f_exp = lambda: Explain.explain_all(args, explainer, encoding, ctx)
+            else:
+                f_exp = lambda: Explain.explain_dataloader(
+                    ctx.test_loader,
+                    args,
+                    explainer=explainer,
+                    encoding=encoding,
+                    is_train=False,
+                    ctx=ctx,
+                )
 
-        ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
-        ctx.results.store_resource_usage(
-            total_time_taken / exp_count, ctx.get_memory_usage()
-        )
-        ctx.results.store_counts(count, exp_count)
-        ctx.end_memory_usage()
+            total_time_taken, exp_count, count = f_exp()
+            # ============= ============= ============= ============= ============= ============= ============= =============
+
+            ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
+            ctx.results.store_resource_usage(total_time_taken / exp_count, -1)
+            profile_memory("explanation")
+            ctx.results.store_counts(count, exp_count)
+        # ctx.end_memory_usage()
         ctx.results.save()
 
         return ctx.results
@@ -179,6 +204,14 @@ class Experiment:
         ctx = Context(args)
         model = Model.get_model(args, ctx=ctx)
         ctx.debug(lambda: [layer.print() for layer in model])
+
+        args.deduplicate = None
+        encoding1 = Encode.get_encoding(
+            model=model,
+            args=args,
+            ctx=ctx,
+        )
+        ctx.debug(encoding1.print)
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -202,14 +235,6 @@ class Experiment:
             encoding3.formula,
         )
 
-        args.deduplicate = None
-        encoding1 = Encode.get_encoding(
-            model=model,
-            args=args,
-            ctx=ctx,
-        )
-        ctx.debug(encoding1.print)
-
         Validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
         )
@@ -230,4 +255,14 @@ class Experiment:
             encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
         )
 
-        input("All encodings are valid. Press Enter to continue...")
+        explainer = Explainer(encoding1, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding1, ctx)
+        f_exp()
+
+        explainer = Explainer(encoding2, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding2, ctx)
+        f_exp()
+
+        explainer = Explainer(encoding3, ctx=ctx)
+        f_exp = lambda: Explain.explain_all(args, explainer, encoding3, ctx)
+        f_exp()

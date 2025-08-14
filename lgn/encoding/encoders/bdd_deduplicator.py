@@ -129,3 +129,6 @@ class BDDSolver:
     @staticmethod
     def from_inputs(inputs: List[Atom]):
         return BDDSolver([i.object for i in inputs])
+
+    def __del__(self):
+        del self.bdd

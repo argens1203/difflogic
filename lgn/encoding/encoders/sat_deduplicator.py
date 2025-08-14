@@ -10,16 +10,19 @@ logger = logging.getLogger(__name__)
 
 class DeduplicationMixin:
     def add_clause(self, clause: list[Formula]):
+        # print("clause", clause)
         f = Or(*[x for x in clause])
-
-        assert None not in f, "None found in filtered clauses"
-        for x in f:
+        # print("f", f.simplified())
+        # print("list(f)", list(f.simplified()))
+        assert None not in f.simplified(), "None found in filtered clauses"
+        for x in f.simplified():
             assert None not in x, "None found in filtered clauses"
 
         # logger.debug("Appending formula: %s", filtered)
-        self.solver.append_formula(list(f))
+        self.solver.append_formula(list(f.simplified()))
 
     def deduplicate_constant(self, f: Formula):
+        # print("deduplicate_constant", f)
         with self.use_context() as vpool:
             auxvar = Atom((vpool._next()))
             auxvar_id = vpool.id(auxvar)
@@ -42,6 +45,7 @@ class DeduplicationMixin:
             return None
 
     def deduplicate_pair(self, f: Formula, prev: Formula):
+        # print("deduplicate pair", f, prev)
         with self.use_context() as vpool:
             auxvar = Atom((vpool._next()))
             auxvar_id = vpool.id(auxvar)

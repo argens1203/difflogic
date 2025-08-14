@@ -1,7 +1,7 @@
 import logging
 import torch
 
-from pysat.formula import Formula, Atom, CNF, Or
+from pysat.formula import Formula, Atom, CNF, Or, And
 from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
@@ -85,19 +85,37 @@ class Encoder:
             special = dict()
             # adding the clauses to a global CNF
             idx = 0
-            for f in [Or(Atom(False), f.simplified()) for f in formula]:
-                f.clausify()
-                cnf.extend(list(f)[:-1])
-                logger.debug("Formula: %s", f)
-                logger.debug("CNF Clauses: %s", f.clauses)
-                logger.debug("Simplified: %s", f.simplified())
-                logger.debug("CNF Clauses: %s", cnf.clauses)
-                # print("(Populate Clauses) vpool", vpool.id2obj.items())
-                # input()
-                if f.clauses[-1][1] is None:
+
+            for f, g in zip(
+                [And(Atom(True), f.simplified()) for f in formula], formula
+            ):
+                # print("f", f)
+                # print("g", g)
+                # print("list(g)", list(g))
+                # print("f", f.simplified())
+                # print("list(f)", list(f))
+                l = list(f)
+                if len(l) == 0:
                     special[idx] = f.simplified()
+                    output_ids.extend([None])
+                else:
+                    # f.clausify()
+                    # print("list(f)[:-1]", list(f)[:-1])
+                    # print("'f.clauses[-1][1]", f.clauses[-1][1])
+                    # print("list(f)[-1]", list(f)[-1])
+                    cnf.extend(list(f)[:-1])
+                    # logger.debug("Formula: %s", f)
+                    # logger.debug("CNF Clauses: %s", f.clauses)
+                    # logger.debug("Simplified: %s", f.simplified())
+                    # logger.debug("CNF Clauses: %s", cnf.clauses)
+                    # print("(Populate Clauses) vpool", vpool.id2obj.items())
+                    # input()
+
+                    # if f.clauses[-1][1] is None:
+                    # special[idx] = f.simplified()
+                    output_ids.extend(list(f)[-1])
+                # input("Press Enter to Continue...")
                 idx += 1
-                output_ids.append(f.clauses[-1][1])
 
                 logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
