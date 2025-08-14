@@ -100,20 +100,17 @@ class BDDSolver:
             raise ValueError(f"Unsupported formula type: {type(formula)}")
 
     def deduplicate(self, f: Formula, previous: Set[Formula]):
+        if f == Atom(True) or f == Atom(False):
+            return f
+
         transformed = self.transform(f)
         if self.is_equiv(transformed, self.bdd.true):
-            if f != Atom(True):
-                self.e_ctx.inc_deduplication()
-                return Atom(True)
-            else:
-                return f
+            self.e_ctx.inc_deduplication()
+            return Atom(True)
 
         if self.is_equiv(transformed, self.bdd.false):
-            if f != Atom(False):
-                self.e_ctx.inc_deduplication()
-                return Atom(False)
-            else:
-                return f
+            self.e_ctx.inc_deduplication()
+            return Atom(False)
 
         for p in previous:
             if len(str(f)) <= len(str(p)):

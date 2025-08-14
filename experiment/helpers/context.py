@@ -3,7 +3,7 @@ import tracemalloc
 from contextlib import contextmanager
 from typing import Callable
 from tabulate import tabulate
-
+import humanfriendly
 from .logging import setup_logger
 from .util import seed_all, get_results
 
@@ -104,6 +104,8 @@ class Context:
             "t_Encoding",
             "t_Explain",
             "t/Exp",
+            "m_enc",
+            "m_expl",
         ]
         data = [
             [
@@ -122,6 +124,8 @@ class Context:
                 self.results.get_encoding_time(),
                 self.results.get_explanation_time(),
                 self.results.get_explanation_time() / self.num_explanations,
+                humanfriendly.format_size(self.results.get_value("memory/encoding")),
+                humanfriendly.format_size(self.results.get_value("memory/explanation")),
             ]
         ]
         print(tabulate(data, headers=headers, tablefmt="github"))

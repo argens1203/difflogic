@@ -62,6 +62,9 @@ class DeduplicationMixin:
         return None
 
     def deduplicate(self, f: Formula, previous: Set[Formula]):
+        if f == Atom(True) or f == Atom(False):
+            return f
+
         c = self.deduplicate_constant(f)
         if c is not None:
             self.e_ctx.inc_deduplication()

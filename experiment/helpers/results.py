@@ -116,6 +116,9 @@ class Results(object):
     def get_total_runtime(self):
         return self.end_time - self.start_time
 
+    def get_value(self, key):
+        return getattr(self, key, None)
+
 
 if __name__ == "__main__":
 
