@@ -1,8 +1,7 @@
 from typing import List, Set
 from pysat.formula import Formula, Atom, Or, And, Neg, Implies, XOr
 from dd.autoref import BDD, Function
-
-from constant import Stats
+from experiment.helpers import Context
 
 
 def xor(a: Function, b: Function) -> Function:
@@ -10,12 +9,13 @@ def xor(a: Function, b: Function) -> Function:
 
 
 class BDDSolver:
-    def __init__(self, variables: list[int]):
+    def __init__(self, variables: list[int], e_ctx: Context):
         self.bdd = BDD()
         self.bdd.declare(*variables)
         self.variables = [self.bdd.var(i) for i in variables]
         # self.bdd.declare(*variables)
         self.ohe = None
+        self.e_ctx = e_ctx
 
     def is_equiv(self, a: Function, b: Function) -> bool:
         if self.ohe is None:
@@ -100,35 +100,32 @@ class BDDSolver:
             raise ValueError(f"Unsupported formula type: {type(formula)}")
 
     def deduplicate(self, f: Formula, previous: Set[Formula]):
+        if f == Atom(True) or f == Atom(False):
+            return f
+
         transformed = self.transform(f)
         if self.is_equiv(transformed, self.bdd.true):
-            if f != Atom(True):
-                Stats["deduplication"] += 1
-                return Atom(True)
-            else:
-                return f
+            self.e_ctx.inc_deduplication()
+            return Atom(True)
 
         if self.is_equiv(transformed, self.bdd.false):
-            if f != Atom(False):
-                Stats["deduplication"] += 1
-                return Atom(False)
-            else:
-                return f
+            self.e_ctx.inc_deduplication()
+            return Atom(False)
 
         for p in previous:
             if len(str(f)) <= len(str(p)):
                 continue
             if self.is_equiv(transformed, self.transform(p)):
-                Stats["deduplication"] += 1
+                self.e_ctx.inc_deduplication()
                 return p
             elif self.is_neg_equiv(transformed, self.transform(p)):
-                Stats["deduplication"] += 1
+                self.e_ctx.inc_deduplication()
                 return Neg(p)
         return f
 
     @staticmethod
-    def from_inputs(inputs: List[Atom]):
-        return BDDSolver([i.object for i in inputs])
+    def from_inputs(inputs: List[Atom], e_ctx: Context):
+        return BDDSolver([i.object for i in inputs], e_ctx=e_ctx)
 
     def __del__(self):
         del self.bdd

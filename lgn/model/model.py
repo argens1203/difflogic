@@ -29,15 +29,15 @@ def get_model(args, results=None):
     ####################################################################################################################
 
     total_num_neurons = sum(
-        map(lambda x: x.num_neurons, logic_layers[1:-1])
+        map(lambda x: x.num_neurons, logic_layers[:])
     )  # TODO: Why 1:-1?
-    if args.verbose in ["debug", "info"]:
-        print(f"total_num_neurons={total_num_neurons}")
-    total_num_weights = sum(
-        map(lambda x: x.num_weights, logic_layers[1:-1])
+    # if args.verbose in ["debug", "info"]:
+    # print(f"total_num_neurons={total_num_neurons}")
+    total_num_weights = (
+        sum(map(lambda x: x.num_weights, logic_layers[:])) * 16
     )  # TODO: Why 1:-1?
-    if args.verbose in ["debug", "info"]:
-        print(f"total_num_weights={total_num_weights}")
+    # if args.verbose in ["debug", "info"]:
+    # print(f"total_num_weights={total_num_weights}")
     if results is not None:
         results.store_results(
             {
@@ -48,7 +48,7 @@ def get_model(args, results=None):
 
     model = model.to(device)
 
-    print(model)
+    # print(model)
     # input("Press Enter to continue...")
     if results is not None:
         results.store_results({"model_str": str(model)})

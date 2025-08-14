@@ -5,7 +5,6 @@ import os
 
 
 class Results(object):
-
     def __init__(self, eid: int, path: str):
         self.eid = eid
         self.path = path
@@ -95,6 +94,30 @@ class Results(object):
 
     def store_model_ready_time(self):
         self.model_ready_time = time.time()
+
+    def store_encoding_ready_time(self):
+        self.encoding_ready_time = time.time()
+
+    def store_explanation_ready_time(self):
+        self.explanation_ready_time = time.time()
+
+    def get_model_ready_time(self):
+        return self.model_ready_time - self.start_time
+
+    def get_explanation_time(self):
+        return self.explanation_ready_time - self.encoding_ready_time
+
+    def get_encoding_time(self):
+        return self.encoding_ready_time - self.model_ready_time
+
+    def store_end_time(self):
+        self.end_time = time.time()
+
+    def get_total_runtime(self):
+        return self.end_time - self.start_time
+
+    def get_value(self, key):
+        return getattr(self, key, None)
 
 
 if __name__ == "__main__":

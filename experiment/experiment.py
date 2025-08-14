@@ -25,28 +25,37 @@ class Experiment:
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
             "eval_freq": 1000,
-            "model_path": dataset + "_" + "model.pth",
-            "verbose": "debug",
-            "save_model": True,
-            "load_model": True,
-            "deduplicate": "bdd",  # 'bdd', 'sat', None
+            "verbose": "info",
+            "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
+            # "save_model": True,
+            "load_model": True,
+            "model_path": dataset + "_" + "model.pth",
+            #  ------
+            # "model_path": "model-paths/$" + dataset + "_" + "model.pth",
+            # "save_model": False,
+            # "num_layers": 5,
+            # "num_neurons": 24,
+            #  ------
             # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
         }
         args = {
             **vars(default_args),
-            **exp_args,
             **dataset_args,
+            **exp_args,
             **{"dataset": dataset},
         }
 
-        Experiment.compare_encoders(args)
+        # Experiment.compare_encoders(args)
 
+        results = Experiment.run(args)
+
+        # args["deduplicate"] = "sat"
         # results = Experiment.run(args)
 
-        # return results
+        return results
 
     @staticmethod
     def run_with_cmd():
@@ -138,8 +147,9 @@ class Experiment:
     def run(args):
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
-        print("args:", args)
-        input("Press Enter to continue...")
+        if args.verbose != "warn":
+            print("args:", args)
+            input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
@@ -153,10 +163,9 @@ class Experiment:
                 args=args,
                 ctx=ctx,
             )
+            ctx.store_num_clauses(encoding.get_vpool_size())
             profile_memory("encoding")
             explainer = Explainer(encoding, ctx=ctx)
-
-            print("args", args)
 
             if args.explain is not None:
                 assert type(args.explain) == str
@@ -191,9 +200,13 @@ class Experiment:
             ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
             ctx.results.store_resource_usage(total_time_taken / exp_count, -1)
             profile_memory("explanation")
+            ctx.results.store_explanation_ready_time()
             ctx.results.store_counts(count, exp_count)
         # ctx.end_memory_usage()
         ctx.results.save()
+        ctx.results.store_end_time()
+        ctx.display()
+        # input("Press Enter to continue...")
 
         return ctx.results
 

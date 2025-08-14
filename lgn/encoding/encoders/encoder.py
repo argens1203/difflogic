@@ -6,10 +6,10 @@ from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
 
+from experiment.helpers import Context, SatContext
 from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
 
-from experiment.helpers import SatContext
 
 fp_type = torch.float32
 
@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class Encoder:
+    def __init__(self, e_ctx: Context):
+        self.e_ctx = e_ctx
+
     def get_encoding(
         self,
         model,

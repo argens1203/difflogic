@@ -10,7 +10,6 @@ from .encoder import Encoder
 from .bdd_deduplicator import BDDSolver
 
 from lgn.dataset import AutoTransformer
-from constant import Stats
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +27,12 @@ class BddEncoder(Encoder):
             inputs = x
 
             logger.debug("Deduplicating...")
-            solver = BDDSolver.from_inputs(inputs=x)
+            solver = BDDSolver.from_inputs(inputs=x, e_ctx=self.e_ctx)
             solver.set_ohe(Dataset.get_attribute_ranges())
 
             all = OrderedSet()
             for i in x:
                 all.add(i)
-            Stats["deduplication"] = 0
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)

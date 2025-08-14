@@ -3,8 +3,6 @@ from pysat.formula import Formula, Atom, Or, Neg, CNF
 
 from typing import Set
 
-from constant import Stats
-
 logger = logging.getLogger(__name__)
 
 
@@ -33,13 +31,11 @@ class DeduplicationMixin:
             if not self.solver.solve(assumptions=[-auxvar_id]):
                 # print("is constant false", f)
                 self.add_clause([auxvar])
-                Stats["deduplication"] += 1
                 return False
 
             if not self.solver.solve(assumptions=[auxvar_id]):
                 # print("is constant true", f)
                 self.add_clause([Neg(auxvar)])
-                Stats["deduplication"] += 1
                 return True
 
             return None
@@ -57,19 +53,21 @@ class DeduplicationMixin:
 
             if not self.solver.solve(assumptions=[-auxvar_id]):
                 self.add_clause([auxvar])
-                Stats["deduplication"] += 1
                 return True
 
             if not self.solver.solve(assumptions=[auxvar_id]):
                 self.add_clause([Neg(auxvar)])
-                Stats["deduplication"] += 1
                 return False
 
         return None
 
     def deduplicate(self, f: Formula, previous: Set[Formula]):
+        if f == Atom(True) or f == Atom(False):
+            return f
+
         c = self.deduplicate_constant(f)
         if c is not None:
+            self.e_ctx.inc_deduplication()
             return Atom(c)
 
         for p in previous:
@@ -77,6 +75,7 @@ class DeduplicationMixin:
                 continue
             g = self.deduplicate_pair(f, p)
             if g is not None:
+                self.e_ctx.inc_deduplication()
                 if g is True:
                     return p
                 else:

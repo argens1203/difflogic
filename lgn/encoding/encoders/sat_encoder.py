@@ -8,8 +8,6 @@ from pysat.formula import Atom
 from pysat.card import EncType
 from pysat.solvers import Solver as BaseSolver
 
-from constant import Stats
-
 from experiment.helpers.ordered_set import OrderedSet
 from experiment.helpers import SatContext
 
@@ -27,11 +25,10 @@ fp_type = torch.float32
 
 class SatEncoder(Encoder, DeduplicationMixin):
     def get_encoding(self, model, Dataset: AutoTransformer, fp_type=fp_type, **kwargs):
-
+        solver_type = kwargs.get("solver_type", "g3")
         self.context = SatContext()
 
         clauses = []
-        Stats["deduplication"] = 0
 
         with self.use_context() as vpool:
             #  GET input handles
@@ -46,12 +43,11 @@ class SatEncoder(Encoder, DeduplicationMixin):
             eq_constraints, parts = self.initialize_ohe(
                 Dataset, input_ids, enc_type=kwargs.get("enc_type", EncType.totalizer)
             )
-            self.solver = BaseSolver(name="g3")
+            self.solver = BaseSolver(name=solver_type)
             self.solver.append_formula(eq_constraints)  # OHE
 
             for layer in model:
                 this_layer = []
-                layer.print()
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):
                     continue

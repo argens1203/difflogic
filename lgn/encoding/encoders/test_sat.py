@@ -3,8 +3,6 @@ import argparse
 
 import pytest
 
-from constant import Stats
-
 from lgn.dataset.iris import IrisDataset
 from lgn.dataset.loader import load_dataset
 from lgn.encoding import Encoder
@@ -40,7 +38,6 @@ class TestSat(unittest.TestCase):
         model, loss_fn, optim = get_model(args, get_results(0, args))
 
         self.encoding = Encoder().get_encoding(model, IrisDataset())
-        Stats["deduplication"] = 0
 
     @pytest.mark.skip("cannot deduplicate without an encoding")
     def test_xxx(self):

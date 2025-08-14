@@ -3,22 +3,25 @@ from tqdm import tqdm
 
 from lgn.explanation import Explainer, Instance
 from experiment.args import ExplainerArgs
+from .helpers import Context
 
 
 class Explain:
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
     @staticmethod
     def explain_raw(
-        args, explainer, encoding, ctx, raw=None, inp=None
+        args, explainer, encoding, ctx: Context, raw=None, inp=None
     ) -> tuple[float, int, int]:
         start = time.time()
         ctx.logger.debug("Raw: %s\n", raw)
         instance = Instance.from_encoding(encoding=encoding, raw=raw, inp=inp)
         exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
+
+        ctx.inc_num_explanations(exp_count)
         return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_one(args, explainer, encoding, ctx) -> tuple[float, int, int]:
+    def explain_one(args, explainer, encoding, ctx: Context) -> tuple[float, int, int]:
         start = time.time()
         exp_count = -1
 
@@ -32,10 +35,11 @@ class Explain:
             exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
             break
 
+        ctx.inc_num_explanations(exp_count)
         return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_all(args, explainer, encoding, ctx) -> tuple[float, int, int]:
+    def explain_all(args, explainer, encoding, ctx: Context) -> tuple[float, int, int]:
         all_times = 0
         exp_count = 0
         count = 0
@@ -57,6 +61,7 @@ class Explain:
             count += c
             remaining_time -= t
 
+        ctx.inc_num_explanations(exp_count)
         return all_times, exp_count, count
 
     @staticmethod
@@ -65,7 +70,7 @@ class Explain:
         exp_args: ExplainerArgs,
         explainer: Explainer,
         encoding,
-        ctx,
+        ctx: Context,
         is_train=False,
     ) -> tuple[float, int, int]:
         all_times = 0
@@ -92,4 +97,5 @@ class Explain:
             all_times += time.time() - start
             count += len(batch)
 
+        ctx.inc_num_explanations(exp_count)
         return all_times, exp_count, count
