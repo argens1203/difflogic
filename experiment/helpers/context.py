@@ -15,6 +15,7 @@ class Cached_Key:
 
 class Context:
     def __init__(self, args):
+        self.args = args
         setup_logger(args)
         seed_all(args.seed)
 
@@ -46,9 +47,9 @@ class Context:
             tracemalloc.stop()
 
     def store_memory_peak(self, label=None):
-        current, peak = tracemalloc.get_traced_memory()
-        print("current", current)
-        print("peak", peak)
+        current, peak = tracemalloc.get_traced_memory()  # in Bytes
+        # print("current", current)
+        # print("peak", peak)
         self.results.store_custom(f"memory/{label}", peak)
         tracemalloc.reset_peak()
 
@@ -74,6 +75,35 @@ class Context:
 
     def inc_deduplication(self):
         self.deduplication += 1
+
+    def store_num_clauses(self, num_clauses):
+        self.num_clauses = num_clauses
+
+    def store_num_explanations(self, num_explanations):
+        self.num_explanations = num_explanations
+
+    def display(self):
+        number_of_gates = self.args.num_layers * self.args.num_neurons
+        runtime = self.results.get_total_runtime()
+
+        print(
+            "Dataset | input_dim | # Layers | # Neurons | Accuracy | Gates | Final Gates | # Clause | # Expla | Runtime | t/Exp"
+        )
+        print(
+            "---------|-----------|----------|-----------|----------|-------|-------------|----------|---------|---------|------"
+        )
+
+        print(
+            f"{self.args.dataset:<9} | {self.dataset.get_input_dim():<9} | {self.args.num_layers:<8} | {self.args.num_neurons:<9} | ",
+            end="",
+        )
+        print(
+            f"{self.results.test_acc:<8.4f} | {number_of_gates:<5} | {number_of_gates - self.deduplication:<11} | {self.num_clauses:<8} | ",
+            end="",
+        )
+        print(
+            f"{self.num_explanations:<7} | {runtime:<7.2f} | {runtime / self.num_explanations:<6.2f}",
+        )
 
     def __del__(self):
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))

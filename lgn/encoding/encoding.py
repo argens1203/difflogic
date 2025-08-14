@@ -104,6 +104,10 @@ class Encoding:
                 for f, e in vpool.obj2id.items():
                     print(e, f)
 
+    def get_vpool_size(self):
+        with self.use_context() as vpool:
+            return len(vpool.obj2id)
+
     def get_enc_type(self):
         return self.enc_type
 

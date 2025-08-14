@@ -8,8 +8,6 @@ from pysat.formula import Atom
 from pysat.card import EncType
 from pysat.solvers import Solver as BaseSolver
 
-from constant import Stats
-
 from experiment.helpers.ordered_set import OrderedSet
 from experiment.helpers import SatContext
 
@@ -31,7 +29,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
         self.context = SatContext()
 
         clauses = []
-        Stats["deduplication"] = 0
 
         with self.use_context() as vpool:
             #  GET input handles
@@ -51,7 +48,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
             for layer in model:
                 this_layer = []
-                layer.print()
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
                 if isinstance(layer, GroupSum):
                     continue

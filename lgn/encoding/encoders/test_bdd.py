@@ -1,6 +1,5 @@
 import unittest
 
-from constant import Stats
 from .bdd_deduplicator import BDDSolver, xor
 
 from pysat.formula import Formula, Atom, CNF, Or, XOr, And
@@ -9,7 +8,8 @@ from pysat.formula import Formula, Atom, CNF, Or, XOr, And
 class TestBdd(unittest.TestCase):
     @classmethod
     def setup_class(cls):
-        Stats["deduplication"] = 0
+        pass
+        # Stats["deduplication"] = 0
 
     def test_solver_equiv(self):
         solver = BDDSolver([1, 2, 3, 4])

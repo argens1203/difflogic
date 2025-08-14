@@ -92,4 +92,6 @@ class Explain:
             all_times += time.time() - start
             count += len(batch)
 
+        ctx.store_num_explanations(exp_count)
+
         return all_times, exp_count, count

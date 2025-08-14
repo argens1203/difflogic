@@ -24,7 +24,7 @@ class Encode:
             logger.info("Using BDD Encoder")
             _Encoder = BddEncoder
 
-        encoding = _Encoder().get_encoding(
+        encoding = _Encoder(e_ctx=ctx).get_encoding(
             model,
             ctx.dataset,
             enc_type=get_enc_type(args.enc_type),

@@ -42,6 +42,7 @@ class Model:
                 model.load_state_dict(
                     torch.load(args.model_path, map_location=torch.device(device))
                 )
+                Model.eval_model(args, model, ctx)
                 logger.info("Model loaded successfully")
             except Exception as e:
                 logger.info(f"Error loading model: {e}; using saved model")
@@ -58,6 +59,7 @@ class Model:
             model.load_state_dict(
                 torch.load(args.model_path, map_location=torch.device(device))
             )
+            Model.eval_model(args, model, ctx)
 
         else:
             Model.train_model(args, model, loss_fn, optim, ctx)
