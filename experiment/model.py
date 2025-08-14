@@ -73,4 +73,5 @@ class Model:
         if args.compile_model:
             compile_model(args, model, ctx.test_loader)
 
+        ctx.results.store_model_ready_time()
         return model

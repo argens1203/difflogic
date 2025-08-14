@@ -2,6 +2,7 @@ import logging
 import tracemalloc
 from contextlib import contextmanager
 from typing import Callable
+from tabulate import tabulate
 
 from .logging import setup_logger
 from .util import seed_all, get_results
@@ -33,6 +34,7 @@ class Context:
         self.deduplication = 0
 
         self.results.store_start_time()
+        self.num_explanations = 0
 
     def debug(self, l: Callable):
         if self.verbose == "debug":
@@ -79,31 +81,50 @@ class Context:
     def store_num_clauses(self, num_clauses):
         self.num_clauses = num_clauses
 
-    def store_num_explanations(self, num_explanations):
-        self.num_explanations = num_explanations
+    def inc_num_explanations(self, num_explanations):
+        self.num_explanations += num_explanations
 
     def display(self):
         number_of_gates = self.args.num_layers * self.args.num_neurons
         runtime = self.results.get_total_runtime()
 
-        print(
-            "Dataset | input_dim | # Layers | # Neurons | Accuracy | Gates | Final Gates | # Clause | # Expla | Runtime | t/Exp"
-        )
-        print(
-            "---------|-----------|----------|-----------|----------|-------|-------------|----------|---------|---------|------"
-        )
-
-        print(
-            f"{self.args.dataset:<9} | {self.dataset.get_input_dim():<9} | {self.args.num_layers:<8} | {self.args.num_neurons:<9} | ",
-            end="",
-        )
-        print(
-            f"{self.results.test_acc:<8.4f} | {number_of_gates:<5} | {number_of_gates - self.deduplication:<11} | {self.num_clauses:<8} | ",
-            end="",
-        )
-        print(
-            f"{self.num_explanations:<7} | {runtime:<7.2f} | {runtime / self.num_explanations:<6.2f}",
-        )
+        headers = [
+            "Dataset",
+            "input_dim",
+            "# Layers",
+            "# Neurons",
+            "Accuracy",
+            "Dedup",
+            "Gates",
+            "Final Gates",
+            "# Clause",
+            "# Expla",
+            "Runtime",
+            "t_Model",
+            "t_Encoding",
+            "t_Explain",
+            "t/Exp",
+        ]
+        data = [
+            [
+                self.args.dataset,
+                self.dataset.get_input_dim(),
+                self.args.num_layers,
+                self.args.num_neurons,
+                self.results.test_acc,
+                self.args.deduplicate,
+                number_of_gates,
+                number_of_gates - self.deduplication,
+                self.num_clauses,
+                self.num_explanations,
+                runtime,
+                self.results.get_model_ready_time(),
+                self.results.get_encoding_time(),
+                self.results.get_explanation_time(),
+                self.results.get_explanation_time() / self.num_explanations,
+            ]
+        ]
+        print(tabulate(data, headers=headers, tablefmt="github"))
 
     def __del__(self):
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))

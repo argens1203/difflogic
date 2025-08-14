@@ -25,16 +25,16 @@ class Experiment:
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
             "eval_freq": 1000,
-            "verbose": "warn",
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "verbose": "info",
+            "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
-            "save_model": True,
+            # "save_model": True,
             "load_model": True,
-            "model_path": dataset + "_" + "model.pth",
-            # "model_path": "model-paths/$" + dataset + "_" + "model.pth",
+            # "model_path": dataset + "_" + "model.pth",
+            "model_path": "model-paths/$" + dataset + "_" + "model.pth",
             "save_model": False,
-            # "num_layers": 5,
-            # "num_neurons": 24,
+            "num_layers": 5,
+            "num_neurons": 24,
             # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
@@ -195,6 +195,7 @@ class Experiment:
             ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
             ctx.results.store_resource_usage(total_time_taken / exp_count, -1)
             profile_memory("explanation")
+            ctx.results.store_explanation_ready_time()
             ctx.results.store_counts(count, exp_count)
         # ctx.end_memory_usage()
         ctx.results.save()

@@ -34,5 +34,5 @@ class Encode:
             ctx.results.store_encoding(encoding)
 
         ctx.debug(encoding.print)
-
+        ctx.results.store_encoding_ready_time()
         return encoding
