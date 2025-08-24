@@ -43,7 +43,7 @@ class Encoder:
         eq_constraints = self.initialize_ohe(Dataset, input_ids, enc_type)
 
         return Encoding(
-            cnf=cnf,
+            clauses=cnf.clauses,
             eq_constraints=eq_constraints,
             fp_type=fp_type,
             Dataset=Dataset,

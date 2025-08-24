@@ -1,8 +1,7 @@
 import logging
 import torch
 
-from pysat.formula import Atom
-
+from pysat.solvers import Solver as BaseSolver
 from constant import device
 
 fp_type = torch.float32
@@ -11,10 +10,30 @@ logger = logging.getLogger(__name__)
 
 
 class PseudoModel:
-    def __init__(self, input_handles, formula, class_dim):
-        self.input_handles = input_handles
-        self.formula = formula
+    def __init__(self, class_dim, input_ids, output_ids, clauses):
+        self.input_ids = input_ids
+        self.output_ids = output_ids
         self.class_dim = class_dim
+        self.solver = BaseSolver(name="g3")
+        self.solver.append_formula(clauses)
+
+    def get_tensor(self, o_id: int, features: list[int]):
+        assumptions = [
+            -inp if feat == 0 else inp for feat, inp in zip(features, self.input_ids)
+        ]
+        assert self.solver.solve(assumptions=assumptions), "UNSAT during get_tensor"
+
+        if self.solver.solve(assumptions=assumptions + [o_id]):
+            assert not self.solver.solve(
+                assumptions=assumptions + [-o_id]
+            ), "UNSAT during get_tensor"
+            return 1
+
+        if self.solver.solve(assumptions=assumptions + [-o_id]):
+            assert not self.solver.solve(
+                assumptions=assumptions + [o_id]
+            ), "UNSAT during get_tensor"
+            return 0
 
     def __call__(self, x: torch.Tensor, logit=False):
         """
@@ -32,21 +51,7 @@ class PseudoModel:
         bool_outputs = (
             torch.tensor(
                 [
-                    [
-                        (
-                            0
-                            if f.simplified(
-                                assumptions=[
-                                    ~inp if feat == 0 else inp
-                                    for feat, inp in zip(features, self.input_handles)
-                                ]
-                            )
-                            # TODO: better way of checking?
-                            == Atom(False)
-                            else 1
-                        )
-                        for f in self.formula
-                    ]
+                    [self.get_tensor(o, features) for o in self.output_ids]
                     for features in x
                 ]
             )

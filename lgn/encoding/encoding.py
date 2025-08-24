@@ -5,7 +5,7 @@ from lgn.encoding.util import get_parts
 class Encoding:
     def __init__(
         self,
-        cnf,
+        clauses,
         eq_constraints,
         fp_type,
         Dataset,
@@ -18,17 +18,21 @@ class Encoding:
         context,
     ):
         self.parts = get_parts(Dataset, input_ids)
-        self.cnf = cnf
+        self.clauses = clauses
         self.eq_constraints = eq_constraints
+
         self.fp_type = fp_type
+
         self.Dataset = Dataset
         self.input_ids = input_ids
         self.output_ids = output_ids
         self.formula = formula
         self.input_handles = input_handles
         self.special = special
+
         self.enc_type = enc_type
         self.context = context
+
         self.input_dim = Dataset.get_input_dim()
         self.class_dim = Dataset.get_num_of_classes()
 
@@ -36,7 +40,7 @@ class Encoding:
         return self.parts
 
     def get_cnf_clauses(self):
-        return self.cnf.clauses
+        return self.clauses
 
     def get_eq_constraints_clauses(self):
         return self.eq_constraints.clauses
@@ -52,7 +56,7 @@ class Encoding:
 
     def get_stats(self):
         return {
-            "cnf_size": len(self.cnf.clauses),
+            "clauses_size": len(self.clauses),
             "eq_size": len(self.eq_constraints.clauses),
         }
 
@@ -75,9 +79,10 @@ class Encoding:
 
     def as_model(self):
         model_args = {
-            "input_handles": self.input_handles,
-            "formula": self.formula,
             "class_dim": self.class_dim,
+            "input_ids": self.input_ids,
+            "output_ids": self.output_ids,
+            "clauses": self.clauses + self.eq_constraints.clauses,
         }
         return PseudoModel(**model_args)
 
