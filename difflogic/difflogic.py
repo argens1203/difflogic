@@ -231,7 +231,7 @@ class LogicLayer(torch.nn.Module):
         ]
         return formulas
 
-    def get_clauses(self, prev_layer: list[int], aux_vars) -> list[int]:
+    def get_clauses(self, prev_layer: list[int], aux_vars) -> list[list[list[int]]]:
         clauses = [
             idx_to_clauses(prev_layer[a], prev_layer[b], i, aux_var)
             for i, a, b, aux_var in zip(

@@ -65,7 +65,7 @@ def idx_to_formula(a, b, i):
         return Atom(True)
 
 
-def idx_to_clauses(a, b, i, aux):
+def idx_to_clauses(a, b, i, aux) -> list[list[int]]:
     # Helper to build equivalence aux <-> (l1 AND l2)
     def and_equiv(l1, l2):
         # aux -> l1 and l2 : (-aux or l1) (-aux or l2)
@@ -123,6 +123,8 @@ def idx_to_clauses(a, b, i, aux):
         return or_equiv(-a, -b)
     if i == 15:
         return [[aux]]  # enforce aux = True
+
+    assert False
 
 
 def idx_to_op(i):
