@@ -73,10 +73,10 @@ class SatEncoder(Encoder, DeduplicationMixin):
             return Encoding(
                 clauses=cnf.clauses,
                 eq_constraints=eq_constraints,
-                Dataset=Dataset,
                 input_ids=input_ids,
                 output_ids=output_ids,
                 formula=x,
                 special=special,
-                context=self.context,
+                s_ctx=self.context,
+                e_ctx=self.e_ctx,
             )

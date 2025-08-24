@@ -150,3 +150,6 @@ class Context:
 
     def get_fp_type(self):
         return self.fp_type
+
+    def get_dataset(self):
+        return self.dataset

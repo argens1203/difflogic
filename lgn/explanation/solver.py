@@ -23,7 +23,7 @@ class Solver:
         self._append_formula(encoding.get_eq_constraints_clauses())
         # print("eq_constraints", encoding.get_eq_constraints_clauses())
 
-        self.vpool_context = encoding.context.get_vpool_context()
+        self.vpool_context = encoding.s_ctx.get_vpool_context()
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
         self.enc_type = ctx.get_enc_type()

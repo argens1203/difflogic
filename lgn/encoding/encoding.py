@@ -7,14 +7,16 @@ class Encoding:
         self,
         clauses,
         eq_constraints,
-        Dataset,
         input_ids,
         output_ids,
         formula,
         special,
-        context,
+        s_ctx,
+        e_ctx,
     ):
+        Dataset = e_ctx.get_dataset()
         self.parts = get_parts(Dataset, input_ids)
+
         self.clauses = clauses
         self.eq_constraints = eq_constraints
 
@@ -24,7 +26,8 @@ class Encoding:
         self.formula = formula
         self.special = special
 
-        self.context = context
+        self.s_ctx = s_ctx
+        self.e_ctx = e_ctx
 
         self.input_dim = Dataset.get_input_dim()
         self.class_dim = Dataset.get_num_of_classes()
@@ -107,4 +110,4 @@ class Encoding:
         pass
 
     def use_context(self):
-        return self.context.use_vpool()
+        return self.s_ctx.use_vpool()
