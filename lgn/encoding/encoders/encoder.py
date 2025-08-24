@@ -11,7 +11,6 @@ from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
 from lgn.encoding.util import get_parts
 
-fp_type = torch.float32
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,6 @@ class Encoder:
         self,
         model,
         Dataset: AutoTransformer,
-        fp_type=fp_type,
     ):
         self.context = SatContext()
 
@@ -45,7 +43,6 @@ class Encoder:
         return Encoding(
             clauses=cnf.clauses,
             eq_constraints=eq_constraints,
-            fp_type=fp_type,
             Dataset=Dataset,
             input_ids=input_ids,
             output_ids=output_ids,

@@ -7,7 +7,6 @@ class Encoding:
         self,
         clauses,
         eq_constraints,
-        fp_type,
         Dataset,
         input_ids,
         output_ids,
@@ -18,8 +17,6 @@ class Encoding:
         self.parts = get_parts(Dataset, input_ids)
         self.clauses = clauses
         self.eq_constraints = eq_constraints
-
-        self.fp_type = fp_type
 
         self.Dataset = Dataset
         self.input_ids = input_ids
@@ -43,9 +40,6 @@ class Encoding:
 
     def get_input_dim(self):
         return self.input_dim
-
-    def get_fp_type(self):
-        return self.fp_type
 
     def get_dataset(self):
         return self.Dataset

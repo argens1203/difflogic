@@ -20,11 +20,9 @@ from ..encoding import Encoding
 
 logger = logging.getLogger(__name__)
 
-fp_type = torch.float32
-
 
 class SatEncoder(Encoder, DeduplicationMixin):
-    def get_encoding(self, model, Dataset: AutoTransformer, fp_type=fp_type):
+    def get_encoding(self, model, Dataset: AutoTransformer):
         solver_type = self.e_ctx.get_solver_type()
         self.context = SatContext()
 
@@ -75,7 +73,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
             return Encoding(
                 clauses=cnf.clauses,
                 eq_constraints=eq_constraints,
-                fp_type=fp_type,
                 Dataset=Dataset,
                 input_ids=input_ids,
                 output_ids=output_ids,

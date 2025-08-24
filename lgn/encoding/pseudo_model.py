@@ -4,8 +4,6 @@ import torch
 from pysat.solvers import Solver as BaseSolver
 from constant import device
 
-fp_type = torch.float32
-
 logger = logging.getLogger(__name__)
 
 

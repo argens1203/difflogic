@@ -250,24 +250,25 @@ class Experiment:
             encoding2.formula,
             encoding3.formula,
         )
+        validator = Validator(ctx)
 
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
         )
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding3, dataloader=ctx.test_loader
         )
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
 
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
         )
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
         )
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
         )
 
