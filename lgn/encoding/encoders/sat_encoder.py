@@ -37,18 +37,17 @@ class SatEncoder(Encoder, DeduplicationMixin):
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver, eq_constraints
 
-    def get_encoding(self, model, Dataset: AutoTransformer):
-        self.context = SatContext()
+    def _get_formula(self, model, input_handles):
+        x = input_handles
+        with self.use_context():
+            for layer in model:
+                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
+                if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
+                    continue
+                x = layer.get_formula(x)
+        return x
 
-        clauses = []
-
-        input_handles, input_ids = self.get_inputs(Dataset)
-        all = OrderedSet()
-        for i in input_handles:
-            all.add(i)
-
-        self.solver, eq_constraints = self.initialize_solver(input_ids)
-
+    def stuff(self, input_handles, model, all, clauses):
         x = input_handles
         with self.use_context():
             for layer in model:
@@ -68,13 +67,31 @@ class SatEncoder(Encoder, DeduplicationMixin):
             input_ids, cnf, output_ids, special = self.populate_clauses(
                 input_handles=input_handles, formula=x
             )
-            return Encoding(
-                clauses=cnf.clauses,
-                eq_constraints=eq_constraints,
-                input_ids=input_ids,
-                output_ids=output_ids,
-                formula=x,
-                special=special,
-                s_ctx=self.context,
-                e_ctx=self.e_ctx,
-            )
+        return x, cnf.clauses, output_ids, special
+
+    def get_encoding(self, model, Dataset: AutoTransformer):
+        self.context = SatContext()
+
+        clauses = []
+
+        input_handles, input_ids = self.get_inputs(Dataset)
+        all = OrderedSet()
+        for i in input_handles:
+            all.add(i)
+
+        self.solver, eq_constraints = self.initialize_solver(input_ids)
+
+        formula, clauses, output_ids, special = self.stuff(
+            input_handles, model, all, clauses
+        )
+
+        return Encoding(
+            clauses=clauses,
+            eq_constraints=eq_constraints,
+            input_ids=input_ids,
+            output_ids=output_ids,
+            formula=formula,
+            special=special,
+            s_ctx=self.context,
+            e_ctx=self.e_ctx,
+        )
