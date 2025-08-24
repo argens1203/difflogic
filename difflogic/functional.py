@@ -65,6 +65,66 @@ def idx_to_formula(a, b, i):
         return Atom(True)
 
 
+def idx_to_clauses(a, b, i, aux):
+    # Helper to build equivalence aux <-> (l1 AND l2)
+    def and_equiv(l1, l2):
+        # aux -> l1 and l2 : (-aux or l1) (-aux or l2)
+        # (l1 and l2) -> aux : (aux or -l1 or -l2)
+        return [[-aux, l1], [-aux, l2], [aux, -l1, -l2]]
+
+    # Helper to build equivalence aux <-> (l1 OR l2)
+    def or_equiv(l1, l2):
+        # aux -> l1 or l2 : (-aux or l1 or l2)
+        # (l1 or l2) -> aux : (-l1 or aux) (-l2 or aux)
+        return [[-aux, l1, l2], [-l1, aux], [-l2, aux]]
+
+    # Helper to build equivalence aux <-> (l1 XOR l2)
+    def xor_equiv(l1, l2):
+        # aux true when literals differ
+        return [
+            [-aux, l1, l2],
+            [-aux, -l1, -l2],
+            [aux, -l1, l2],
+            [aux, l1, -l2],
+        ]
+
+    def direct_equiv(l1):
+        return [[-aux, l1], [aux, -l1]]
+
+    if i == 0:
+        return [[-aux]]  # enforce aux = False
+    if i == 1:
+        return and_equiv(a, b)
+    if i == 2:
+        return and_equiv(a, -b)  # - (a -> b) = - (-a OR b) = a AND -b
+    if i == 3:
+        return direct_equiv(a)
+    if i == 4:
+        return and_equiv(b, -a)  # b (b -> a) = - (-b OR a) = b AND -a
+    if i == 5:
+        return direct_equiv(b)
+    if i == 6:
+        return xor_equiv(a, b)
+    if i == 7:
+        return or_equiv(a, b)
+    if i == 8:
+        return and_equiv(-a, -b)  # - (a OR b) = -a AND -b
+    if i == 9:
+        return xor_equiv(-a, b)  # - (a XOR b) = (-a XOR b)
+    if i == 10:
+        return direct_equiv(-b)
+    if i == 11:
+        return or_equiv(-b, a)  # b -> a = -b OR a
+    if i == 12:
+        return direct_equiv(-a)
+    if i == 13:
+        return or_equiv(-a, b)  # a -> b = -a OR b
+    if i == 14:
+        return or_equiv(-a, -b)
+    if i == 15:
+        return [[aux]]  # enforce aux = True
+
+
 def idx_to_op(i):
     if i == 0:
         return "FALSE"
