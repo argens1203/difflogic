@@ -31,8 +31,9 @@ class BddEncoder(Encoder):
             solver.set_ohe(Dataset.get_attribute_ranges())
 
             all = OrderedSet()
-            for i in x:
-                all.add(i)
+            #  TODO: uncomment this?
+            # for i in x:
+            #     all.add(i)
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)
@@ -40,9 +41,13 @@ class BddEncoder(Encoder):
                 if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
                     continue
                 x = layer.get_formula(x)
+                for f in x:
+                    print("before", f)
                 for idx in tqdm(range(len(x))):
                     x[idx] = solver.deduplicate(x[idx], all)
                     all.add(x[idx])
+                for f in x:
+                    print("after", f)
 
         del solver
         return x, inputs

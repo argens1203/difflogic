@@ -4,7 +4,7 @@ import torch
 
 from difflogic import LogicLayer, GroupSum
 
-from pysat.formula import Atom
+from pysat.formula import Atom, Neg
 from pysat.card import EncType
 from pysat.solvers import Solver as BaseSolver
 
@@ -47,7 +47,11 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 x = layer.get_formula(x)
         return x
 
-    def stuff(self, input_handles, model, all, clauses):
+    def _stuff(self, input_handles, model, clauses):
+        all = OrderedSet()
+        for i in input_handles:
+            all.add(i)
+
         x = input_handles
         with self.use_context():
             for layer in model:
@@ -69,20 +73,88 @@ class SatEncoder(Encoder, DeduplicationMixin):
             )
         return x, cnf.clauses, output_ids, special
 
+    def get_layers(self, model) -> list[LogicLayer]:
+        layers = []
+        for layer in model:
+            assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
+            if isinstance(layer, GroupSum):
+                continue
+            layers.append(layer)
+        return layers
+
+    def stuff(self, input_handles, model, clauses):
+        with self.use_context() as vpool:
+            input_ids = [vpool.id(h) for h in input_handles]
+
+        prev = input_ids
+        gates = []
+        clauses = []
+
+        with self.use_context() as vpool:
+            for layer in self.get_layers(model):
+                aux_vars = [vpool._next() for _ in range(layer.out_dim)]
+                print("aux_vars", aux_vars)
+                print("layer", layer)
+                layer.print()
+                for f in layer.get_clauses(prev, aux_vars):
+                    print("clause", f)
+                    clauses.extend(f)
+                gates.append(aux_vars)
+                # input("Press Enter to continue...")
+                prev = aux_vars
+
+        print("clauses", clauses)
+        print("gates", gates)
+        self.solver.append_formula(clauses)
+
+        curr = input_handles
+        lookup = dict()
+        for i, layer in enumerate(self.get_layers(model)):
+            curr = layer.get_formula(curr)
+            for j, g in enumerate(curr):
+                print("lookup", lookup)
+                lookup[(i, j)] = g
+                print("before", g)
+                print("i,", i, "j", j)
+                clause, i_, j_, is_constant, is_reverse = self.deduplicate_c(
+                    i, j, gates, self.solver, input_ids
+                )
+                print("clause", clause)
+                print("i_", i_, "j_", j_)
+                if clause is not None:
+                    self.solver.append_formula([clause])
+                    clauses.extend([clause])
+                if is_constant is not None:
+                    lookup[(i, j)] = Atom(is_constant)
+                    curr[j] = lookup[(i, j)]
+                    print("after", curr[j])
+                    # input("Press Enter to continue...")
+                    continue
+                if is_reverse is not None:
+                    if is_reverse:
+                        lookup[(i, j)] = Neg(lookup[(i_, j_)])
+                    else:
+                        lookup[(i, j)] = lookup[(i_, j_)]
+                curr[j] = lookup[(i, j)]
+                print("after", curr[j])
+                # input("Press Enter to continue...")
+
+        formula = curr
+        output_ids = gates[-1]
+        special = {}
+        return formula, clauses, output_ids, special
+
     def get_encoding(self, model, Dataset: AutoTransformer):
         self.context = SatContext()
 
         clauses = []
 
         input_handles, input_ids = self.get_inputs(Dataset)
-        all = OrderedSet()
-        for i in input_handles:
-            all.add(i)
 
         self.solver, eq_constraints = self.initialize_solver(input_ids)
 
         formula, clauses, output_ids, special = self.stuff(
-            input_handles, model, all, clauses
+            input_handles, model, clauses
         )
 
         return Encoding(
