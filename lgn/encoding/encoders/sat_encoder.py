@@ -93,18 +93,18 @@ class SatEncoder(Encoder, DeduplicationMixin):
         with self.use_context() as vpool:
             for layer in self.get_layers(model):
                 aux_vars = [vpool._next() for _ in range(layer.out_dim)]
-                print("aux_vars", aux_vars)
-                print("layer", layer)
-                layer.print()
+                # print("aux_vars", aux_vars)
+                # print("layer", layer)
+                # layer.print()
                 for f in layer.get_clauses(prev, aux_vars):
-                    print("clause", f)
+                    # print("clause", f)
                     clauses.extend(f)
                 gates.append(aux_vars)
                 # input("Press Enter to continue...")
                 prev = aux_vars
 
-        print("clauses", clauses)
-        print("gates", gates)
+        # print("clauses", clauses)
+        # print("gates", gates)
         self.solver.append_formula(clauses)
 
         curr = input_handles
@@ -112,22 +112,22 @@ class SatEncoder(Encoder, DeduplicationMixin):
         for i, layer in enumerate(self.get_layers(model)):
             curr = layer.get_formula(curr)
             for j, g in enumerate(curr):
-                print("lookup", lookup)
+                # print("lookup", lookup)
                 lookup[(i, j)] = g
-                print("before", g)
-                print("i,", i, "j", j)
+                # print("before", g)
+                # print("i,", i, "j", j)
                 clause, i_, j_, is_constant, is_reverse = self.deduplicate_c(
                     i, j, gates, self.solver, input_ids
                 )
-                print("clause", clause)
-                print("i_", i_, "j_", j_)
+                # print("clause", clause)
+                # print("i_", i_, "j_", j_)
                 if clause is not None:
                     self.solver.append_formula([clause])
                     clauses.extend([clause])
                 if is_constant is not None:
                     lookup[(i, j)] = Atom(is_constant)
                     curr[j] = lookup[(i, j)]
-                    print("after", curr[j])
+                    # print("after", curr[j])
                     # input("Press Enter to continue...")
                     continue
                 if is_reverse is not None:
@@ -136,7 +136,7 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     else:
                         lookup[(i, j)] = lookup[(i_, j_)]
                 curr[j] = lookup[(i, j)]
-                print("after", curr[j])
+                # print("after", curr[j])
                 # input("Press Enter to continue...")
 
         formula = curr

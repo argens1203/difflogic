@@ -48,15 +48,15 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        Experiment.compare_encoders(args)
+        # Experiment.compare_encoders(args)
 
-        results = Experiment.run(args)
+        # results = Experiment.run(args)
 
         args["deduplicate"] = "sat"
         results = Experiment.run(args)
 
-        args["deduplicate"] = "bdd"
-        results = Experiment.run(args)
+        # args["deduplicate"] = "bdd"
+        # results = Experiment.run(args)
 
         return results
 
