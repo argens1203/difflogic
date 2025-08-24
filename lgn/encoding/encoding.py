@@ -12,9 +12,7 @@ class Encoding:
         input_ids,
         output_ids,
         formula,
-        input_handles,
         special,
-        enc_type,
         context,
     ):
         self.parts = get_parts(Dataset, input_ids)
@@ -27,10 +25,8 @@ class Encoding:
         self.input_ids = input_ids
         self.output_ids = output_ids
         self.formula = formula
-        self.input_handles = input_handles
         self.special = special
 
-        self.enc_type = enc_type
         self.context = context
 
         self.input_dim = Dataset.get_input_dim()
@@ -112,9 +108,6 @@ class Encoding:
     def get_vpool_size(self):
         with self.use_context() as vpool:
             return len(vpool.obj2id)
-
-    def get_enc_type(self):
-        return self.enc_type
 
     def __del__(self):
         pass

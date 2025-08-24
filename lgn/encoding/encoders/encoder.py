@@ -25,9 +25,7 @@ class Encoder:
         model,
         Dataset: AutoTransformer,
         fp_type=fp_type,
-        **kwargs,
     ):
-        enc_type = kwargs.get("enc_type", EncType.totalizer)
         self.context = SatContext()
 
         formula, input_handles = self.get_formula(
@@ -40,7 +38,9 @@ class Encoder:
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
-        eq_constraints = self.initialize_ohe(Dataset, input_ids, enc_type)
+        eq_constraints = self.initialize_ohe(
+            Dataset, input_ids, self.e_ctx.get_enc_type()
+        )
 
         return Encoding(
             clauses=cnf.clauses,
@@ -50,9 +50,7 @@ class Encoder:
             input_ids=input_ids,
             output_ids=output_ids,
             formula=formula,
-            input_handles=input_handles,
             special=special,
-            enc_type=enc_type,
             context=self.context,
         )
 
