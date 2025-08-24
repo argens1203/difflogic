@@ -30,12 +30,12 @@ class Experiment:
             "experiment_id": 10000,
             # "save_model": True,
             "load_model": True,
-            "model_path": dataset + "_" + "model.pth",
+            # "model_path": dataset + "_" + "model.pth",
             #  ------
-            # "model_path": "model-paths/$" + dataset + "_" + "model.pth",
-            # "save_model": False,
-            # "num_layers": 5,
-            # "num_neurons": 24,
+            "model_path": "model-paths/$" + dataset + "_" + "model.pth",
+            "save_model": False,
+            "num_layers": 5,
+            "num_neurons": 24,
             #  ------
             # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
