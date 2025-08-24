@@ -28,8 +28,16 @@ class SatEncoder(Encoder, DeduplicationMixin):
             input_ids = [vpool.id(h) for h in input_handles]
         return input_handles, input_ids
 
+    def initialize_solver(self, input_ids):
+        with self.use_context() as vpool:
+            eq_constraints = self.initialize_ohe(
+                self.e_ctx.get_dataset(), input_ids, enc_type=self.e_ctx.get_enc_type()
+            )
+        solver = BaseSolver(name=self.e_ctx.get_solver_type())
+        solver.append_formula(eq_constraints.clauses)  # OHE
+        return solver, eq_constraints
+
     def get_encoding(self, model, Dataset: AutoTransformer):
-        solver_type = self.e_ctx.get_solver_type()
         self.context = SatContext()
 
         clauses = []
@@ -39,14 +47,10 @@ class SatEncoder(Encoder, DeduplicationMixin):
         for i in input_handles:
             all.add(i)
 
+        self.solver, eq_constraints = self.initialize_solver(input_ids)
+
         x = input_handles
         with self.use_context():
-            eq_constraints = self.initialize_ohe(
-                Dataset, input_ids, enc_type=self.e_ctx.get_enc_type()
-            )
-            self.solver = BaseSolver(name=solver_type)
-            self.solver.append_formula(eq_constraints.clauses)  # OHE
-
             for layer in model:
                 this_layer = []
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
