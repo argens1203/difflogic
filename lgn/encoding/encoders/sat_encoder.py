@@ -22,32 +22,30 @@ logger = logging.getLogger(__name__)
 
 
 class SatEncoder(Encoder, DeduplicationMixin):
+    def get_inputs(self, Dataset: AutoTransformer):
+        with self.use_context() as vpool:
+            input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
+            input_ids = [vpool.id(h) for h in input_handles]
+        return input_handles, input_ids
+
     def get_encoding(self, model, Dataset: AutoTransformer):
         solver_type = self.e_ctx.get_solver_type()
         self.context = SatContext()
 
         clauses = []
 
-        with self.use_context() as vpool:
-            #  GET input handles
-            input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
-            all = OrderedSet()
-            for i in input_handles:
-                all.add(i)
-            x = input_handles
+        input_handles, input_ids = self.get_inputs(Dataset)
+        all = OrderedSet()
+        for i in input_handles:
+            all.add(i)
 
-            # Get solver
-            input_ids = [vpool.id(h) for h in input_handles]
+        x = input_handles
+        with self.use_context():
             eq_constraints = self.initialize_ohe(
                 Dataset, input_ids, enc_type=self.e_ctx.get_enc_type()
             )
             self.solver = BaseSolver(name=solver_type)
-            print(eq_constraints.clauses)
-            print(eq_constraints)
-            input("Press Enter to continue...!!")
             self.solver.append_formula(eq_constraints.clauses)  # OHE
-            print(self.solver.nof_clauses(), "clauses after OHE")
-            input("Press Enter to continue...")
 
             for layer in model:
                 this_layer = []
@@ -66,10 +64,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
             input_ids, cnf, output_ids, special = self.populate_clauses(
                 input_handles=input_handles, formula=x
             )
-            print(self.solver.nof_clauses(), "clauses after everything")
-            print(len(cnf.clauses), "clauses after everything deduplication")
-            print(cnf.clauses)
-            input("Press Enter to continue...")
             return Encoding(
                 clauses=cnf.clauses,
                 eq_constraints=eq_constraints,
