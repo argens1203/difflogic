@@ -40,7 +40,7 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
             # Get solver
             input_ids = [vpool.id(h) for h in input_handles]
-            eq_constraints, parts = self.initialize_ohe(
+            eq_constraints = self.initialize_ohe(
                 Dataset, input_ids, enc_type=kwargs.get("enc_type", EncType.totalizer)
             )
             self.solver = BaseSolver(name=solver_type)
@@ -65,7 +65,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
             )
 
             return Encoding(
-                parts=parts,
                 cnf=cnf,
                 eq_constraints=eq_constraints,
                 fp_type=fp_type,

@@ -1,10 +1,10 @@
 from .pseudo_model import PseudoModel
+from lgn.encoding.util import get_parts
 
 
 class Encoding:
     def __init__(
         self,
-        parts,
         cnf,
         eq_constraints,
         fp_type,
@@ -17,7 +17,7 @@ class Encoding:
         enc_type,
         context,
     ):
-        self.parts = parts
+        self.parts = get_parts(Dataset, input_ids)
         self.cnf = cnf
         self.eq_constraints = eq_constraints
         self.fp_type = fp_type
