@@ -267,3 +267,5 @@ python main.py --dataset=iris --explain_one --save_model && python main.py --dat
 
 # TODO:
 1. fixing file structure of lgn/dataset
+
+python -m cProfile main.py
