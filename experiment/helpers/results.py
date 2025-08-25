@@ -65,7 +65,7 @@ class Results(object):
     # ---- ADD ONs ---- #
 
     def store_encoding(self, encoding):
-        self.cnf_size = encoding.get_stats()["cnf_size"]
+        self.cnf_size = encoding.get_stats()["clauses_size"]
         self.eq_size = encoding.get_stats()["eq_size"]
         self.formulas = [str(f.simplified()) for f in encoding.formula]
         self.encoding_time = time.time()

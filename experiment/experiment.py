@@ -26,16 +26,16 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "verbose": "info",
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "deduplicate": None,  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
             "load_model": True,
-            "model_path": dataset + "_" + "model.pth",
+            # "model_path": dataset + "_" + "model.pth",
             #  ------
-            # "model_path": "model-paths/$" + dataset + "_" + "model.pth",
-            # "save_model": False,
-            # "num_layers": 5,
-            # "num_neurons": 24,
+            "model_path": "model-paths/$" + dataset + "_" + "model.pth",
+            "save_model": False,
+            "num_layers": 5,
+            "num_neurons": 24,
             #  ------
             # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
@@ -50,9 +50,12 @@ class Experiment:
 
         # Experiment.compare_encoders(args)
 
+        # results = Experiment.run(args)
+
+        args["deduplicate"] = "sat"
         results = Experiment.run(args)
 
-        # args["deduplicate"] = "sat"
+        # args["deduplicate"] = "bdd"
         # results = Experiment.run(args)
 
         return results
@@ -149,7 +152,7 @@ class Experiment:
         # args = argparse.Namespace(**args)
         if args.verbose != "warn":
             print("args:", args)
-            input("Press Enter to continue...")
+            # input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
@@ -247,24 +250,25 @@ class Experiment:
             encoding2.formula,
             encoding3.formula,
         )
+        validator = Validator(ctx)
 
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding2, dataloader=ctx.test_loader
         )
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding1, encoding2=encoding3, dataloader=ctx.test_loader
         )
-        Validator.validate_encodings_with_data(
+        validator.validate_encodings_with_data(
             encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
 
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
         )
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
         )
-        Validator.validate_encodings_with_truth_table(
+        validator.validate_encodings_with_truth_table(
             encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
         )
 

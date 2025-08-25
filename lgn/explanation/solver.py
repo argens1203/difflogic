@@ -4,15 +4,18 @@ import logging
 from contextlib import contextmanager
 
 from pysat.solvers import Solver as BaseSolver
-from pysat.card import CardEnc
+from pysat.card import CardEnc, EncType
 from pysat.formula import Formula
+from experiment.helpers import Context
 
 logger = logging.getLogger(__name__)
 
 
 class Solver:
-    def __init__(self, encoding: Encoding):
-        self.solver = BaseSolver(name="g3")  # g42, cd19 > m22 # TODO: try other solvers
+    def __init__(self, encoding: Encoding, ctx: Context):
+        self.solver = BaseSolver(
+            name=ctx.get_solver_type()
+        )  # g42, cd19 > m22 # TODO: try other solvers
         self.encoding = encoding
         self._append_formula(encoding.get_cnf_clauses())
         # print("cnf", encoding.get_cnf_clauses())
@@ -20,10 +23,10 @@ class Solver:
         self._append_formula(encoding.get_eq_constraints_clauses())
         # print("eq_constraints", encoding.get_eq_constraints_clauses())
 
-        self.vpool_context = encoding.context.get_vpool_context()
+        self.vpool_context = encoding.s_ctx.get_vpool_context()
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
-        self.enc_type = encoding.get_enc_type()
+        self.enc_type = ctx.get_enc_type()
 
     def set_cardinality(self, lits, bound):
         with self.use_context() as vpool:

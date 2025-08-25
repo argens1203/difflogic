@@ -4,9 +4,9 @@ from contextlib import contextmanager
 from typing import Callable
 from tabulate import tabulate
 import humanfriendly
+import torch
 from .logging import setup_logger
-from .util import seed_all, get_results
-
+from .util import seed_all, get_results, get_enc_type
 from lgn.dataset import load_dataset
 
 
@@ -28,6 +28,9 @@ class Context:
             args
         )
         self.verbose = args.verbose
+        self.enc_type = get_enc_type(args.enc_type)
+        self.solver_type = args.solver_type
+        self.fp_type = torch.float32
 
         self.cache_hit = {Cached_Key.SOLVER: 0}
         self.cache_miss = {Cached_Key.SOLVER: 0}
@@ -138,3 +141,15 @@ class Context:
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))
         self.logger.debug("Cache Miss: %s", str(self.cache_miss))
         self.logger.debug("Deduplication: %s", str(self.deduplication))
+
+    def get_enc_type(self):
+        return self.enc_type
+
+    def get_solver_type(self):
+        return self.solver_type
+
+    def get_fp_type(self):
+        return self.fp_type
+
+    def get_dataset(self):
+        return self.dataset

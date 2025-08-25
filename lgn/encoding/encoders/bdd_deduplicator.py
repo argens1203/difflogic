@@ -113,8 +113,8 @@ class BDDSolver:
             return Atom(False)
 
         for p in previous:
-            if len(str(f)) <= len(str(p)):
-                continue
+            # if len(str(f)) <= len(str(p)):
+            #     continue
             if self.is_equiv(transformed, self.transform(p)):
                 self.e_ctx.inc_deduplication()
                 return p

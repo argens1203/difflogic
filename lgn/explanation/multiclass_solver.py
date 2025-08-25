@@ -109,7 +109,7 @@ class MulticlassSolver:
 
         self.ctx.inc_cache_miss(Cached_Key.SOLVER)
 
-        solver = Solver(encoding=self.encoding)
+        solver = Solver(encoding=self.encoding, ctx=self.ctx)
 
         lits, bound = self.get_lits_and_bound(true_class, adj_class)
         solver.set_cardinality(lits, bound)

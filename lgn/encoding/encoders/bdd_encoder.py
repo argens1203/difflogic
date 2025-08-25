@@ -31,8 +31,9 @@ class BddEncoder(Encoder):
             solver.set_ohe(Dataset.get_attribute_ranges())
 
             all = OrderedSet()
-            for i in x:
-                all.add(i)
+            #  TODO: uncomment this?
+            # for i in x:
+            #     all.add(i)
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)
