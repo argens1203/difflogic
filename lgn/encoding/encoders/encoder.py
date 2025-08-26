@@ -33,6 +33,10 @@ class Encoder:
             input_handles=input_handles, formula=formula
         )
 
+        print("output_ids", output_ids)
+        print("special", special)
+        input("Press Enter to continue...")
+
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
@@ -114,7 +118,7 @@ class Encoder:
                 # input("Press Enter to Continue...")
                 idx += 1
 
-                logger.debug("=== === === ===")
+                # logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
 
         return input_ids, cnf, output_ids, special

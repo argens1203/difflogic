@@ -56,7 +56,12 @@ class Encoding:
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
-        return self.output_ids[start : start + step]
+
+        ret = self.output_ids[start : start + step]
+        for idx in range(start, start + step):
+            if idx in self.special:
+                ret[idx - start] = None
+        return ret
 
     def get_truth_value(self, idx):
         return self.special.get(idx, None)
@@ -76,6 +81,7 @@ class Encoding:
             "input_ids": self.input_ids,
             "output_ids": self.output_ids,
             "clauses": self.clauses + self.eq_constraints.clauses,
+            "special": self.special,
         }
         return PseudoModel(**model_args)
 

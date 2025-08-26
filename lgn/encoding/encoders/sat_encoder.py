@@ -33,6 +33,8 @@ class SatEncoder(Encoder, DeduplicationMixin):
             eq_constraints = self.initialize_ohe(
                 self.e_ctx.get_dataset(), input_ids, enc_type=self.e_ctx.get_enc_type()
             )
+        print(eq_constraints.clauses)
+        input("Press Enter to continue...")
         solver = BaseSolver(name=self.e_ctx.get_solver_type())
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver, eq_constraints
@@ -49,8 +51,8 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
     def _stuff(self, input_handles, model, clauses):
         all = OrderedSet()
-        for i in input_handles:
-            all.add(i)
+        # for i in input_handles:
+        # all.add(i)
 
         x = input_handles
         with self.use_context():
@@ -60,7 +62,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 if isinstance(layer, GroupSum):
                     continue
                 for f in tqdm(layer.get_formula(x)):
+                    self.e_ctx.debug(lambda: print("Before dedup:", f))
                     f = self.deduplicate(f, all)
+                    self.e_ctx.debug(lambda: print("After dedup:", f))
                     f.clausify()
                     this_layer.append(f)
                     if f != Atom(True) and f != Atom(False):
@@ -68,9 +72,12 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     clauses.extend(f.clauses)
                 x = this_layer
 
+            self.e_ctx.debug(lambda: print("input_handles", input_handles))
+            self.e_ctx.debug(lambda: print("x", x))
             input_ids, cnf, output_ids, special = self.populate_clauses(
                 input_handles=input_handles, formula=x
             )
+            self.e_ctx.debug(lambda: input("Press Enter to continue..."))
         return x, cnf.clauses, output_ids, special
 
     def get_layers(self, model) -> list[LogicLayer]:
@@ -93,42 +100,38 @@ class SatEncoder(Encoder, DeduplicationMixin):
         with self.use_context() as vpool:
             for layer in self.get_layers(model):
                 aux_vars = [vpool._next() for _ in range(layer.out_dim)]
-                # print("aux_vars", aux_vars)
-                # print("layer", layer)
-                # layer.print()
                 for f in layer.get_clauses(prev, aux_vars):
-                    # print("clause", f)
                     clauses.extend(f)
                 gates.append(aux_vars)
-                # input("Press Enter to continue...")
                 prev = aux_vars
 
-        # print("clauses", clauses)
-        # print("gates", gates)
+        # self.e_ctx.debug(lambda: print("clauses", clauses, "gates", gates))
         self.solver.append_formula(clauses)
 
         curr = input_handles
         lookup = dict()
         for i, layer in enumerate(self.get_layers(model)):
             curr = layer.get_formula(curr)
+            special = {}
             for j, g in enumerate(curr):
-                # print("lookup", lookup)
+                # self.e_ctx.debug(lambda: print("lookup", lookup))
                 lookup[(i, j)] = g
-                # print("before", g)
-                # print("i,", i, "j", j)
+                # self.e_ctx.debug(lambda: print("g", g))
+                # self.e_ctx.debug(lambda: print("i", i, "j", j))
                 clause, i_, j_, is_constant, is_reverse = self.deduplicate_c(
                     i, j, gates, self.solver, input_ids
                 )
-                # print("clause", clause)
-                # print("i_", i_, "j_", j_)
+                # self.e_ctx.debug(lambda: print("clause", clause))
+                # self.e_ctx.debug(lambda: print("i_", i_, "j_", j_))
                 if clause is not None:
                     self.solver.append_formula([clause])
                     clauses.extend([clause])
                 if is_constant is not None:
                     lookup[(i, j)] = Atom(is_constant)
                     curr[j] = lookup[(i, j)]
-                    # print("after", curr[j])
-                    # input("Press Enter to continue...")
+                    special[j] = lookup[(i, j)]
+                    # self.e_ctx.debug(lambda: print("after", curr[j]))
+                    # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
                     continue
                 if is_reverse is not None:
                     if is_reverse:
@@ -136,12 +139,11 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     else:
                         lookup[(i, j)] = lookup[(i_, j_)]
                 curr[j] = lookup[(i, j)]
-                # print("after", curr[j])
-                # input("Press Enter to continue...")
+                # self.e_ctx.debug(lambda: print("after", curr[j]))
+                # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
 
         formula = curr
         output_ids = gates[-1]
-        special = {}
         return formula, clauses, output_ids, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):
@@ -156,6 +158,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
         formula, clauses, output_ids, special = self.stuff(
             input_handles, model, clauses
         )
+        print("output_ids", output_ids)
+        print("special", special)
+        input("Press Enter to continue...")
 
         return Encoding(
             clauses=clauses,

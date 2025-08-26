@@ -41,9 +41,18 @@ class BddEncoder(Encoder):
                 if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
                     continue
                 x = layer.get_formula(x)
+
+                self.e_ctx.debug(lambda: print("Before deduplication:"))
+                for idx, f in enumerate(x):
+                    self.e_ctx.debug(lambda: print(idx, ":", f))
+
                 for idx in tqdm(range(len(x))):
                     x[idx] = solver.deduplicate(x[idx], all)
                     all.add(x[idx])
+
+                self.e_ctx.debug(lambda: print("After deduplication:"))
+                for idx, f in enumerate(x):
+                    self.e_ctx.debug(lambda: print(idx, ":", f))
 
         del solver
         return x, inputs
