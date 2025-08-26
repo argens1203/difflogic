@@ -27,12 +27,10 @@ class DeduplicationMixin:
         if not solver.solve(assumptions=[-gate]):
             # print(solver.get_core())
             # print("is constant True", gate)
-            self.e_ctx.inc_deduplication()
             return [gate], None, None, True, None
         if not solver.solve(assumptions=[gate]):
             # print(solver.get_core())
             # print("is constant False", gate)
-            self.e_ctx.inc_deduplication()
             return [-gate], None, None, False, None
 
         for k, layer in enumerate(gates):
@@ -42,7 +40,6 @@ class DeduplicationMixin:
                 res = self.dedup_pair_c(gate, prev, solver)
                 if res is not None:
                     # print("deduplicate pair:", gate, prev, k, m)
-                    self.e_ctx.inc_deduplication()
                     clause, is_reverse = res
                     return clause, k, m, None, is_reverse
 

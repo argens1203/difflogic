@@ -30,7 +30,7 @@ class Experiment:
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
-            # "load_model": True,
+            "load_model": True,
             # "model_path": dataset + "_" + "model.pth",
             # "explain_inp": "3,4,7,11,13,-17,16,-15,-14,-12,-2,-9,-8,-10,-6,-5,-1",
             # "xnum": 10000,

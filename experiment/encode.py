@@ -29,6 +29,8 @@ class Encode:
             ctx.dataset,
         )
 
+        # input("Press Enter to continue...")
+
         if ctx.results is not None:
             ctx.results.store_encoding(encoding)
 

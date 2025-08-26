@@ -99,12 +99,15 @@ class SatEncoder(Encoder, DeduplicationMixin):
                     special[j] = lookup[(i, j)]
                     # self.e_ctx.debug(lambda: print("after", curr[j]))
                     # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
+                    if g != Atom(True) and g != Atom(False):
+                        self.e_ctx.inc_deduplication()
                     continue
                 if is_reverse is not None:
                     if is_reverse:
                         lookup[(i, j)] = Neg(lookup[(i_, j_)])
                     else:
                         lookup[(i, j)] = lookup[(i_, j_)]
+                    self.e_ctx.inc_deduplication()
                 curr[j] = lookup[(i, j)]
                 # self.e_ctx.debug(lambda: print("after", curr[j]))
                 # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
