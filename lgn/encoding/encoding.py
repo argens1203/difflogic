@@ -58,6 +58,8 @@ class Encoding:
         start = (class_id - 1) * step
 
         ret = self.output_ids[start : start + step]
+
+        # Hacky way for SAT deduplication which produces no None in output_ids
         for idx in range(start, start + step):
             if idx in self.special:
                 ret[idx - start] = None

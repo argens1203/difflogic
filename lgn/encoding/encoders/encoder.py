@@ -33,10 +33,6 @@ class Encoder:
             input_handles=input_handles, formula=formula
         )
 
-        print("output_ids", output_ids)
-        print("special", special)
-        input("Press Enter to continue...")
-
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
@@ -73,8 +69,6 @@ class Encoder:
                 if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
                     continue
                 x = layer.get_formula(x)
-
-                print("(Encoder): vpool", vpool.id2obj.items())
 
         return x, inputs
 

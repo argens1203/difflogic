@@ -33,8 +33,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
             eq_constraints = self.initialize_ohe(
                 self.e_ctx.get_dataset(), input_ids, enc_type=self.e_ctx.get_enc_type()
             )
-        print(eq_constraints.clauses)
-        input("Press Enter to continue...")
         solver = BaseSolver(name=self.e_ctx.get_solver_type())
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver, eq_constraints
@@ -158,9 +156,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
         formula, clauses, output_ids, special = self.stuff(
             input_handles, model, clauses
         )
-        print("output_ids", output_ids)
-        print("special", special)
-        input("Press Enter to continue...")
 
         return Encoding(
             clauses=clauses,

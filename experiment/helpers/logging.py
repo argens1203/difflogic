@@ -10,6 +10,10 @@ default_formatter = logging.Formatter(
     "%(message)s"
 )
 
+console_handler = None
+file_handler = None
+info_file_handler = None
+
 
 def setup_file_logger_and_remove_log(file_path):
     if os.path.exists(file_path):
@@ -28,21 +32,29 @@ def get_log_level(args: ExperimentArgs):
 
 
 def setup_logger(args: ExperimentArgs):
+    global console_handler, file_handler, info_file_handler
+
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
+    if console_handler is not None:
+        logger.removeHandler(console_handler)
     # Add console handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(default_formatter)
     console_handler.setLevel(get_log_level(args))
     logger.addHandler(console_handler)
 
+    if file_handler is not None:
+        logger.removeHandler(file_handler)
     # Add detailed file log
     file_handler = setup_file_logger_and_remove_log(LOG_FILE_PATH)
     file_handler.setFormatter(default_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
 
+    if info_file_handler is not None:
+        logger.removeHandler(info_file_handler)
     # Add info file log
     info_file_handler = setup_file_logger_and_remove_log(INFO_LOG_FILE_PATH)
     info_file_handler.setFormatter(default_formatter)
