@@ -47,37 +47,6 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 x = layer.get_formula(x)
         return x
 
-    def _stuff(self, input_handles, model, clauses):
-        all = OrderedSet()
-        # for i in input_handles:
-        # all.add(i)
-
-        x = input_handles
-        with self.use_context():
-            for layer in model:
-                this_layer = []
-                assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-                if isinstance(layer, GroupSum):
-                    continue
-                for f in tqdm(layer.get_formula(x)):
-                    self.e_ctx.debug(lambda: print("Before dedup:", f))
-                    f = self.deduplicate(f, all)
-                    self.e_ctx.debug(lambda: print("After dedup:", f))
-                    f.clausify()
-                    this_layer.append(f)
-                    if f != Atom(True) and f != Atom(False):
-                        all.add(f)
-                    clauses.extend(f.clauses)
-                x = this_layer
-
-            self.e_ctx.debug(lambda: print("input_handles", input_handles))
-            self.e_ctx.debug(lambda: print("x", x))
-            input_ids, cnf, output_ids, special = self.populate_clauses(
-                input_handles=input_handles, formula=x
-            )
-            self.e_ctx.debug(lambda: input("Press Enter to continue..."))
-        return x, cnf.clauses, output_ids, special
-
     def get_layers(self, model) -> list[LogicLayer]:
         layers = []
         for layer in model:
