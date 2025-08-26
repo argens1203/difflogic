@@ -166,7 +166,9 @@ class Experiment:
                 args=args,
                 ctx=ctx,
             )
-            ctx.store_num_clauses(encoding.get_vpool_size())
+            ctx.store_clause(
+                encoding.get_cnf_clauses() + encoding.get_eq_constraints_clauses()
+            )
             profile_memory("encoding")
             explainer = Explainer(encoding, ctx=ctx)
 

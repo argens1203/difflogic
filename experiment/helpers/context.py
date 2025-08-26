@@ -81,8 +81,10 @@ class Context:
     def inc_deduplication(self):
         self.deduplication += 1
 
-    def store_num_clauses(self, num_clauses):
-        self.num_clauses = num_clauses
+    def store_clause(self, clause: list[list[int]]):
+        self.num_clauses = len(clause)
+        self.num_vars = max(abs(literal) for clause in clause for literal in clause)
+        # print(clause)
 
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
@@ -103,6 +105,7 @@ class Context:
             "# gates",
             "# gates_f",
             "# cl",
+            "# var",
             "# expl",
             "run_t",
             "t_Model",
@@ -125,6 +128,7 @@ class Context:
                 number_of_gates,
                 number_of_gates - self.deduplication,
                 self.num_clauses,
+                self.num_vars,
                 self.num_explanations,
                 runtime,
                 self.results.get_model_ready_time(),
