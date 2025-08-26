@@ -4,9 +4,9 @@ from contextlib import contextmanager
 from typing import Callable
 from tabulate import tabulate
 import humanfriendly
+import torch
 from .logging import setup_logger
-from .util import seed_all, get_results
-
+from .util import seed_all, get_results, get_enc_type
 from lgn.dataset import load_dataset
 
 
@@ -28,6 +28,9 @@ class Context:
             args
         )
         self.verbose = args.verbose
+        self.enc_type = get_enc_type(args.enc_type)
+        self.solver_type = args.solver_type
+        self.fp_type = torch.float32
 
         self.cache_hit = {Cached_Key.SOLVER: 0}
         self.cache_miss = {Cached_Key.SOLVER: 0}
@@ -78,8 +81,10 @@ class Context:
     def inc_deduplication(self):
         self.deduplication += 1
 
-    def store_num_clauses(self, num_clauses):
-        self.num_clauses = num_clauses
+    def store_clause(self, clause: list[list[int]]):
+        self.num_clauses = len(clause)
+        self.num_vars = max(abs(literal) for clause in clause for literal in clause)
+        # print(clause)
 
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
@@ -100,6 +105,7 @@ class Context:
             "# gates",
             "# gates_f",
             "# cl",
+            "# var",
             "# expl",
             "run_t",
             "t_Model",
@@ -122,6 +128,7 @@ class Context:
                 number_of_gates,
                 number_of_gates - self.deduplication,
                 self.num_clauses,
+                self.num_vars,
                 self.num_explanations,
                 runtime,
                 self.results.get_model_ready_time(),
@@ -138,3 +145,15 @@ class Context:
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))
         self.logger.debug("Cache Miss: %s", str(self.cache_miss))
         self.logger.debug("Deduplication: %s", str(self.deduplication))
+
+    def get_enc_type(self):
+        return self.enc_type
+
+    def get_solver_type(self):
+        return self.solver_type
+
+    def get_fp_type(self):
+        return self.fp_type
+
+    def get_dataset(self):
+        return self.dataset

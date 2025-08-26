@@ -14,6 +14,7 @@ class Explain:
     ) -> tuple[float, int, int]:
         start = time.time()
         ctx.logger.debug("Raw: %s\n", raw)
+        ctx.logger.debug("Inp: %s\n", inp)
         instance = Instance.from_encoding(encoding=encoding, raw=raw, inp=inp)
         exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
 

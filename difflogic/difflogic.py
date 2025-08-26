@@ -9,6 +9,7 @@ from .functional import (
     GradFactor,
     idx_to_op,
     idx_to_formula,
+    idx_to_clauses,
     bit_add,
 )
 
@@ -229,6 +230,15 @@ class LogicLayer(torch.nn.Module):
             for i, a, b in zip(self.weights.argmax(-1), *self.indices)
         ]
         return formulas
+
+    def get_clauses(self, prev_layer: list[int], aux_vars) -> list[list[list[int]]]:
+        clauses = [
+            idx_to_clauses(prev_layer[a], prev_layer[b], i, aux_var)
+            for i, a, b, aux_var in zip(
+                self.weights.argmax(-1), *self.indices, aux_vars
+            )
+        ]
+        return clauses
 
     def print(self):
         ops = [idx_to_op(i) for i in self.weights.argmax(-1)]

@@ -18,18 +18,18 @@ class Encode:
     def get_encoding(model, args: Args, ctx: Context):
         _Encoder = Encoder
         if args.deduplicate == "sat":
-            logger.info("Using SAT Encoder")
+            logger.info("Using SAT Encoder...")
             _Encoder = SatEncoder
         elif args.deduplicate == "bdd":
-            logger.info("Using BDD Encoder")
+            logger.info("Using BDD Encoder...")
             _Encoder = BddEncoder
 
         encoding = _Encoder(e_ctx=ctx).get_encoding(
             model,
             ctx.dataset,
-            enc_type=get_enc_type(args.enc_type),
-            solver_type=args.solver_type,
         )
+
+        # input("Press Enter to continue...")
 
         if ctx.results is not None:
             ctx.results.store_encoding(encoding)

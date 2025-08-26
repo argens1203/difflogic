@@ -5,8 +5,6 @@ from contextlib import contextmanager
 
 from pysat.formula import Formula
 
-fp_type = torch.float32
-
 
 class SatContext:
     def __init__(self):

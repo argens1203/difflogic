@@ -9,9 +9,8 @@ from difflogic import LogicLayer, GroupSum
 from experiment.helpers import Context, SatContext
 from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
+from lgn.encoding.util import get_parts
 
-
-fp_type = torch.float32
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +23,7 @@ class Encoder:
         self,
         model,
         Dataset: AutoTransformer,
-        fp_type=fp_type,
-        **kwargs,
     ):
-        enc_type = kwargs.get("enc_type", EncType.totalizer)
         self.context = SatContext()
 
         formula, input_handles = self.get_formula(
@@ -40,21 +36,19 @@ class Encoder:
         # REMARK: formula represents output from second last layer
         # ie.: dimension is neuron_number, not class number
 
-        eq_constraints, parts = self.initialize_ohe(Dataset, input_ids, enc_type)
+        eq_constraints = self.initialize_ohe(
+            Dataset, input_ids, self.e_ctx.get_enc_type()
+        )
 
         return Encoding(
-            parts=parts,
-            cnf=cnf,
+            clauses=cnf.clauses,
             eq_constraints=eq_constraints,
-            fp_type=fp_type,
-            Dataset=Dataset,
             input_ids=input_ids,
             output_ids=output_ids,
             formula=formula,
-            input_handles=input_handles,
             special=special,
-            enc_type=enc_type,
-            context=self.context,
+            s_ctx=self.context,
+            e_ctx=self.e_ctx,
         )
 
     def get_formula(
@@ -75,8 +69,6 @@ class Encoder:
                 if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
                     continue
                 x = layer.get_formula(x)
-
-                print("(Encoder): vpool", vpool.id2obj.items())
 
         return x, inputs
 
@@ -120,21 +112,17 @@ class Encoder:
                 # input("Press Enter to Continue...")
                 idx += 1
 
-                logger.debug("=== === === ===")
+                # logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
 
         return input_ids, cnf, output_ids, special
 
     def initialize_ohe(self, Dataset: AutoTransformer, input_ids, enc_type):
         eq_constraints = CNF()
-        parts: list[list[int]] = []
+        parts = get_parts(Dataset, input_ids)
         with self.use_context() as vpool:
-            start = 0
             logger.debug("full_input_ids: %s", input_ids)
-            for step in Dataset.get_attribute_ranges():
-                logger.debug("Step: %d", step)
-                logger.debug("input_ids: %s", input_ids[start : start + step])
-                part = input_ids[start : start + step]
+            for part in parts:
                 eq_constraints.extend(
                     CardEnc.equals(
                         lits=part,
@@ -142,11 +130,9 @@ class Encoder:
                         encoding=enc_type,
                     )
                 )
-                start += step
-                parts.append(part)
         logger.debug("eq_constraints: %s", eq_constraints.clauses)
 
-        return eq_constraints, parts
+        return eq_constraints
 
     def use_context(self):
         return self.context.use_vpool()

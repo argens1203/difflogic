@@ -1,34 +1,34 @@
 from .pseudo_model import PseudoModel
+from lgn.encoding.util import get_parts
 
 
 class Encoding:
     def __init__(
         self,
-        parts,
-        cnf,
+        clauses,
         eq_constraints,
-        fp_type,
-        Dataset,
         input_ids,
         output_ids,
         formula,
-        input_handles,
         special,
-        enc_type,
-        context,
+        s_ctx,
+        e_ctx,
     ):
-        self.parts = parts
-        self.cnf = cnf
+        Dataset = e_ctx.get_dataset()
+        self.parts = get_parts(Dataset, input_ids)
+
+        self.clauses = clauses
         self.eq_constraints = eq_constraints
-        self.fp_type = fp_type
+
         self.Dataset = Dataset
         self.input_ids = input_ids
         self.output_ids = output_ids
         self.formula = formula
-        self.input_handles = input_handles
         self.special = special
-        self.enc_type = enc_type
-        self.context = context
+
+        self.s_ctx = s_ctx
+        self.e_ctx = e_ctx
+
         self.input_dim = Dataset.get_input_dim()
         self.class_dim = Dataset.get_num_of_classes()
 
@@ -36,7 +36,7 @@ class Encoding:
         return self.parts
 
     def get_cnf_clauses(self):
-        return self.cnf.clauses
+        return self.clauses
 
     def get_eq_constraints_clauses(self):
         return self.eq_constraints.clauses
@@ -44,22 +44,26 @@ class Encoding:
     def get_input_dim(self):
         return self.input_dim
 
-    def get_fp_type(self):
-        return self.fp_type
-
     def get_dataset(self):
         return self.Dataset
 
     def get_stats(self):
         return {
-            "cnf_size": len(self.cnf.clauses),
+            "clauses_size": len(self.clauses),
             "eq_size": len(self.eq_constraints.clauses),
         }
 
     def get_output_ids(self, class_id):
         step = len(self.output_ids) // self.class_dim
         start = (class_id - 1) * step
-        return self.output_ids[start : start + step]
+
+        ret = self.output_ids[start : start + step]
+
+        # Hacky way for SAT deduplication which produces no None in output_ids
+        for idx in range(start, start + step):
+            if idx in self.special:
+                ret[idx - start] = None
+        return ret
 
     def get_truth_value(self, idx):
         return self.special.get(idx, None)
@@ -75,9 +79,11 @@ class Encoding:
 
     def as_model(self):
         model_args = {
-            "input_handles": self.input_handles,
-            "formula": self.formula,
             "class_dim": self.class_dim,
+            "input_ids": self.input_ids,
+            "output_ids": self.output_ids,
+            "clauses": self.clauses + self.eq_constraints.clauses,
+            "special": self.special,
         }
         return PseudoModel(**model_args)
 
@@ -108,11 +114,8 @@ class Encoding:
         with self.use_context() as vpool:
             return len(vpool.obj2id)
 
-    def get_enc_type(self):
-        return self.enc_type
-
     def __del__(self):
         pass
 
     def use_context(self):
-        return self.context.use_vpool()
+        return self.s_ctx.use_vpool()

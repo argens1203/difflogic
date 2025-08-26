@@ -1,20 +1,46 @@
 import logging
 import torch
 
+from pysat.solvers import Solver as BaseSolver
 from pysat.formula import Atom
-
 from constant import device
-
-fp_type = torch.float32
 
 logger = logging.getLogger(__name__)
 
 
 class PseudoModel:
-    def __init__(self, input_handles, formula, class_dim):
-        self.input_handles = input_handles
-        self.formula = formula
+    def __init__(self, class_dim, input_ids, output_ids, clauses, special):
+        self.input_ids = input_ids
+        self.output_ids = output_ids
         self.class_dim = class_dim
+        self.solver = BaseSolver(name="g3")
+        self.solver.append_formula(clauses)
+        self.special = special
+
+    def get_tensor(self, o_id: int, features: list[int], idx: int):
+        assumptions = [
+            -inp if feat == 0 else inp for feat, inp in zip(features, self.input_ids)
+        ]
+        assert self.solver.solve(assumptions=assumptions), "UNSAT during get_tensor"
+
+        if o_id is None:
+            if idx in self.special:
+                return self.special[idx] == Atom(True)
+            assert False, "Output id is None"
+
+        # print("assumptions", assumptions)
+        # print("o_id", o_id)
+        if self.solver.solve(assumptions=assumptions + [o_id]):
+            assert not self.solver.solve(
+                assumptions=assumptions + [-o_id]
+            ), "UNSAT during get_tensor"
+            return 1
+
+        if self.solver.solve(assumptions=assumptions + [-o_id]):
+            assert not self.solver.solve(
+                assumptions=assumptions + [o_id]
+            ), "UNSAT during get_tensor"
+            return 0
 
     def __call__(self, x: torch.Tensor, logit=False):
         """
@@ -29,23 +55,13 @@ class PseudoModel:
         returns: class label or votes
         rtype: torch.Tensor (batch_size) or torch.Tensor (batch_size, no_of_classes)
         """
+
         bool_outputs = (
             torch.tensor(
                 [
                     [
-                        (
-                            0
-                            if f.simplified(
-                                assumptions=[
-                                    ~inp if feat == 0 else inp
-                                    for feat, inp in zip(features, self.input_handles)
-                                ]
-                            )
-                            # TODO: better way of checking?
-                            == Atom(False)
-                            else 1
-                        )
-                        for f in self.formula
+                        self.get_tensor(o, features, idx)
+                        for idx, o in enumerate(self.output_ids)
                     ]
                     for features in x
                 ]
