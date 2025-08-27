@@ -126,6 +126,7 @@ class DeduplicationMixin:
         self.clauses = []
         gates = self._get_gates(input_ids, model)
         const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(gates)
+
         return gates, const_lookup, is_rev_lookup, pair_lookup
 
     def use_context(self):
