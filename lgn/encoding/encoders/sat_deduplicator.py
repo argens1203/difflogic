@@ -11,15 +11,17 @@ class DeduplicationMixin:
         with self.use_context() as vpool:
             auxvar_id = vpool._next()
 
-            self._extend_clauses([[auxvar_id, -gate, prev]])
-            self._extend_clauses([[auxvar_id, gate, -prev]])
-            self._extend_clauses([[-auxvar_id, -gate, -prev]])
-            self._extend_clauses([[-auxvar_id, gate, prev]])
+            self.solver.append_formula([[auxvar_id, -gate, prev]])
+            self.solver.append_formula([[auxvar_id, gate, -prev]])
+            self.solver.append_formula([[-auxvar_id, -gate, -prev]])
+            self.solver.append_formula([[-auxvar_id, gate, prev]])
 
             if not self.solver.solve(assumptions=[-auxvar_id]):
-                return [auxvar_id], True
+                self.solver.append_formula([[auxvar_id]])
+                return True
             if not self.solver.solve(assumptions=[auxvar_id]):
-                return [-auxvar_id], False
+                self.solver.append_formula([[-auxvar_id]])
+                return False
 
     def deduplicate_c(self, i, j, gates):
         # print("gates", gates)
@@ -39,11 +41,8 @@ class DeduplicationMixin:
             for m, prev in enumerate(layer):
                 if k == i and m == j:
                     return None, None, None, None
-                res = self.dedup_pair_c(gate, prev)
-                if res is not None:
-                    # print("deduplicate pair:", gate, prev, k, m)
-                    clause, is_reverse = res
-                    self._add_clause(clause)
+                is_reverse = self.dedup_pair_c(gate, prev)
+                if is_reverse is not None:
                     return k, m, None, is_reverse
 
         assert False

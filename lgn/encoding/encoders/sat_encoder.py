@@ -61,7 +61,10 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
     def _extend_clauses(self, clauses: list[list[int]]):
         self.clauses.extend(clauses)
-        print(len(self.clauses))
+        print("self.clauses", len(self.clauses))
+        num_vars = max(abs(literal) for clause in self.clauses for literal in clause)
+        print("num_vars", num_vars)
+
         self.solver.append_formula(clauses)
 
     def _stuff(self, input_handles, model):
@@ -80,37 +83,43 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 gates.append(aux_vars)
                 prev = aux_vars
 
+        const_lookup = dict()
+        is_rev_lookup = dict()
+        pair_lookup = dict()
+        for i, layer_of_gates in enumerate(gates):
+            for j, _ in enumerate(layer_of_gates):
+                i_, j_, is_constant, is_reverse = self.deduplicate_c(i, j, gates)
+                if is_constant is not None:
+                    const_lookup[(i, j)] = is_constant
+                if is_reverse is not None:
+                    is_rev_lookup[(i, j)] = is_reverse
+                if i_ is not None and j_ is not None:
+                    pair_lookup[(i, j)] = (i_, j_)
+                else:
+                    pair_lookup[(i, j)] = (i, j)
+
         curr = input_handles
         lookup = dict()
         for i, layer in enumerate(self._get_layers(model)):
             curr = layer.get_formula(curr)
             special = {}
             for j, g in enumerate(curr):
-                # self.e_ctx.debug(lambda: print("lookup", lookup))
-                lookup[(i, j)] = g
-                # self.e_ctx.debug(lambda: print("g", g))
-                # self.e_ctx.debug(lambda: print("i", i, "j", j))
-                i_, j_, is_constant, is_reverse = self.deduplicate_c(i, j, gates)
-                # self.e_ctx.debug(lambda: print("clause", clause))
-                # self.e_ctx.debug(lambda: print("i_", i_, "j_", j_))
-                if is_constant is not None:
-                    lookup[(i, j)] = Atom(is_constant)
+                if (i, j) in const_lookup:
+                    lookup[(i, j)] = Atom(const_lookup[(i, j)])
                     curr[j] = lookup[(i, j)]
                     special[j] = lookup[(i, j)]
-                    # self.e_ctx.debug(lambda: print("after", curr[j]))
-                    # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
                     if g != Atom(True) and g != Atom(False):
                         self.e_ctx.inc_deduplication()
-                    continue
-                if is_reverse is not None:
-                    if is_reverse:
-                        lookup[(i, j)] = Neg(lookup[(i_, j_)])
+                elif (i, j) in is_rev_lookup:
+                    if is_rev_lookup[(i, j)]:
+                        lookup[(i, j)] = Neg(lookup[pair_lookup[(i, j)]])
+                        curr[j] = lookup[(i, j)]
                     else:
-                        lookup[(i, j)] = lookup[(i_, j_)]
+                        lookup[(i, j)] = lookup[pair_lookup[(i, j)]]
+                        curr[j] = lookup[(i, j)]
                     self.e_ctx.inc_deduplication()
-                curr[j] = lookup[(i, j)]
-                # self.e_ctx.debug(lambda: print("after", curr[j]))
-                # self.e_ctx.debug(lambda: input("Press Enter to continue..."))
+                else:
+                    lookup[(i, j)] = g
 
         formula = curr
         output_ids = gates[-1]
@@ -124,6 +133,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
         self.solver, eq_constraints = self._initialize_solver(input_ids)
 
         formula, output_ids, special = self._stuff(input_handles, model)
+        with self.use_context() as vpool:
+            print("next vpool var", vpool._next())
+            input("Press enter to continue...")
 
         return Encoding(
             clauses=self.clauses,
