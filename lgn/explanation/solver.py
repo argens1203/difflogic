@@ -37,7 +37,7 @@ class Solver:
                 vpool=vpool,
             )
             clauses = comp.clauses
-            logger.debug("Clauses: %s", str(comp.clauses))
+            # logger.debug("Clauses: %s", str(comp.clauses))
             self._append_formula(clauses)
         return self
 

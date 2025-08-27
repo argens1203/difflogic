@@ -84,7 +84,7 @@ class Context:
     def store_clause(self, clause: list[list[int]]):
         self.num_clauses = len(clause)
         self.num_vars = max(abs(literal) for clause in clause for literal in clause)
-        # print(clause)
+        print("Clause: ", clause)
 
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations

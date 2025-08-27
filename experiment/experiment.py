@@ -25,8 +25,8 @@ class Experiment:
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
             "eval_freq": 1000,
-            # "verbose": "info",
-            "verbose": "debug",
+            "verbose": "info",
+            # "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
@@ -55,8 +55,8 @@ class Experiment:
 
         results = Experiment.run(args)
 
-        args["deduplicate"] = "bdd"
-        results = Experiment.run(args)
+        # args["deduplicate"] = "bdd"
+        # results = Experiment.run(args)
 
         return results
 

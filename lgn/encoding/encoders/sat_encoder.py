@@ -56,8 +56,12 @@ class SatEncoder(Encoder, DeduplicationMixin):
             layers.append(layer)
         return layers
 
+    def _add_clause(self, clause: list[int]):
+        self._extend_clauses([clause])
+
     def _extend_clauses(self, clauses: list[list[int]]):
         self.clauses.extend(clauses)
+        print(len(self.clauses))
         self.solver.append_formula(clauses)
 
     def _stuff(self, input_handles, model):
@@ -86,13 +90,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 lookup[(i, j)] = g
                 # self.e_ctx.debug(lambda: print("g", g))
                 # self.e_ctx.debug(lambda: print("i", i, "j", j))
-                clause, i_, j_, is_constant, is_reverse = self.deduplicate_c(
-                    i, j, gates
-                )
+                i_, j_, is_constant, is_reverse = self.deduplicate_c(i, j, gates)
                 # self.e_ctx.debug(lambda: print("clause", clause))
                 # self.e_ctx.debug(lambda: print("i_", i_, "j_", j_))
-                if clause is not None:
-                    self._extend_clauses([clause])
                 if is_constant is not None:
                     lookup[(i, j)] = Atom(is_constant)
                     curr[j] = lookup[(i, j)]
