@@ -1,8 +1,7 @@
 import logging
-from pysat.formula import Formula, Atom, Or, Neg, CNF
+from pysat.formula import Atom
 
-from typing import Set
-
+from experiment.helpers.sat_context import SatContext
 from lgn.dataset.auto_transformer import AutoTransformer
 
 from .util import _get_layers, get_eq_constraints
@@ -13,8 +12,9 @@ from pysat.solvers import Solver as BaseSolver
 
 
 class DeduplicationMixin:
-    # def __init__(self, e_ctx):
-    #     self.e_ctx = e_ctx
+    def __init__(self, e_ctx):
+        self.e_ctx = e_ctx
+        self.context = SatContext()
 
     def _get_inputs(self, Dataset: AutoTransformer):
         with self.use_context() as vpool:
@@ -89,9 +89,9 @@ class DeduplicationMixin:
 
     def _extend_clauses(self, clauses: list[list[int]]):
         self.clauses.extend(clauses)
-        print("self.clauses", len(self.clauses))
-        num_vars = max(abs(literal) for clause in self.clauses for literal in clause)
-        print("num_vars", num_vars)
+        # print("self.clauses", len(self.clauses))
+        # num_vars = max(abs(literal) for clause in self.clauses for literal in clause)
+        # print("num_vars", num_vars)
 
         self.solver.append_formula(clauses)
 
@@ -127,3 +127,6 @@ class DeduplicationMixin:
         gates = self._get_gates(input_ids, model)
         const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(gates)
         return gates, const_lookup, is_rev_lookup, pair_lookup
+
+    def use_context(self):
+        return self.context.use_vpool()

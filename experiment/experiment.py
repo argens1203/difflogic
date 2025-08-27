@@ -40,7 +40,7 @@ class Experiment:
             # "num_layers": 5,
             # "num_neurons": 24,
             #  ------
-            "explain_one": True,
+            # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
         }
@@ -55,8 +55,8 @@ class Experiment:
 
         results = Experiment.run(args)
 
-        # args["deduplicate"] = "bdd"
-        # results = Experiment.run(args)
+        args["deduplicate"] = "bdd"
+        results = Experiment.run(args)
 
         return results
 

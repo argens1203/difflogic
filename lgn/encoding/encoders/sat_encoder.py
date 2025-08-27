@@ -1,14 +1,7 @@
-from tqdm import tqdm
 import logging
-import torch
-
-from difflogic import LogicLayer, GroupSum
 
 from pysat.formula import Atom, Neg
-from pysat.card import EncType
-from pysat.solvers import Solver as BaseSolver
 
-from experiment.helpers.ordered_set import OrderedSet
 from experiment.helpers import SatContext
 
 from lgn.dataset import AutoTransformer
@@ -22,7 +15,7 @@ from .util import _get_layers, get_eq_constraints
 logger = logging.getLogger(__name__)
 
 
-class SatEncoder(Encoder, DeduplicationMixin):
+class SatEncoder(Encoder):
     def _get_inputs(self, Dataset: AutoTransformer):
         with self.use_context() as vpool:
             input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
@@ -64,10 +57,11 @@ class SatEncoder(Encoder, DeduplicationMixin):
         return curr, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):
+        gates, const_lookup, is_rev_lookup, pair_lookup = DeduplicationMixin(
+            self.e_ctx
+        )._function(model, Dataset)
+
         self.context = SatContext()
-
-        gates, const_lookup, is_rev_lookup, pair_lookup = self._function(model, Dataset)
-
         input_handles, input_ids = self._get_inputs(Dataset)
 
         formula, special = self.d(
@@ -76,9 +70,9 @@ class SatEncoder(Encoder, DeduplicationMixin):
         output_ids = gates[-1]
         #
 
-        with self.use_context() as vpool:
-            print("next vpool var", vpool._next())
-            input("Press enter to continue...")
+        # with self.use_context() as vpool:
+        # print("next vpool var", vpool._next())
+        # input("Press enter to continue...")
 
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles, formula
