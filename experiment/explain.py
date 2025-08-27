@@ -1,9 +1,13 @@
 import time
+import logging
+
 from tqdm import tqdm
 
 from lgn.explanation import Explainer, Instance
 from experiment.args import ExplainerArgs
 from .helpers import Context
+
+logger = logging.getLogger(__name__)
 
 
 class Explain:
@@ -79,10 +83,13 @@ class Explain:
         count = 0
         max_time = exp_args.max_time
 
+        logging.info("Explaining dataloader with max_time: %s", max_time)
         begin = time.time()
-        for batch, label, idx in tqdm(data_loader):
+        batch_idx = 0
+        for batch, label, idx in data_loader:
             start = time.time()
-            for feat, i in tqdm(zip(batch, idx)):
+            logging.info("Explaining batch: %s", batch_idx)
+            for feat, i in tqdm(zip(batch, idx), total=len(batch)):
                 raw = ctx.get_raw(i, is_train=is_train)
                 ctx.logger.debug("Raw: %s\n", raw)
 
@@ -91,12 +98,13 @@ class Explain:
                     instance, xnum=exp_args.xnum
                 )
                 exp_count += exp_count_axp_plus_cxp
+                count += 1
                 if max_time is not None and time.time() - begin > max_time:
                     break
             if max_time is not None and time.time() - begin > max_time:
                 break
             all_times += time.time() - start
-            count += len(batch)
+            batch_idx += 1
 
         ctx.inc_num_explanations(exp_count)
         return all_times, exp_count, count
