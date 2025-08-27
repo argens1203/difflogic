@@ -6,7 +6,7 @@ from experiment.helpers import SatContext
 
 from lgn.dataset import AutoTransformer
 
-from .sat_deduplicator import DeduplicationMixin
+from .sat_deduplicator import SatDeduplicator
 from .encoder import Encoder
 from ..encoding import Encoding
 from .util import _get_layers, get_eq_constraints
@@ -31,7 +31,9 @@ class SatEncoder(Encoder):
                 vpool=vpool,
             )
 
-    def d(self, input_handles, model, const_lookup, is_rev_lookup, pair_lookup):
+    def _get_formula(
+        self, input_handles, model, const_lookup, is_rev_lookup, pair_lookup
+    ):
         curr = input_handles
         lookup = dict()
         for i, layer in enumerate(_get_layers(model)):
@@ -57,22 +59,16 @@ class SatEncoder(Encoder):
         return curr, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):
-        gates, const_lookup, is_rev_lookup, pair_lookup = DeduplicationMixin(
+        const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
             self.e_ctx
-        )._function(model, Dataset)
+        ).deduplicate(model, Dataset)
 
         self.context = SatContext()
-        input_handles, input_ids = self._get_inputs(Dataset)
 
-        formula, special = self.d(
+        input_handles, input_ids = self._get_inputs(Dataset)
+        formula, special = self._get_formula(
             input_handles, model, const_lookup, is_rev_lookup, pair_lookup
         )
-        output_ids = gates[-1]
-        #
-
-        # with self.use_context() as vpool:
-        # print("next vpool var", vpool._next())
-        # input("Press enter to continue...")
 
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles, formula

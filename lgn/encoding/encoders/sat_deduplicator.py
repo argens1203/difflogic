@@ -1,4 +1,5 @@
 import logging
+from tqdm import tqdm
 from pysat.formula import Atom
 
 from experiment.helpers.sat_context import SatContext
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 from pysat.solvers import Solver as BaseSolver
 
 
-class DeduplicationMixin:
+class SatDeduplicator:
     def __init__(self, e_ctx):
         self.e_ctx = e_ctx
         self.context = SatContext()
@@ -100,7 +101,7 @@ class DeduplicationMixin:
         is_rev_lookup = dict()
         pair_lookup = dict()
         for i, layer_of_gates in enumerate(gates):
-            for j, _ in enumerate(layer_of_gates):
+            for j, _ in tqdm(enumerate(layer_of_gates), total=len(layer_of_gates)):
                 i_, j_, is_constant, is_reverse = self.deduplicate_c(i, j, gates)
                 if is_constant is not None:
                     const_lookup[(i, j)] = is_constant
@@ -117,7 +118,7 @@ class DeduplicationMixin:
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver
 
-    def _function(self, model, Dataset):
+    def deduplicate(self, model, Dataset):
         input_handles, input_ids = self._get_inputs(Dataset)
 
         eq_constraints = self._get_eq_constraints(input_ids)
@@ -127,7 +128,7 @@ class DeduplicationMixin:
         gates = self._get_gates(input_ids, model)
         const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(gates)
 
-        return gates, const_lookup, is_rev_lookup, pair_lookup
+        return const_lookup, is_rev_lookup, pair_lookup
 
     def use_context(self):
         return self.context.use_vpool()
