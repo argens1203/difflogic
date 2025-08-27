@@ -9,6 +9,7 @@ from difflogic import LogicLayer, GroupSum
 from experiment.helpers import Context, SatContext
 from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
+from lgn.encoding.encoders.util import get_eq_constraints
 from lgn.encoding.util import get_parts
 
 
@@ -118,21 +119,8 @@ class Encoder:
         return input_ids, cnf, output_ids, special
 
     def initialize_ohe(self, Dataset: AutoTransformer, input_ids, enc_type):
-        eq_constraints = CNF()
-        parts = get_parts(Dataset, input_ids)
         with self.use_context() as vpool:
-            logger.debug("full_input_ids: %s", input_ids)
-            for part in parts:
-                eq_constraints.extend(
-                    CardEnc.equals(
-                        lits=part,
-                        vpool=vpool,
-                        encoding=enc_type,
-                    )
-                )
-        logger.debug("eq_constraints: %s", eq_constraints.clauses)
-
-        return eq_constraints
+            return get_eq_constraints(Dataset, input_ids, enc_type, vpool)
 
     def use_context(self):
         return self.context.use_vpool()
