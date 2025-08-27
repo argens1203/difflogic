@@ -25,22 +25,22 @@ class Experiment:
         dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
             "eval_freq": 1000,
-            "verbose": "info",
-            # "verbose": "debug",
+            # "verbose": "info",
+            "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
             "load_model": True,
-            # "model_path": dataset + "_" + "model.pth",
+            "model_path": dataset + "_" + "model.pth",
             # "explain_inp": "3,4,7,11,13,-17,16,-15,-14,-12,-2,-9,-8,-10,-6,-5,-1",
             # "xnum": 10000,
             #  ------
-            "model_path": "model-paths/$" + dataset + "_" + "model.pth",
-            "save_model": False,
-            "num_layers": 5,
-            "num_neurons": 24,
+            # "model_path": "model-paths/$" + dataset + "_" + "model.pth",
+            # "save_model": False,
+            # "num_layers": 5,
+            # "num_neurons": 24,
             #  ------
-            # "explain_one": True,
+            "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
             # {2, 3, 6, 8, -7, -5, -4, -1}
         }

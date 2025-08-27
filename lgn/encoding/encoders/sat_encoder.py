@@ -22,13 +22,13 @@ logger = logging.getLogger(__name__)
 
 
 class SatEncoder(Encoder, DeduplicationMixin):
-    def get_inputs(self, Dataset: AutoTransformer):
+    def _get_inputs(self, Dataset: AutoTransformer):
         with self.use_context() as vpool:
             input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
             input_ids = [vpool.id(h) for h in input_handles]
         return input_handles, input_ids
 
-    def initialize_solver(self, input_ids):
+    def _initialize_solver(self, input_ids):
         with self.use_context() as vpool:
             eq_constraints = self.initialize_ohe(
                 self.e_ctx.get_dataset(), input_ids, enc_type=self.e_ctx.get_enc_type()
@@ -47,7 +47,7 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 x = layer.get_formula(x)
         return x
 
-    def get_layers(self, model) -> list[LogicLayer]:
+    def _get_layers(self, model) -> list[LogicLayer]:
         layers = []
         for layer in model:
             assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
@@ -56,28 +56,29 @@ class SatEncoder(Encoder, DeduplicationMixin):
             layers.append(layer)
         return layers
 
-    def stuff(self, input_handles, model, clauses):
+    def _extend_clauses(self, clauses: list[list[int]]):
+        self.clauses.extend(clauses)
+        self.solver.append_formula(clauses)
+
+    def _stuff(self, input_handles, model):
+        self.clauses = []
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
 
         prev = input_ids
         gates = []
-        clauses = []
 
         with self.use_context() as vpool:
-            for layer in self.get_layers(model):
+            for layer in self._get_layers(model):
                 aux_vars = [vpool._next() for _ in range(layer.out_dim)]
                 for f in layer.get_clauses(prev, aux_vars):
-                    clauses.extend(f)
+                    self._extend_clauses(f)
                 gates.append(aux_vars)
                 prev = aux_vars
 
-        # self.e_ctx.debug(lambda: print("clauses", clauses, "gates", gates))
-        self.solver.append_formula(clauses)
-
         curr = input_handles
         lookup = dict()
-        for i, layer in enumerate(self.get_layers(model)):
+        for i, layer in enumerate(self._get_layers(model)):
             curr = layer.get_formula(curr)
             special = {}
             for j, g in enumerate(curr):
@@ -86,13 +87,12 @@ class SatEncoder(Encoder, DeduplicationMixin):
                 # self.e_ctx.debug(lambda: print("g", g))
                 # self.e_ctx.debug(lambda: print("i", i, "j", j))
                 clause, i_, j_, is_constant, is_reverse = self.deduplicate_c(
-                    i, j, gates, self.solver, input_ids
+                    i, j, gates
                 )
                 # self.e_ctx.debug(lambda: print("clause", clause))
                 # self.e_ctx.debug(lambda: print("i_", i_, "j_", j_))
                 if clause is not None:
-                    self.solver.append_formula([clause])
-                    clauses.extend([clause])
+                    self._extend_clauses([clause])
                 if is_constant is not None:
                     lookup[(i, j)] = Atom(is_constant)
                     curr[j] = lookup[(i, j)]
@@ -114,23 +114,19 @@ class SatEncoder(Encoder, DeduplicationMixin):
 
         formula = curr
         output_ids = gates[-1]
-        return formula, clauses, output_ids, special
+        return formula, output_ids, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):
         self.context = SatContext()
 
-        clauses = []
+        input_handles, input_ids = self._get_inputs(Dataset)
 
-        input_handles, input_ids = self.get_inputs(Dataset)
+        self.solver, eq_constraints = self._initialize_solver(input_ids)
 
-        self.solver, eq_constraints = self.initialize_solver(input_ids)
-
-        formula, clauses, output_ids, special = self.stuff(
-            input_handles, model, clauses
-        )
+        formula, output_ids, special = self._stuff(input_handles, model)
 
         return Encoding(
-            clauses=clauses,
+            clauses=self.clauses,
             eq_constraints=eq_constraints,
             input_ids=input_ids,
             output_ids=output_ids,
