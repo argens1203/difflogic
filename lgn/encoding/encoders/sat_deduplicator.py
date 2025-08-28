@@ -109,10 +109,6 @@ class SatDeduplicator:
                     const_lookup[(i, j)] = is_constant
                     continue
 
-                # is_reverse = self.deduplicate_input(
-                #     gates[i][j],
-                # )
-
                 i_, j_, is_reverse = self.deduplicate_pair(i, j, gates)
                 if is_reverse is not None:
                     is_rev_lookup[(i, j)] = is_reverse
