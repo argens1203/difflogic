@@ -48,33 +48,35 @@ class SatDeduplicator:
                 self.solver.append_formula([[-auxvar_id]])
                 return False
 
-    def deduplicate_c(self, i, j, gates):
+    def deduplicate_c(self, gate):
         # print("gates", gates)
-        gate = gates[i][j]
         if not self.solver.solve(assumptions=[-gate]):
             # print(solver.get_core())
             # print("is constant True", gate)
             self._add_clause([gate])
-            return None, None, True, None
+            return True
         if not self.solver.solve(assumptions=[gate]):
             # print(solver.get_core())
             # print("is constant False", gate)
             self._add_clause([-gate])
-            return None, None, False, None
+            return False
+        return None
 
+    def deduplicate_pair(self, i, j, gates):
+        gate = gates[i][j]
         for k, layer in enumerate(gates):
             for m, prev in enumerate(layer):
                 if k == i and m == j:
-                    return None, None, None, None
+                    return None, None, None
                 is_reverse = self.dedup_pair_c(gate, prev)
                 if is_reverse is not None:
-                    return k, m, None, is_reverse
+                    return k, m, is_reverse
 
         assert False
 
     def _get_gates(self, input_ids, model):
         prev = input_ids
-        gates = []
+        gates = [input_ids]
 
         with self.use_context() as vpool:
             for layer in _get_layers(model):
@@ -102,9 +104,12 @@ class SatDeduplicator:
         pair_lookup = dict()
         for i, layer_of_gates in enumerate(gates):
             for j, _ in tqdm(enumerate(layer_of_gates), total=len(layer_of_gates)):
-                i_, j_, is_constant, is_reverse = self.deduplicate_c(i, j, gates)
+                is_constant = self.deduplicate_c(gates[i][j])
                 if is_constant is not None:
                     const_lookup[(i, j)] = is_constant
+                    continue
+
+                i_, j_, is_reverse = self.deduplicate_pair(i, j, gates)
                 if is_reverse is not None:
                     is_rev_lookup[(i, j)] = is_reverse
                 if i_ is not None and j_ is not None:

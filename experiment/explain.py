@@ -88,7 +88,7 @@ class Explain:
         batch_idx = 0
         for batch, label, idx in data_loader:
             start = time.time()
-            logging.info("Explaining batch: %s", batch_idx)
+            logging.info("Explaining batch: %s", batch_idx + 1)
             for feat, i in tqdm(zip(batch, idx), total=len(batch)):
                 raw = ctx.get_raw(i, is_train=is_train)
                 ctx.logger.debug("Raw: %s\n", raw)
