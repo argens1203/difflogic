@@ -32,7 +32,7 @@ class Experiment:
             "save_model": True,
             "load_model": True,
             "max_time": 30,
-            # "model_path": dataset + "_" + "model.pth",
+            "model_path": dataset + "_" + "model.pth",
             # "explain_inp": "3,4,7,11,13,-17,16,-15,-14,-12,-2,-9,-8,-10,-6,-5,-1",
             # "xnum": 10000,
             #  ------
@@ -59,9 +59,9 @@ class Experiment:
 
         # Experiment.compare_encoders(args)
 
-        results = Experiment.run(args)
+        # results = Experiment.run(args)
 
-        args["deduplicate"] = "bdd"
+        # args["deduplicate"] = "bdd"
         results = Experiment.run(args)
 
         return results

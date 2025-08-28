@@ -36,14 +36,19 @@ class SatEncoder(Encoder):
     ):
         curr = input_handles
         lookup = dict()
-        for i, layer in enumerate(_get_layers(model)):
+        for i, h in enumerate(input_handles):
+            lookup[(0, i)] = h
+
+        i = 1
+        for layer in _get_layers(model):
             curr = layer.get_formula(curr)
             special = {}
             for j, g in enumerate(curr):
                 if (i, j) in const_lookup:
-                    lookup[(i, j)] = Atom(const_lookup[(i, j)])
-                    curr[j] = lookup[(i, j)]
-                    special[j] = lookup[(i, j)]
+                    f = Atom(const_lookup[(i, j)])
+                    lookup[(i, j)] = f
+                    curr[j] = f
+                    special[j] = f
                     if g != Atom(True) and g != Atom(False):
                         self.e_ctx.inc_deduplication()
                 elif (i, j) in is_rev_lookup:
@@ -56,6 +61,7 @@ class SatEncoder(Encoder):
                     self.e_ctx.inc_deduplication()
                 else:
                     lookup[(i, j)] = g
+            i += 1
         return curr, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):

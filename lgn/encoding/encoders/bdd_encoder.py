@@ -32,8 +32,8 @@ class BddEncoder(Encoder):
 
             all = OrderedSet()
             #  TODO: uncomment this?
-            # for i in x:
-            #     all.add(i)
+            for i in x:
+                all.add(i)
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)
