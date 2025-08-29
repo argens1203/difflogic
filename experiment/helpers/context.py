@@ -8,6 +8,7 @@ import torch
 from .logging import setup_logger
 from .util import seed_all, get_results, get_enc_type
 from lgn.dataset import load_dataset
+from collections import OrderedDict
 
 
 class Cached_Key:
@@ -35,6 +36,8 @@ class Context:
         self.cache_hit = {Cached_Key.SOLVER: 0}
         self.cache_miss = {Cached_Key.SOLVER: 0}
         self.deduplication = 0
+        self.layer_seen = set()
+        self.dedup_dict = dict()
 
         self.results.store_start_time()
         self.num_explanations = 0
@@ -77,9 +80,29 @@ class Context:
 
     def reset_deduplication(self):
         self.deduplication = 0
+        self.dedup_dict = OrderedDict()
 
-    def inc_deduplication(self):
+    def inc_deduplication(self, curr_layer, target_layer):
+        CONSTANT = "Constant"
+        INPUT = "Input"
+
+        if curr_layer not in self.layer_seen:
+            self.layer_seen.add(curr_layer)
+            self.dedup_dict[(curr_layer, CONSTANT)] = 0
+            self.dedup_dict[(curr_layer, INPUT)] = 0
+            for k in range(1, curr_layer + 1):
+                self.dedup_dict[(curr_layer, k)] = 0
+        # curr_layer = 1-based
+        # target_layer = 1-based, 0 = input, -1 = constants
+
+        if target_layer == -1:
+            target_layer = CONSTANT
+        if target_layer == 0:
+            target_layer = INPUT
         self.deduplication += 1
+        self.dedup_dict[(curr_layer, target_layer)] = (
+            self.dedup_dict.get((curr_layer, target_layer), 0) + 1
+        )
 
     def store_clause(self, clause: list[list[int]]):
         self.num_clauses = len(clause)
@@ -139,6 +162,11 @@ class Context:
             ]
         ]
         print(tabulate(data, headers=headers, tablefmt="github"))
+        self.print_dedup_dict()
+
+    def print_dedup_dict(self):
+        for k in self.dedup_dict:
+            print(f"Layer {k[0]} -> {k[1]}: {self.dedup_dict[k]}")
 
     def __del__(self):
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))

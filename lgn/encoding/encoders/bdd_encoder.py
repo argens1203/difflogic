@@ -33,7 +33,7 @@ class BddEncoder(Encoder):
             all = OrderedSet()
             #  TODO: uncomment this?
             for i in x:
-                all.add(i)
+                all.add((0, i))
 
             for i, layer in enumerate(model):
                 logger.debug("Layer %d: %s", i, layer)
@@ -47,8 +47,8 @@ class BddEncoder(Encoder):
                     self.e_ctx.debug(lambda: print(idx, ":", f))
 
                 for idx in tqdm(range(len(x))):
-                    x[idx] = solver.deduplicate(x[idx], all)
-                    all.add(x[idx])
+                    x[idx] = solver.deduplicate(x[idx], all, i + 1)
+                    all.add((i + 1, x[idx]))
 
                 self.e_ctx.debug(lambda: print("After deduplication:"))
                 for idx, f in enumerate(x):

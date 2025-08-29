@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # Experiment.debug(dataset="monk3")
     # Experiment.debug(dataset="breast_cancer")
     # Experiment.debug(dataset="adult")
-    # experiment.debug(dataset="mnist")
+    # Experiment.debug(dataset="mnist")
 
     # experiment.experiment(datasets=["adult", "mnist"], base_experiment_id=10000)
     # experiment.find_model()

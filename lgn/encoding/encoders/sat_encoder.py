@@ -39,7 +39,7 @@ class SatEncoder(Encoder):
         for i, h in enumerate(input_handles):
             lookup[(0, i)] = h
 
-        i = 1
+        i = 1  # First layer is inputs
         for layer in _get_layers(model):
             curr = layer.get_formula(curr)
             special = {}
@@ -50,15 +50,16 @@ class SatEncoder(Encoder):
                     curr[j] = f
                     special[j] = f
                     if g != Atom(True) and g != Atom(False):
-                        self.e_ctx.inc_deduplication()
+                        self.e_ctx.inc_deduplication(i, -1)
                 elif (i, j) in is_rev_lookup:
+                    target = pair_lookup[(i, j)]
                     if is_rev_lookup[(i, j)]:
-                        lookup[(i, j)] = Neg(lookup[pair_lookup[(i, j)]])
+                        lookup[(i, j)] = Neg(lookup[target])
                         curr[j] = lookup[(i, j)]
                     else:
-                        lookup[(i, j)] = lookup[pair_lookup[(i, j)]]
+                        lookup[(i, j)] = lookup[target]
                         curr[j] = lookup[(i, j)]
-                    self.e_ctx.inc_deduplication()
+                    self.e_ctx.inc_deduplication(i, target[0])
                 else:
                     lookup[(i, j)] = g
             i += 1

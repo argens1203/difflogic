@@ -27,7 +27,7 @@ class Experiment:
             "eval_freq": 1000,
             "verbose": "info",
             # "verbose": "debug",
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "deduplicate": "bdd",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             # "save_model": True,
             "load_model": True,
@@ -44,7 +44,12 @@ class Experiment:
             # "model_path": "model-paths/$adult" + "_" + "model.pth",
             # "save_model": False,
             # "num_layers": 5,
-            # "num_neurons": 58,
+            # "num_neurons": 256,
+            #  ------
+            # "model_path": "model-paths/$mnist" + "_" + "model.pth",
+            # "save_model": False,
+            # "num_layers": 6,
+            # "num_neurons": 8000,
             #  ------
             # "explain_one": True,
             # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
@@ -61,8 +66,8 @@ class Experiment:
 
         results = Experiment.run(args)
 
-        args["deduplicate"] = "bdd"
-        results = Experiment.run(args)
+        # args["deduplicate"] = "bdd"
+        # results = Experiment.run(args)
 
         return results
 

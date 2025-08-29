@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Tuple
 from pysat.formula import Formula, Atom, Or, And, Neg, Implies, XOr
 from dd.autoref import BDD, Function
 from experiment.helpers import Context
@@ -99,27 +99,29 @@ class BDDSolver:
         else:
             raise ValueError(f"Unsupported formula type: {type(formula)}")
 
-    def deduplicate(self, f: Formula, previous: Set[Formula]):
+    def deduplicate(
+        self, f: Formula, previous: Set[Tuple[int, Formula]], layer: int
+    ):  # layer is 1-based
         if f == Atom(True) or f == Atom(False):
             return f
 
         transformed = self.transform(f)
         if self.is_equiv(transformed, self.bdd.true):
-            self.e_ctx.inc_deduplication()
+            self.e_ctx.inc_deduplication(layer, -1)
             return Atom(True)
 
         if self.is_equiv(transformed, self.bdd.false):
-            self.e_ctx.inc_deduplication()
+            self.e_ctx.inc_deduplication(layer, -1)
             return Atom(False)
 
-        for p in previous:
+        for p_layer, p in previous:
             # if len(str(f)) <= len(str(p)):
             #     continue
             if self.is_equiv(transformed, self.transform(p)):
-                self.e_ctx.inc_deduplication()
+                self.e_ctx.inc_deduplication(layer, p_layer)
                 return p
             elif self.is_neg_equiv(transformed, self.transform(p)):
-                self.e_ctx.inc_deduplication()
+                self.e_ctx.inc_deduplication(layer, p_layer)
                 return Neg(p)
         return f
 
