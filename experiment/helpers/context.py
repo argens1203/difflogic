@@ -1,3 +1,4 @@
+from datetime import datetime
 import csv
 import logging
 import tracemalloc
@@ -219,7 +220,13 @@ class MultiContext:
         self.data.append(ctx.get_data()[0])
         self.headers = ctx.get_headers()
 
-    def to_csv(self, filename):
+    @staticmethod
+    def __unique_str_from_timestamp():
+        return datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]  # Up to milliseconds
+
+    def to_csv(self, filename, with_timestamp=True):
+        if with_timestamp:
+            filename = f"{MultiContext.__unique_str_from_timestamp()}_{filename}"
         with open(filename, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(self.headers)

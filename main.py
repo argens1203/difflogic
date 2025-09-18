@@ -1,3 +1,4 @@
+from sqlite3 import Date
 from experiment.experiment import Experiment
 from experiment.helpers.context import MultiContext
 
@@ -14,7 +15,7 @@ if __name__ == "__main__":
     m_ctx.add(Experiment.debug(dataset="breast_cancer"))
     m_ctx.add(Experiment.debug(dataset="adult"))
     # m_ctx.add(Experiment.debug(dataset="mnist"))
-    m_ctx.to_csv(filename="results_multi.csv")
+    m_ctx.to_csv(filename=f"results_multi.csv", with_timestamp=True)
     # Experiment.debug(dataset="monk1")
     # Experiment.debug(dataset="monk2")
     # Experiment.debug(dataset="monk3")
