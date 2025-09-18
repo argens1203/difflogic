@@ -35,6 +35,7 @@ class Experiment:
             "load_model": True,
             "output": "csv",
             "max_explain_time": 30,
+            # "xnum": 10,
             #  ------
             # "explain_one": True,
         }
