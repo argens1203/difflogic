@@ -1,3 +1,4 @@
+import csv
 import logging
 import tracemalloc
 from contextlib import contextmanager
@@ -111,10 +112,15 @@ class Context:
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
 
-    def display(self):
-        number_of_gates = self.args.num_layers * self.args.num_neurons
-        runtime = self.results.get_total_runtime()
+    def output(self):
+        if self.args.output == "display":
+            self.display()
+        elif self.args.output == "csv":
+            self.to_csv()
+        else:
+            raise ValueError(f"Unknown output format: {self.args.output}")
 
+    def get_headers(self):
         headers = [
             "ds",
             "input_dim",
@@ -137,6 +143,11 @@ class Context:
             "m_enc",
             "m_expl",
         ]
+        return headers
+
+    def get_data(self):
+        number_of_gates = self.args.num_layers * self.args.num_neurons
+        runtime = self.results.get_total_runtime()
         data = [
             [
                 self.args.dataset,
@@ -161,6 +172,19 @@ class Context:
                 humanfriendly.format_size(self.results.get_value("memory/explanation")),
             ]
         ]
+        return data
+
+    def to_csv(self):
+        data = self.get_data()
+        headers = self.get_headers()
+        with open("results.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            writer.writerows(data)
+
+    def display(self):
+        headers = self.get_headers()
+        data = self.get_data()
         print(tabulate(data, headers=headers, tablefmt="github"))
         self.print_dedup_dict()
 
@@ -184,3 +208,19 @@ class Context:
 
     def get_dataset(self):
         return self.dataset
+
+
+class MultiContext:
+    def __init__(self):
+        self.data = []
+        self.headers = None
+
+    def add(self, ctx: Context):
+        self.data.append(ctx.get_data()[0])
+        self.headers = ctx.get_headers()
+
+    def to_csv(self, filename):
+        with open(filename, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(self.headers)
+            writer.writerows(self.data)

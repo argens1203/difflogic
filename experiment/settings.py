@@ -1,3 +1,6 @@
+from experiment.args.model_args import ModelArgs
+
+
 class Settings:
     # Model training hyper parameters (according to the paper)
     all_temperatures = [1, 1 / 0.3, 1 / 0.1, 1 / 0.03, 1 / 0.01]
@@ -114,12 +117,31 @@ class Settings:
     debug_network_param = dict(dataset_params)
 
     @staticmethod
-    def get_settings(dataset_name: str = "", paper=False, minimal=True):
+    def get_settings(
+        dataset_name: str = "", paper=False, minimal=True
+    ) -> dict[str, int]:
         if not paper or dataset_name == "iris":
-            return Settings.debug_network_param.get(dataset_name)
+            return Settings.debug_network_param.get(dataset_name, {})
         if minimal:
             if dataset_name not in ["mnist", "cifar10"]:
-                return Settings.network_param.get(dataset_name)
+                return Settings.network_param.get(dataset_name, {})
             else:
-                return (Settings.network_param.get(dataset_name) or {}).get("small")
+                return (Settings.network_param.get(dataset_name) or {}).get("small", {})
         return {}
+
+    @staticmethod
+    def get_model_args(dataset_name: str = "", paper=False) -> ModelArgs:
+        params = Settings.get_settings(dataset_name, paper)
+        return ModelArgs(
+            num_neurons=params.get("num_neurons"),
+            num_layers=params.get("num_layers"),
+        )
+
+    @staticmethod
+    def get_model_path(dataset: str, size: str) -> str:
+        if size == "small":
+            return "model-paths/$" + dataset + "_" + "model.pth"
+        if size == "debug":
+            return dataset + "_" + "model.pth"
+
+        assert False

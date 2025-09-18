@@ -19,7 +19,7 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         "--max_time",
         type=int,
         default=3600,
-        help="Timeout for entire run (in seconds) (default: 3600)",
+        help="Timeout for entire explanation (in seconds) (default: 3600)",
     )
     parser.add_argument(
         "--explain",
