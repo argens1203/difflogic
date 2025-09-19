@@ -23,12 +23,12 @@ torch.set_num_threads(1)  # ???
 
 class Experiment:
     @staticmethod
-    def debug(dataset=None, reverse=False, ohe=False):
+    def debug(dataset=None, reverse=False):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
             "verbose": "info",
-            "size": "small",
+            "size": "debug",
             # "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
@@ -36,7 +36,6 @@ class Experiment:
             "output": "csv",
             "max_explain_time": 30,
             "strategy": ("b_full" if reverse else "full"),
-            # "strategy": "ohe" if ohe else "full",
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
             # "xnum": 10,
             #  ------

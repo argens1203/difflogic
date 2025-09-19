@@ -21,6 +21,6 @@ def add_encoding_args(parser: argparse.ArgumentParser):
         "--strategy",
         type=str,
         default="full",
-        choices=["full", "b_full", "parent", "ohe"],
+        choices=["full", "b_full", "parent"],
         help="Deduplication strategy to use (only for SAT).",
     )
