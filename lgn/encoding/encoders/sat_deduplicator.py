@@ -62,23 +62,58 @@ class SatDeduplicator:
             return False
         return None
 
-    def deduplicate_pair(self, i, j, gates, reverse):
+    def __deduplicate_pair_normal(self, i, j, gates):
         gate = gates[i][j]
-        order = enumerate(gates) if not reverse else reversed(list(enumerate(gates)))
-        for k, layer in order:
-            if k > i:
-                continue
+
+        for k, layer in enumerate(gates):
             for m, prev in enumerate(layer):
                 if k == i and m == j:
-                    if reverse:
-                        break  # For reverse order, skip checking self and everything after
                     return None, None, None
                 is_reverse = self.dedup_pair_c(gate, prev)
                 if is_reverse is not None:
                     return k, m, is_reverse
 
-        assert reverse
+        assert False
+
+    def __deduplicate_pair_reverse(self, i, j, gates):
+        gate = gates[i][j]
+
+        for k, layer in reversed(list(enumerate(gates))):
+            if k > i:
+                continue
+            for m, prev in enumerate(layer):
+                if k == i and m == j:
+                    break  # For reverse order, skip checking self and everything after in the same layer
+                is_reverse = self.dedup_pair_c(gate, prev)
+                if is_reverse is not None:
+                    return k, m, is_reverse
+
         return None, None, None
+
+    def __deduplicate_pair_one_layer(self, i, j, gates):
+        gate = gates[i][j]
+        for k, layer in reversed(list(enumerate(gates))):
+            if k > i or (k < i - 1 and k != 0):
+                continue
+            # Only check current, previous and input layer
+            for m, prev in enumerate(layer):
+                if k == i and m == j:
+                    break  # For reverse order, skip checking self and everything after in the same layer
+                is_reverse = self.dedup_pair_c(gate, prev)
+                if is_reverse is not None:
+                    return k, m, is_reverse
+
+        return None, None, None
+
+    def deduplicate_pair(self, i, j, gates, strategy: str):
+        if strategy == "full":
+            return self.__deduplicate_pair_normal(i, j, gates)
+        elif strategy == "b_full":
+            return self.__deduplicate_pair_reverse(i, j, gates)
+        elif strategy == "parent":
+            return self.__deduplicate_pair_one_layer(i, j, gates)
+
+        assert False
 
     def _get_gates(self, input_ids, model):
         prev = input_ids
@@ -104,7 +139,7 @@ class SatDeduplicator:
 
         self.solver.append_formula(clauses)
 
-    def _get_lookups(self, gates, reverse):
+    def _get_lookups(self, gates, strategy: str):
         const_lookup = dict()
         is_rev_lookup = dict()
         pair_lookup = dict()
@@ -116,7 +151,9 @@ class SatDeduplicator:
                     const_lookup[(i, j)] = is_constant
                     continue
 
-                i_, j_, is_reverse = self.deduplicate_pair(i, j, gates, reverse=reverse)
+                i_, j_, is_reverse = self.deduplicate_pair(
+                    i, j, gates, strategy=strategy
+                )
                 if is_reverse is not None:
                     is_rev_lookup[(i, j)] = is_reverse
                 if i_ is not None and j_ is not None:
@@ -130,7 +167,7 @@ class SatDeduplicator:
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver
 
-    def deduplicate(self, model, Dataset, reverse=False):
+    def deduplicate(self, model, Dataset, strategy: str = "full"):
         input_handles, input_ids = self._get_inputs(Dataset)
 
         eq_constraints = self._get_eq_constraints(input_ids)
@@ -139,7 +176,7 @@ class SatDeduplicator:
         self.clauses = []
         gates = self._get_gates(input_ids, model)
         const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(
-            gates, reverse=reverse
+            gates, strategy=strategy
         )
 
         return const_lookup, is_rev_lookup, pair_lookup

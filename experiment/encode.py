@@ -19,9 +19,9 @@ class Encode:
         _Encoder = Encoder(e_ctx=ctx)  # Default Encoder (no deduplication)
         if args.deduplicate == "sat":
             logger.info("Using SAT Encoder...")
-            if args.strategy in ["full", "b_full"]:
+            if args.strategy in ["full", "b_full", "parent"]:
                 _Encoder = SatEncoder(e_ctx=ctx)
-                _Encoder.reverse = args.strategy == "b_full"
+                _Encoder.strategy = args.strategy
 
         elif args.deduplicate == "bdd":
             logger.info("Using BDD Encoder...")
