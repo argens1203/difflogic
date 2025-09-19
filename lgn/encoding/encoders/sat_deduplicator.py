@@ -1,15 +1,65 @@
+from __future__ import annotations
 import logging
 from tqdm import tqdm
 from pysat.formula import Atom
 
 from experiment.helpers.sat_context import SatContext
 from lgn.dataset.auto_transformer import AutoTransformer
+from lgn.encoding.util import get_parts
 
 from .util import _get_layers, get_eq_constraints
 
 logger = logging.getLogger(__name__)
 
 from pysat.solvers import Solver as BaseSolver
+
+from typing import List, Optional
+
+
+class Gate:
+
+    x: int
+    y: int
+    op: int
+    ohe: set[int]
+    left: Optional[Gate]
+    right: Optional[Gate]
+
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        op: int = -1,
+        ohe: Optional[set[int]] = None,
+        left: Optional[Gate] = None,
+        right: Optional[Gate] = None,
+    ):
+        self.x = x
+        self.y = y
+        self.op = op
+        self.left = left
+        self.right = right
+
+        # Op defintions
+        __atom = [0, 15]
+        __left = [3, 12]
+        __right = [5, 10]
+        __both = [1, 2, 4, 6, 7, 8, 9, 11, 13, 14]
+
+        if ohe is None:
+            assert left is not None and right is not None
+            if op in __atom:
+                self.ohe = set()
+            elif op in __left:
+                self.ohe = left.ohe
+            elif op in __right:
+                self.ohe = right.ohe
+            elif op in __both:
+                self.ohe = left.ohe | right.ohe
+            else:
+                assert False, f"Unknown op: {op}"
+        else:
+            self.ohe = ohe
 
 
 class SatDeduplicator:
@@ -62,30 +112,101 @@ class SatDeduplicator:
             return False
         return None
 
-    def deduplicate_pair(self, i, j, gates):
-        gate = gates[i][j]
-        for k, layer in enumerate(gates):
+    def __deduplicate_pair_normal(self, i, j, vars, gates):
+        curr = vars[i][j]
+
+        for k, layer in enumerate(vars):
             for m, prev in enumerate(layer):
                 if k == i and m == j:
                     return None, None, None
-                is_reverse = self.dedup_pair_c(gate, prev)
+                if gates[i][j].ohe & gates[k][m].ohe == set():
+                    continue
+                is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
                     return k, m, is_reverse
 
         assert False
 
+    def __deduplicate_pair_reverse(self, i, j, vars, gates):
+        curr = vars[i][j]
+
+        for k, layer in reversed(list(enumerate(vars))):
+            if k > i:
+                continue
+            for m, prev in enumerate(layer):
+                if k == i and m == j:
+                    break  # For reverse order, skip checking self and everything after in the same layer
+                if gates[i][j].ohe & gates[k][m].ohe == set():
+                    continue
+                is_reverse = self.dedup_pair_c(curr, prev)
+                if is_reverse is not None:
+                    return k, m, is_reverse
+
+        return None, None, None
+
+    def __deduplicate_pair_one_layer(self, i, j, vars, gates):
+        curr = vars[i][j]
+        for k, layer in reversed(list(enumerate(vars))):
+            if k > i or (k < i - 1 and k != 0):
+                continue
+            # Only check current, previous and input layer
+            for m, prev in enumerate(layer):
+                if k == i and m == j:
+                    break  # For reverse order, skip checking self and everything after in the same layer
+                if gates[i][j].ohe & gates[k][m].ohe == set():
+                    continue
+                is_reverse = self.dedup_pair_c(curr, prev)
+                if is_reverse is not None:
+                    return k, m, is_reverse
+
+        return None, None, None
+
+    def deduplicate_pair(self, i, j, vars, gates, strategy: str):
+        if strategy == "full":
+            return self.__deduplicate_pair_normal(i, j, vars=vars, gates=gates)
+        elif strategy == "b_full":
+            return self.__deduplicate_pair_reverse(i, j, vars=vars, gates=gates)
+        elif strategy == "parent":
+            return self.__deduplicate_pair_one_layer(i, j, vars=vars, gates=gates)
+
+        assert False
+
+    def __get_input_gates(self, input_ids: List[int]) -> List[Gate]:
+        def __get_ohe_set(input_id: int, parts: List[List[int]]) -> set[int]:
+            for part in parts:
+                if input_id in part:
+                    return set(part)
+            assert False
+
+        parts = get_parts(self.e_ctx.get_dataset(), input_ids)
+        ret = []
+        for i in range(len(input_ids)):
+            ret.append(Gate(0, i, -1, __get_ohe_set(input_ids[i], parts), None))
+        return ret
+
     def _get_gates(self, input_ids, model):
+        gates: List[List[Gate]] = [self.__get_input_gates(input_ids)]
+
+        for x, layer in enumerate(_get_layers(model)):
+            curr_layer = []
+            for idx, (op, a, b) in enumerate(layer.get_raw()):
+                # logger.info(f"op: {op}, a: {a}, b: {b}")
+                curr_layer.append(Gate(x + 1, idx, op, None, gates[x][a], gates[x][b]))
+            gates.append(curr_layer)
+        return gates
+
+    def _get_vars(self, input_ids, model):
         prev = input_ids
-        gates = [input_ids]
+        vars = [input_ids]
 
         with self.use_context() as vpool:
             for layer in _get_layers(model):
                 aux_vars = [vpool._next() for _ in range(layer.out_dim)]
                 for f in layer.get_clauses(prev, aux_vars):
                     self._extend_clauses(f)
-                gates.append(aux_vars)
+                vars.append(aux_vars)
                 prev = aux_vars
-        return gates
+        return vars
 
     def _add_clause(self, clause: list[int]):
         self._extend_clauses([clause])
@@ -98,18 +219,20 @@ class SatDeduplicator:
 
         self.solver.append_formula(clauses)
 
-    def _get_lookups(self, gates):
+    def _get_lookups(self, vars, gates, strategy: str):
         const_lookup = dict()
         is_rev_lookup = dict()
         pair_lookup = dict()
-        for i, layer_of_gates in enumerate(gates):
+
+        for i, layer_of_gates in enumerate(vars):
             for j, _ in tqdm(enumerate(layer_of_gates), total=len(layer_of_gates)):
-                is_constant = self.deduplicate_c(gates[i][j])
+                is_constant = self.deduplicate_c(vars[i][j])
                 if is_constant is not None:
                     const_lookup[(i, j)] = is_constant
                     continue
-
-                i_, j_, is_reverse = self.deduplicate_pair(i, j, gates)
+                i_, j_, is_reverse = self.deduplicate_pair(
+                    i, j, vars=vars, gates=gates, strategy=strategy
+                )
                 if is_reverse is not None:
                     is_rev_lookup[(i, j)] = is_reverse
                 if i_ is not None and j_ is not None:
@@ -123,15 +246,18 @@ class SatDeduplicator:
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver
 
-    def deduplicate(self, model, Dataset):
+    def deduplicate(self, model, Dataset, strategy: str = "full"):
         input_handles, input_ids = self._get_inputs(Dataset)
 
         eq_constraints = self._get_eq_constraints(input_ids)
         self.solver = self._initialize_solver(eq_constraints)
 
         self.clauses = []
+        vars = self._get_vars(input_ids, model)
         gates = self._get_gates(input_ids, model)
-        const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(gates)
+        const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(
+            vars=vars, strategy=strategy, gates=gates
+        )
 
         return const_lookup, is_rev_lookup, pair_lookup
 

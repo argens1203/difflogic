@@ -5,8 +5,8 @@ from typing import Optional
 
 @dataclass
 class ExplainerArgs:
-    xnum: int = 1000
-    max_time: int = 3600
+    xnum: Optional[int] = None
+    max_explain_time: int = 3600
     explain: Optional[str] = None
     explain_all: bool = False
     explain_one: bool = False
@@ -14,12 +14,12 @@ class ExplainerArgs:
 
 
 def add_explainer_args(parser: argparse.ArgumentParser):
-    parser.add_argument("--xnum", type=int, default=1000)
+    parser.add_argument("--xnum", type=int, default=None)
     parser.add_argument(
-        "--max_time",
+        "--max_explain_time",
         type=int,
         default=3600,
-        help="Timeout for entire run (in seconds) (default: 3600)",
+        help="Timeout for entire explanation (in seconds) (default: 3600)",
     )
     parser.add_argument(
         "--explain",

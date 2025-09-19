@@ -1,5 +1,5 @@
 import logging
-from typing import Set
+from typing import Optional, Set
 
 # if TYPE_CHECKING:
 from lgn.encoding import Encoding
@@ -75,7 +75,9 @@ class Explainer:
         # the entirity of to_hit is a MCS
         return mcs
 
-    def mhs_mus_enumeration(self, instance: Instance, xnum=1000, smallest=False):
+    def mhs_mus_enumeration(
+        self, instance: Instance, xnum: Optional[int] = None, smallest=False
+    ):
         session: Session
 
         with Session.use_context(
@@ -101,7 +103,7 @@ class Explainer:
                 # If guess is MUS, block it
                 if not res["solvable"]:
                     session.block(guess)
-                    if session.get_expls_count() >= xnum:
+                    if xnum is not None and session.get_expls_count() >= xnum:
                         break
                     else:
                         continue
@@ -116,7 +118,7 @@ class Explainer:
             itr = session.get_itr()
 
             # Check itration count
-            if xnum > 100:
+            if xnum is None:
                 assert itr == (
                     len(session.expls) + len(session.duals) + 1
                 ), "Assertion Error: " + ",".join(
@@ -145,7 +147,7 @@ class Explainer:
     def mhs_mcs_enumeration(
         self,
         instance: Instance,
-        xnum=1000,
+        xnum: Optional[int] = None,
         smallest=False,
     ):
         session: Session
@@ -174,7 +176,7 @@ class Explainer:
                 # If guess is MCS, block it
                 if res["solvable"]:
                     session.block(hset)
-                    if session.get_expls_count() >= xnum:
+                    if xnum is not None and session.get_expls_count() >= xnum:
                         break
                     else:
                         continue
@@ -193,7 +195,7 @@ class Explainer:
             expls = session.get_expls_opt()
             duals = session.get_duals_opt()
 
-            if xnum > 100:
+            if xnum is None:
                 # Check iteration count
                 assert itr == (
                     len(expls) + len(duals) + 1
@@ -242,7 +244,7 @@ class Explainer:
 
     # NEW
 
-    def explain_both_and_assert(self, instance, xnum=1000):
+    def explain_both_and_assert(self, instance, xnum: Optional[int]):
         self.explain(instance)
 
         axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum)
@@ -282,7 +284,7 @@ class Explainer:
         for cxp_d in cxp_dual:
             cxp_dual_set.add(frozenset(cxp_d))
 
-        if xnum > 100:
+        if xnum is None:
             assert axp_set.difference(cxp_dual_set) == set()
             assert cxp_dual_set.difference(axp_set) == set()
 

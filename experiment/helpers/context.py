@@ -1,3 +1,5 @@
+from datetime import datetime
+import csv
 import logging
 import tracemalloc
 from contextlib import contextmanager
@@ -8,6 +10,7 @@ import torch
 from .logging import setup_logger
 from .util import seed_all, get_results, get_enc_type
 from lgn.dataset import load_dataset
+from collections import OrderedDict
 
 
 class Cached_Key:
@@ -35,6 +38,8 @@ class Context:
         self.cache_hit = {Cached_Key.SOLVER: 0}
         self.cache_miss = {Cached_Key.SOLVER: 0}
         self.deduplication = 0
+        self.layer_seen = set()
+        self.dedup_dict = dict()
 
         self.results.store_start_time()
         self.num_explanations = 0
@@ -77,9 +82,29 @@ class Context:
 
     def reset_deduplication(self):
         self.deduplication = 0
+        self.dedup_dict = OrderedDict()
 
-    def inc_deduplication(self):
+    def inc_deduplication(self, curr_layer, target_layer):
+        CONSTANT = "Constant"
+        INPUT = "Input"
+
+        if curr_layer not in self.layer_seen:
+            self.layer_seen.add(curr_layer)
+            self.dedup_dict[(curr_layer, CONSTANT)] = 0
+            self.dedup_dict[(curr_layer, INPUT)] = 0
+            for k in range(1, curr_layer + 1):
+                self.dedup_dict[(curr_layer, k)] = 0
+        # curr_layer = 1-based
+        # target_layer = 1-based, 0 = input, -1 = constants
+
+        if target_layer == -1:
+            target_layer = CONSTANT
+        if target_layer == 0:
+            target_layer = INPUT
         self.deduplication += 1
+        self.dedup_dict[(curr_layer, target_layer)] = (
+            self.dedup_dict.get((curr_layer, target_layer), 0) + 1
+        )
 
     def store_clause(self, clause: list[list[int]]):
         self.num_clauses = len(clause)
@@ -88,10 +113,15 @@ class Context:
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
 
-    def display(self):
-        number_of_gates = self.args.num_layers * self.args.num_neurons
-        runtime = self.results.get_total_runtime()
+    def output(self):
+        if self.args.output == "display":
+            self.display()
+        elif self.args.output == "csv":
+            self.to_csv()
+        else:
+            raise ValueError(f"Unknown output format: {self.args.output}")
 
+    def get_headers(self):
         headers = [
             "ds",
             "input_dim",
@@ -113,7 +143,13 @@ class Context:
             "t/Exp",
             "m_enc",
             "m_expl",
+            "strategy",
         ]
+        return headers
+
+    def get_data(self):
+        number_of_gates = self.args.num_layers * self.args.num_neurons
+        runtime = self.results.get_total_runtime()
         data = [
             [
                 self.args.dataset,
@@ -136,9 +172,28 @@ class Context:
                 self.results.get_explanation_time() / self.num_explanations,
                 humanfriendly.format_size(self.results.get_value("memory/encoding")),
                 humanfriendly.format_size(self.results.get_value("memory/explanation")),
+                self.args.strategy,
             ]
         ]
+        return data
+
+    def to_csv(self):
+        data = self.get_data()
+        headers = self.get_headers()
+        with open("results.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            writer.writerows(data)
+
+    def display(self):
+        headers = self.get_headers()
+        data = self.get_data()
         print(tabulate(data, headers=headers, tablefmt="github"))
+        self.print_dedup_dict()
+
+    def print_dedup_dict(self):
+        for k in self.dedup_dict:
+            print(f"Layer {k[0]} -> {k[1]}: {self.dedup_dict[k]}")
 
     def __del__(self):
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))
@@ -156,3 +211,31 @@ class Context:
 
     def get_dataset(self):
         return self.dataset
+
+
+class MultiContext:
+    def __init__(self):
+        self.data = []
+        self.headers = None
+
+    def add(self, ctx: Context):
+        self.data.append(ctx.get_data()[0])
+        self.headers = ctx.get_headers()
+
+    @staticmethod
+    def __unique_str_from_timestamp():
+        return datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]  # Up to milliseconds
+
+    def to_csv(self, filename, with_timestamp=True):
+        if with_timestamp:
+            filename = f"{MultiContext.__unique_str_from_timestamp()}_{filename}"
+        with open(filename, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(self.headers)
+            writer.writerows(self.data)
+
+    def display(self):
+        headers = self.headers
+        data = self.data
+        print(tabulate(data, headers=headers, tablefmt="github"))
+        # self.print_dedup_dict()

@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class SatEncoder(Encoder):
+    strategy = "full"
+
     def _get_inputs(self, Dataset: AutoTransformer):
         with self.use_context() as vpool:
             input_handles = [Atom(i + 1) for i in range(Dataset.get_input_dim())]
@@ -39,7 +41,7 @@ class SatEncoder(Encoder):
         for i, h in enumerate(input_handles):
             lookup[(0, i)] = h
 
-        i = 1
+        i = 1  # First layer is inputs
         for layer in _get_layers(model):
             curr = layer.get_formula(curr)
             special = {}
@@ -50,15 +52,16 @@ class SatEncoder(Encoder):
                     curr[j] = f
                     special[j] = f
                     if g != Atom(True) and g != Atom(False):
-                        self.e_ctx.inc_deduplication()
+                        self.e_ctx.inc_deduplication(i, -1)
                 elif (i, j) in is_rev_lookup:
+                    target = pair_lookup[(i, j)]
                     if is_rev_lookup[(i, j)]:
-                        lookup[(i, j)] = Neg(lookup[pair_lookup[(i, j)]])
+                        lookup[(i, j)] = Neg(lookup[target])
                         curr[j] = lookup[(i, j)]
                     else:
-                        lookup[(i, j)] = lookup[pair_lookup[(i, j)]]
+                        lookup[(i, j)] = lookup[target]
                         curr[j] = lookup[(i, j)]
-                    self.e_ctx.inc_deduplication()
+                    self.e_ctx.inc_deduplication(i, target[0])
                 else:
                     lookup[(i, j)] = g
             i += 1
@@ -67,7 +70,7 @@ class SatEncoder(Encoder):
     def get_encoding(self, model, Dataset: AutoTransformer):
         const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
             self.e_ctx
-        ).deduplicate(model, Dataset)
+        ).deduplicate(model, Dataset, strategy=self.strategy)
 
         self.context = SatContext()
 

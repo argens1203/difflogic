@@ -240,6 +240,14 @@ class LogicLayer(torch.nn.Module):
         ]
         return clauses
 
+    def get_raw(self) -> list[tuple[int, int, int]]:
+        return list(
+            map(
+                lambda x: (x[0].item(), x[1].item(), x[2].item()),
+                list(zip(self.weights.argmax(-1), *self.indices)),
+            )
+        )
+
     def print(self):
         ops = [idx_to_op(i) for i in self.weights.argmax(-1)]
         print("Operations:")

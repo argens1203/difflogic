@@ -49,13 +49,13 @@ class Explain:
         exp_count = 0
         count = 0
 
-        remaining_time = args.max_time
+        remaining_time = args.max_explain_time
         for data_loader, is_train in zip(
             [ctx.train_loader, ctx.test_loader], [True, False]
         ):
             t, e, c = Explain.explain_dataloader(
                 data_loader=data_loader,
-                exp_args=ExplainerArgs(xnum=args.xnum, max_time=remaining_time),
+                exp_args=ExplainerArgs(xnum=args.xnum, max_explain_time=remaining_time),
                 is_train=is_train,
                 explainer=explainer,
                 encoding=encoding,
@@ -81,9 +81,11 @@ class Explain:
         all_times = 0
         exp_count = 0
         count = 0
-        max_time = exp_args.max_time
+        max_explain_time = exp_args.max_explain_time
 
-        logging.info("Explaining dataloader with max_time: %s", max_time)
+        logging.info(
+            "Explaining dataloader with max_explain_time: %s", max_explain_time
+        )
         begin = time.time()
         batch_idx = 0
         for batch, label, idx in data_loader:
@@ -99,9 +101,12 @@ class Explain:
                 )
                 exp_count += exp_count_axp_plus_cxp
                 count += 1
-                if max_time is not None and time.time() - begin > max_time:
+                if (
+                    max_explain_time is not None
+                    and time.time() - begin > max_explain_time
+                ):
                     break
-            if max_time is not None and time.time() - begin > max_time:
+            if max_explain_time is not None and time.time() - begin > max_explain_time:
                 break
             all_times += time.time() - start
             batch_idx += 1

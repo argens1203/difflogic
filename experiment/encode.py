@@ -16,15 +16,18 @@ class Args(EncodingArgs, PySatArgs):
 class Encode:
     @staticmethod
     def get_encoding(model, args: Args, ctx: Context):
-        _Encoder = Encoder
+        _Encoder = Encoder(e_ctx=ctx)  # Default Encoder (no deduplication)
         if args.deduplicate == "sat":
             logger.info("Using SAT Encoder...")
-            _Encoder = SatEncoder
+            _Encoder = SatEncoder(e_ctx=ctx)
+            _Encoder.strategy = args.strategy
+            assert args.strategy in ["full", "b_full", "parent"]
+
         elif args.deduplicate == "bdd":
             logger.info("Using BDD Encoder...")
-            _Encoder = BddEncoder
+            _Encoder = BddEncoder(e_ctx=ctx)
 
-        encoding = _Encoder(e_ctx=ctx).get_encoding(
+        encoding = _Encoder.get_encoding(
             model,
             ctx.dataset,
         )

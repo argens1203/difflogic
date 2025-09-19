@@ -11,6 +11,9 @@ class ExperimentArgs:
     save_model: bool = True
     load_model: bool = True
     model_path: str = "model.pth"
+    size: Optional[str] = None
+    output: str = "display"
+    output_path: str = "results.csv"
 
 
 def add_experiment_args(parser: argparse.ArgumentParser):
@@ -49,4 +52,25 @@ def add_experiment_args(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "--model_path", type=str, default="model.pth", help="Path to save the model"
+    )
+    parser.add_argument(
+        "--size",
+        type=str,
+        default="custom",
+        choices=["debug", "small", "custom"],
+        help="Size of network, with args preset accordingly",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="display",
+        choices=["display", "csv"],
+        help="Output format",
+    )
+
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        default="results.csv",
+        help="Path to save results if output is csv",
     )

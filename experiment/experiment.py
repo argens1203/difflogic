@@ -1,6 +1,9 @@
 import argparse
+from typing import Dict
 import torch
 import json
+
+from experiment.args.model_args import ModelArgs
 
 from .args import get_args, DefaultArgs
 from .helpers import Context
@@ -20,51 +23,58 @@ torch.set_num_threads(1)  # ???
 
 class Experiment:
     @staticmethod
-    def debug(dataset=None):
+    def debug(dataset=None, reverse=False):
         dataset = dataset if dataset is not None else "iris"
-        dataset_args: dict[str, int] = Settings.debug_network_param.get(dataset) or {}
         exp_args = {
             "eval_freq": 1000,
             "verbose": "info",
+            "size": "small",
             # "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
-            # "save_model": True,
             "load_model": True,
-            "max_time": 30,
-            # "model_path": dataset + "_" + "model.pth",
-            # "explain_inp": "3,4,7,11,13,-17,16,-15,-14,-12,-2,-9,-8,-10,-6,-5,-1",
-            # "xnum": 10000,
+            "output": "csv",
+            "max_explain_time": 30,
+            "strategy": ("b_full" if reverse else "full"),
+            # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
+            # "xnum": 10,
             #  ------
-            "model_path": "model-paths/$" + dataset + "_" + "model.pth",
-            "save_model": False,
-            "num_layers": 5,
-            "num_neurons": 24,
-            #  ------
-            # "model_path": "model-paths/$adult" + "_" + "model.pth",
-            # "save_model": False,
-            # "num_layers": 5,
-            # "num_neurons": 58,
-            #  ------
-            # "explain_one": True,
-            # "explain_inp": "1,3,6,7,-2,-4,-5,-8",
-            # {2, 3, 6, 8, -7, -5, -4, -1}
+            "explain_one": True,
         }
         args = {
             **vars(default_args),
-            **dataset_args,
             **exp_args,
             **{"dataset": dataset},
         }
 
         # Experiment.compare_encoders(args)
+        args = Experiment.setup_preset_args(args)
+        ctx = Experiment.run(args)
 
-        results = Experiment.run(args)
+        # args["deduplicate"] = "bdd"
+        # results = Experiment.run(args)
 
-        args["deduplicate"] = "bdd"
-        results = Experiment.run(args)
+        return ctx
 
-        return results
+    @staticmethod
+    def setup_preset_args(args):
+        if args.get("size") != "custom":
+            model_args = Settings.get_model_args(
+                dataset_name=args.get("dataset"),
+                paper=args.get("size") != "debug",
+            )
+            model_path = Settings.get_model_path(
+                dataset=args.get("dataset"),
+                size=args.get("size"),
+            )
+            save_model = args.get("size") == "debug"
+            args = {
+                **args,
+                **vars(model_args),
+                **{"model_path": model_path},
+                **{"save_model": save_model},
+            }
+        return args
 
     @staticmethod
     def run_with_cmd():
@@ -154,6 +164,7 @@ class Experiment:
 
     @staticmethod
     def run(args):
+
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         if args.verbose != "warn":
@@ -216,10 +227,10 @@ class Experiment:
         # ctx.end_memory_usage()
         ctx.results.save()
         ctx.results.store_end_time()
-        ctx.display()
+        ctx.output()
         # input("Press Enter to continue...")
 
-        return ctx.results
+        return ctx
 
     @staticmethod
     def compare_encoders(args):
