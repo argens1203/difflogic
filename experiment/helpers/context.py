@@ -143,6 +143,7 @@ class Context:
             "t/Exp",
             "m_enc",
             "m_expl",
+            "strategy",
         ]
         return headers
 
@@ -171,6 +172,7 @@ class Context:
                 self.results.get_explanation_time() / self.num_explanations,
                 humanfriendly.format_size(self.results.get_value("memory/encoding")),
                 humanfriendly.format_size(self.results.get_value("memory/explanation")),
+                self.args.strategy,
             ]
         ]
         return data
@@ -231,3 +233,9 @@ class MultiContext:
             writer = csv.writer(f)
             writer.writerow(self.headers)
             writer.writerows(self.data)
+
+    def display(self):
+        headers = self.headers
+        data = self.data
+        print(tabulate(data, headers=headers, tablefmt="github"))
+        # self.print_dedup_dict()
