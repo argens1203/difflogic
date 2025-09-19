@@ -120,8 +120,13 @@ class Settings:
     def get_settings(
         dataset_name: str = "", paper=False, minimal=True
     ) -> dict[str, int]:
-        if not paper or dataset_name == "iris":
+        if not paper:
             return Settings.debug_network_param.get(dataset_name, {})
+        if dataset_name == "iris":
+            return {
+                "num_neurons": 24,
+                "num_layers": 5,
+            }  # Custom created large iris model
         if minimal:
             if dataset_name not in ["mnist", "cifar10"]:
                 return Settings.network_param.get(dataset_name, {})

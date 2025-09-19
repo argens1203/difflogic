@@ -28,7 +28,7 @@ class Experiment:
         exp_args = {
             "eval_freq": 1000,
             "verbose": "info",
-            "size": "debug",
+            "size": "small",
             # "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,

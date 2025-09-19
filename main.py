@@ -23,7 +23,7 @@ if __name__ == "__main__":
     m_ctx.add(Experiment.debug(dataset="adult", reverse=True))
     # m_ctx.add(Experiment.debug(dataset="mnist"))
     # m_ctx.display()
-    m_ctx.to_csv(filename=f"both_results.csv", with_timestamp=True)
+    m_ctx.to_csv(filename=f"both_large_results.csv", with_timestamp=True)
     # Experiment.debug(dataset="monk1")
     # Experiment.debug(dataset="monk2")
     # Experiment.debug(dataset="monk3")
