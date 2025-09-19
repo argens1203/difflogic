@@ -35,8 +35,8 @@ class Experiment:
             "load_model": True,
             "output": "csv",
             "max_explain_time": 30,
-            # "strategy": ("b_full" if reverse else "full"),
-            "strategy": "ohe" if ohe else "full",
+            "strategy": ("b_full" if reverse else "full"),
+            # "strategy": "ohe" if ohe else "full",
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
             # "xnum": 10,
             #  ------

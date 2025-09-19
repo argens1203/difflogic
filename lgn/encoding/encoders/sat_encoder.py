@@ -74,7 +74,7 @@ class SatEncoder(Encoder):
                 self.e_ctx
             ).deduplicate(model, Dataset, strategy=self.strategy)
         else:
-            const_lookup, is_rev_lookup, pair_lookup = NewSatDeduplicator(
+            const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
                 self.e_ctx
             ).deduplicate(model, Dataset, strategy=self.strategy)
 
