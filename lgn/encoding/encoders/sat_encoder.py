@@ -5,6 +5,7 @@ from pysat.formula import Atom, Neg
 from experiment.helpers import SatContext
 
 from lgn.dataset import AutoTransformer
+from lgn.encoding.encoders.new_sat_deduplicator import NewSatDeduplicator
 
 from .sat_deduplicator import SatDeduplicator
 from .encoder import Encoder
@@ -68,9 +69,15 @@ class SatEncoder(Encoder):
         return curr, special
 
     def get_encoding(self, model, Dataset: AutoTransformer):
-        const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
-            self.e_ctx
-        ).deduplicate(model, Dataset, strategy=self.strategy)
+        if self.strategy in ["full", "b_full", "parent"]:
+            const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
+                self.e_ctx
+            ).deduplicate(model, Dataset, strategy=self.strategy)
+        else:
+            const_lookup, is_rev_lookup, pair_lookup = NewSatDeduplicator(
+                self.e_ctx
+            ).deduplicate(model, Dataset, strategy=self.strategy)
+
         self.context = SatContext()
 
         input_handles, input_ids = self._get_inputs(Dataset)
