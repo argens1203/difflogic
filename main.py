@@ -10,6 +10,7 @@ if __name__ == "__main__":
     m_ctx = MultiContext()
 
     # m_ctx.add(Experiment.debug(dataset="mnist"))
+    # m_ctx.add(Experiment.debug(dataset="compas"))
     m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="adult"))
 

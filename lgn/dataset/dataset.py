@@ -9,6 +9,7 @@ from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
 from .mnist import MNISTDataset
 from .lending import LendingDataset
+from .compas import CompasDataset
 
 
 def load_n(loader, n):
@@ -34,6 +35,8 @@ def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
         return MNISTDataset.get_input_dim()
     if dataset == "lending":
         return LendingDataset.get_input_dim()
+    if dataset == "compas":
+        return CompasDataset.get_input_dim()
     return {
         "mnist20x20": 400,
         "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
@@ -55,6 +58,8 @@ def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
         return MNISTDataset.get_num_of_classes()
     if dataset == "lending":
         return LendingDataset.get_num_of_classes()
+    if dataset == "compas":
+        return CompasDataset.get_num_of_classes()
     return {
         "mnist20x20": 10,
         "cifar-10-3-thresholds": 10,
@@ -76,6 +81,8 @@ def get_dataset(dataset):
         return MNISTDataset
     if dataset == "lending":
         return LendingDataset
+    if dataset == "compas":
+        return CompasDataset
 
 
 class Flatten:
