@@ -13,6 +13,9 @@ def get_model(args, results=None):
     in_dim = dataset.get_input_dim()
     class_count = dataset.get_num_of_classes()
 
+    # print(f"in_dim={in_dim}, class_count={class_count}")
+    # input("Press Enter to continue...")
+
     logic_layers = []
 
     k = args.num_neurons

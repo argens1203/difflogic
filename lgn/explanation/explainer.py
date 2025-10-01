@@ -20,6 +20,8 @@ class Explainer:
     def __init__(self, encoding: Encoding, ctx: Context):
         self.encoding = encoding
         self.oracle = MulticlassSolver(encoding=encoding, ctx=ctx)
+        for cls in self.encoding.get_classes():
+            assert self.oracle.is_solvable(pred_class=cls, inp=set())
 
     def explain(self, instance: Instance):
         pred_class = instance.get_predicted_class()

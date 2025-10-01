@@ -6,6 +6,7 @@ from .adult import AdultDataset
 from .monk import Monk1Dataset, Monk2Dataset, Monk3Dataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
+from .lending import LendingDataset
 
 
 def get_raw(raw, train, test):
@@ -71,6 +72,8 @@ def load_dataset(args):
         dataset = Caltech101Dataset()
     elif args.dataset == "mnist":
         dataset = MNISTDataset()
+    elif args.dataset == "lending":
+        dataset = LendingDataset()
 
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(

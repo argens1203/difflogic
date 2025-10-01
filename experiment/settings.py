@@ -99,6 +99,7 @@ class Settings:
         ("monk3", 10),
         ("breast_cancer", 26),
         ("mnist", 400),
+        ("lending", 256),
     ]
     dataset_params = [
         (
