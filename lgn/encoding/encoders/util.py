@@ -26,6 +26,7 @@ def get_eq_constraints(Dataset: AutoTransformer, input_ids, enc_type, vpool):
     parts = get_parts(Dataset, input_ids)
 
     logger.debug("full_input_ids: %s", input_ids)
+    logger.debug("parts: %s", parts)
 
     for part in parts:
         eq_constraints.extend(

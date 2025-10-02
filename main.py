@@ -10,7 +10,8 @@ if __name__ == "__main__":
     m_ctx = MultiContext()
 
     # m_ctx.add(Experiment.debug(dataset="mnist"))
-    m_ctx.add(Experiment.debug(dataset="lending"))
+    # m_ctx.add(Experiment.debug(dataset="compas"))
+    # m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="adult"))
 
     # # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     # m_ctx.add(Experiment.debug(dataset="iris"))
     # m_ctx.add(Experiment.debug(dataset="monk1"))
     # m_ctx.add(Experiment.debug(dataset="monk2"))
-    # m_ctx.add(Experiment.debug(dataset="monk3"))
+    m_ctx.add(Experiment.debug(dataset="monk3"))
     # m_ctx.add(Experiment.debug(dataset="breast_cancer"))
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))

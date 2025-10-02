@@ -7,6 +7,7 @@ from .monk import Monk1Dataset, Monk2Dataset, Monk3Dataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
 from .lending import LendingDataset
+from .compas import CompasDataset
 
 
 def get_raw(raw, train, test):
@@ -21,9 +22,10 @@ def get_raw(raw, train, test):
 
 
 def load_dataset(args):
-    if args.dataset == "adult":
-        train_set = AdultDataset(split="train")
-        test_set = AdultDataset(split="test")
+    if args.dataset == "adult" or args.dataset == "lending":
+        Dataset = AdultDataset if args.dataset == "adult" else LendingDataset
+        train_set = Dataset(split="train")
+        test_set = Dataset(split="test")
         train_loader = torch.utils.data.DataLoader(
             train_set, batch_size=args.batch_size, shuffle=True
         )
@@ -72,8 +74,8 @@ def load_dataset(args):
         dataset = Caltech101Dataset()
     elif args.dataset == "mnist":
         dataset = MNISTDataset()
-    elif args.dataset == "lending":
-        dataset = LendingDataset()
+    elif args.dataset == "compas":
+        dataset = CompasDataset()
 
     train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
     train_loader = torch.utils.data.DataLoader(

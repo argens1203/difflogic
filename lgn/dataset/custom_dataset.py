@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import csv
 from abc import ABC, abstractmethod
 
 from torchvision.datasets.utils import download_url, check_integrity
@@ -35,17 +36,19 @@ class CustomDataset(Dataset, ABC):
         if filepath is None:
             filepath = self.fpath
 
-        with open(filepath, "r") as f:
-            data = f.readlines()
+        rows = []
+        with open(filepath, "r", newline="", encoding="utf-8") as f:
+            reader = csv.reader(f, delimiter=delimiter, quotechar='"')
+            for row in reader:
+                # turn row into the raw line string if you need to filter before parsing
+                raw_line = delimiter.join(row)
+                if not row or not select(raw_line):
+                    continue
+                # strip spaces from each field
+                cleaned = [cell.strip() for cell in row]
+                rows.append(cleaned)
 
-        for i in range(len(data)):
-            if len(data[i]) <= 2 or not select(data[i]):
-                data[i] = None
-            else:
-                data[i] = data[i].strip("\n").strip().strip(".").split(delimiter)
-                data[i] = [d.strip() for d in data[i]]
-        data = list(filter(lambda x: x is not None, data))
-        return np.array(data)
+        return np.array(rows, dtype=object)
 
     @abstractmethod
     def load_data(self):
