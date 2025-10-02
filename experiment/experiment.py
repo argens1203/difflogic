@@ -27,7 +27,7 @@ class Experiment:
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
-            "verbose": "info",
+            # "verbose": "info",
             "size": "debug",
             "verbose": "debug",
             "deduplicate": "sat",  # 'bdd', 'sat', None

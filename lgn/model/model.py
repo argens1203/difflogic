@@ -1,4 +1,5 @@
 import torch
+import logging
 from attr import dataclass
 
 from difflogic import LogicLayer, GroupSum
@@ -7,13 +8,16 @@ from lgn.dataset import get_dataset
 from constant import device
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_model(args, results=None):
     llkw = dict(grad_factor=args.grad_factor, connections=args.connections)
     dataset = get_dataset(args.dataset)
     in_dim = dataset.get_input_dim()
     class_count = dataset.get_num_of_classes()
 
-    # print(f"in_dim={in_dim}, class_count={class_count}")
+    logger.debug(f"in_dim={in_dim}, class_count={class_count}")
     # input("Press Enter to continue...")
 
     logic_layers = []

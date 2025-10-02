@@ -83,6 +83,8 @@ class SatEncoder(Encoder):
             input_handles, formula
         )
 
+        logger.debug("output_ids: %s", str(output_ids))
+
         return Encoding(
             clauses=cnf.clauses,
             eq_constraints=self._get_eq_constraints(input_ids),

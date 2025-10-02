@@ -73,6 +73,35 @@ class Encoder:
 
         return x, inputs
 
+    def __handle_output_duplicates(self, output_ids, cnf):
+        total_output_len = len(output_ids)
+        cls_no = self.e_ctx.dataset.get_num_of_classes()
+        assert total_output_len % cls_no == 0
+        group_size = total_output_len // cls_no
+
+        duplicates = dict()  # key: output var, value: list of indices in output_ids
+
+        for idx in range(0, total_output_len, group_size):
+            subgroup = output_ids[idx : idx + group_size]
+            rest = output_ids[:idx]
+            # rest = output_ids[:idx] + output_ids[idx + group_size :] Only compare with previous, previous takes precendence
+            for o in subgroup:
+                if o is not None and -o in rest:
+                    duplicates.setdefault(o, []).append(idx)
+
+        logger.debug("Before deduplication output_ids: %s", str(output_ids))
+
+        with self.use_context() as vpool:
+            for k, v in duplicates.items():
+                for idx in v:
+                    auxvar = vpool._next()
+                    cnf.extend([[k, -auxvar], [-k, auxvar]])
+                    output_ids[idx] = auxvar
+
+        logger.debug("Final output_ids: %s", str(output_ids))
+
+        return output_ids, cnf
+
     def populate_clauses(self, input_handles, formula):
         with self.use_context() as vpool:
             input_ids = [vpool.id(h) for h in input_handles]
@@ -115,6 +144,10 @@ class Encoder:
 
                 # logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
+
+            logger.debug("output_ids: %s", str(output_ids))
+
+        output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
 
         return input_ids, cnf, output_ids, special
 

@@ -121,6 +121,12 @@ class MulticlassSolver:
     def get_lits_and_bound(self, true_class, adj_class):
         pos, pos_none_idxs = remove_none(self.encoding.get_output_ids(adj_class))
         neg, neg_none_idxs = remove_none(self.encoding.get_output_ids(true_class))
+
+        logger.debug("Pos: %s", str(pos))
+        logger.debug("Neg: %s", str(neg))
+        logger.debug("Pos none idxs: %s", str(pos_none_idxs))
+        logger.debug("Neg none idxs: %s", str(neg_none_idxs))
+
         neg = [-a for a in neg]
         lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
 
@@ -132,12 +138,20 @@ class MulticlassSolver:
             str(lits),
         )
 
+        # assert len(set(lits)) == len(lits), "Literals must be unique"
+
         bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
 
         for idx in pos_none_idxs:
+            logger.debug(
+                "Truth value of %d is %s", idx, self.encoding.get_truth_value(idx)
+            )
             if self.encoding.get_truth_value(idx) is True:
                 bound -= 1  # One vote less for each defenite True in the output of the adj class
         for idx in neg_none_idxs:
+            logger.debug(
+                "Truth value of %d is %s", idx, self.encoding.get_truth_value(idx)
+            )
             if self.encoding.get_truth_value(idx) is False:
                 bound -= 1  # One vote more is needed for each defenite True in the output of the true class
 
