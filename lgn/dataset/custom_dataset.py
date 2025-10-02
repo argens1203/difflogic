@@ -36,9 +36,25 @@ class CustomDataset(Dataset, ABC):
         if filepath is None:
             filepath = self.fpath
 
+        # with open(filepath, "r") as f:
+        #     data = f.readlines()
+
+        # for i in range(len(data)):
+        #     if len(data[i]) <= 2 or not select(data[i]):
+        #         data[i] = None
+        #     else:
+        #         data[i] = data[i].strip("\n").strip().strip(".").split(delimiter)
+        #         data[i] = [d.strip() for d in data[i]]
+        # data = list(filter(lambda x: x is not None, data))
+        # print(data[0])
+        # input("Press Enter to continue...")
+        # return np.array(data)
+
         rows = []
         with open(filepath, "r", newline="", encoding="utf-8") as f:
-            reader = csv.reader(f, delimiter=delimiter, quotechar='"')
+            reader = csv.reader(
+                f, delimiter=delimiter, quotechar='"', skipinitialspace=True
+            )
             for row in reader:
                 # turn row into the raw line string if you need to filter before parsing
                 raw_line = delimiter.join(row)
@@ -47,7 +63,9 @@ class CustomDataset(Dataset, ABC):
                 # strip spaces from each field
                 cleaned = [cell.strip() for cell in row]
                 rows.append(cleaned)
+        # print(rows[0])
 
+        # input("Press Enter to continue...")
         return np.array(rows, dtype=object)
 
     @abstractmethod

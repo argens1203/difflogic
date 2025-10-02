@@ -29,7 +29,7 @@ class Experiment:
             "eval_freq": 1000,
             # "verbose": "info",
             "size": "debug",
-            "verbose": "debug",
+            "verbose": "info",
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             "load_model": True,
