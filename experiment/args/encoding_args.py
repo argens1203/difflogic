@@ -7,6 +7,7 @@ from typing import Optional
 class EncodingArgs:
     deduplicate: Optional[str] = None
     strategy: str = "full"
+    ohe_deduplication: bool = True
 
 
 def add_encoding_args(parser: argparse.ArgumentParser):
@@ -23,4 +24,11 @@ def add_encoding_args(parser: argparse.ArgumentParser):
         default="full",
         choices=["full", "b_full", "parent"],
         help="Deduplication strategy to use (only for SAT).",
+    )
+
+    parser.add_argument(
+        "--ohe_deduplication",
+        action="store_true",
+        default=True,
+        help="Enable OHE deduplication (only for SAT).",
     )

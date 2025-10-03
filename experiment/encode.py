@@ -21,6 +21,7 @@ class Encode:
             logger.info("Using SAT Encoder...")
             _Encoder = SatEncoder(e_ctx=ctx)
             _Encoder.strategy = args.strategy
+            _Encoder.deduplicate_ohe = args.ohe_deduplication
             assert args.strategy in ["full", "b_full", "parent"]
 
         elif args.deduplicate == "bdd":

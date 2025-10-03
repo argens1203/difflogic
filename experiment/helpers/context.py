@@ -43,6 +43,7 @@ class Context:
 
         self.results.store_start_time()
         self.num_explanations = 0
+        self.ohe_deduplication = []
 
     def debug(self, l: Callable):
         if self.verbose == "debug":
@@ -106,6 +107,9 @@ class Context:
             self.dedup_dict.get((curr_layer, target_layer), 0) + 1
         )
 
+    def inc_ohe_deduplication(self, ohe_from, ohe_to):
+        self.ohe_deduplication.append((ohe_from, ohe_to))
+
     def store_clause(self, clause: list[list[int]]):
         self.num_clauses = len(clause)
         self.num_vars = max(abs(literal) for clause in clause for literal in clause)
@@ -131,6 +135,7 @@ class Context:
             "enc",
             "solver",
             "ddup",
+            "ohe-ddup",
             "# gates",
             "# gates_f",
             "# cl",
@@ -160,6 +165,7 @@ class Context:
                 self.args.enc_type,
                 self.args.solver_type,
                 self.args.deduplicate,
+                len(self.ohe_deduplication) if self.args.ohe_deduplication else "N/A",
                 number_of_gates,
                 number_of_gates - self.deduplication,
                 self.num_clauses,

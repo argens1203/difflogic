@@ -112,7 +112,7 @@ class SatDeduplicator:
             return False
         return None
 
-    def __deduplicate_pair_normal(self, i, j, vars, gates):
+    def __deduplicate_pair_normal(self, i, j, vars, gates, deduplicate_ohe: bool):
         curr = vars[i][j]
 
         for k, layer in enumerate(vars):
@@ -123,11 +123,17 @@ class SatDeduplicator:
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
+                    if deduplicate_ohe and gates[i][j].ohe ^ gates[k][m].ohe != set():
+                        if len(gates[i][j].ohe) < len(gates[k][m].ohe):
+                            self.e_ctx.inc_ohe_deduplication(
+                                gates[i][j].ohe, gates[k][m].ohe
+                            )
+                            gates[i][j].ohe = gates[k][m].ohe
                     return k, m, is_reverse
 
         assert False
 
-    def __deduplicate_pair_reverse(self, i, j, vars, gates):
+    def __deduplicate_pair_reverse(self, i, j, vars, gates, deduplicate_ohe: bool):
         curr = vars[i][j]
 
         for k, layer in reversed(list(enumerate(vars))):
@@ -140,11 +146,17 @@ class SatDeduplicator:
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
+                    if deduplicate_ohe and gates[i][j].ohe ^ gates[k][m].ohe != set():
+                        if len(gates[i][j].ohe) < len(gates[k][m].ohe):
+                            self.e_ctx.inc_ohe_deduplication(
+                                gates[i][j].ohe, gates[k][m].ohe
+                            )
+                            gates[i][j].ohe = gates[k][m].ohe
                     return k, m, is_reverse
 
         return None, None, None
 
-    def __deduplicate_pair_one_layer(self, i, j, vars, gates):
+    def __deduplicate_pair_one_layer(self, i, j, vars, gates, deduplicate_ohe: bool):
         curr = vars[i][j]
         for k, layer in reversed(list(enumerate(vars))):
             if k > i or (k < i - 1 and k != 0):
@@ -157,17 +169,29 @@ class SatDeduplicator:
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
+                    if deduplicate_ohe and gates[i][j].ohe ^ gates[k][m].ohe != set():
+                        if len(gates[i][j].ohe) < len(gates[k][m].ohe):
+                            self.e_ctx.inc_ohe_deduplication(
+                                gates[i][j].ohe, gates[k][m].ohe
+                            )
+                            gates[i][j].ohe = gates[k][m].ohe
                     return k, m, is_reverse
 
         return None, None, None
 
-    def deduplicate_pair(self, i, j, vars, gates, strategy: str):
+    def deduplicate_pair(self, i, j, vars, gates, strategy: str, deduplicate_ohe: bool):
         if strategy == "full":
-            return self.__deduplicate_pair_normal(i, j, vars=vars, gates=gates)
+            return self.__deduplicate_pair_normal(
+                i, j, vars=vars, gates=gates, deduplicate_ohe=deduplicate_ohe
+            )
         elif strategy == "b_full":
-            return self.__deduplicate_pair_reverse(i, j, vars=vars, gates=gates)
+            return self.__deduplicate_pair_reverse(
+                i, j, vars=vars, gates=gates, deduplicate_ohe=deduplicate_ohe
+            )
         elif strategy == "parent":
-            return self.__deduplicate_pair_one_layer(i, j, vars=vars, gates=gates)
+            return self.__deduplicate_pair_one_layer(
+                i, j, vars=vars, gates=gates, deduplicate_ohe=deduplicate_ohe
+            )
 
         assert False
 
@@ -219,7 +243,7 @@ class SatDeduplicator:
 
         self.solver.append_formula(clauses)
 
-    def _get_lookups(self, vars, gates, strategy: str):
+    def _get_lookups(self, vars, gates, strategy: str, deduplicate_ohe: bool):
         const_lookup = dict()
         is_rev_lookup = dict()
         pair_lookup = dict()
@@ -231,7 +255,12 @@ class SatDeduplicator:
                     const_lookup[(i, j)] = is_constant
                     continue
                 i_, j_, is_reverse = self.deduplicate_pair(
-                    i, j, vars=vars, gates=gates, strategy=strategy
+                    i,
+                    j,
+                    vars=vars,
+                    gates=gates,
+                    strategy=strategy,
+                    deduplicate_ohe=deduplicate_ohe,
                 )
                 if is_reverse is not None:
                     is_rev_lookup[(i, j)] = is_reverse
@@ -246,7 +275,10 @@ class SatDeduplicator:
         solver.append_formula(eq_constraints.clauses)  # OHE
         return solver
 
-    def deduplicate(self, model, Dataset, strategy: str = "full"):
+    def deduplicate(self, model, Dataset, opt=dict()):
+        strategy = opt.get("strategy", "full")
+        deduplicate_ohe = opt.get("deduplicate_ohe", True)
+
         input_handles, input_ids = self._get_inputs(Dataset)
 
         eq_constraints = self._get_eq_constraints(input_ids)
@@ -256,7 +288,7 @@ class SatDeduplicator:
         vars = self._get_vars(input_ids, model)
         gates = self._get_gates(input_ids, model)
         const_lookup, is_rev_lookup, pair_lookup = self._get_lookups(
-            vars=vars, strategy=strategy, gates=gates
+            vars=vars, strategy=strategy, gates=gates, deduplicate_ohe=deduplicate_ohe
         )
 
         return const_lookup, is_rev_lookup, pair_lookup

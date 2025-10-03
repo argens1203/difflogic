@@ -23,7 +23,7 @@ torch.set_num_threads(1)  # ???
 
 class Experiment:
     @staticmethod
-    def debug(dataset=None, reverse=False, parent=True, small=True):
+    def debug(dataset=None, reverse=False, parent=True, small=True, ohe_dedup=False):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
@@ -39,6 +39,7 @@ class Experiment:
             "strategy": "parent" if parent else ("b_full" if reverse else "full"),
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
             # "xnum": 10,
+            "ohe_deduplication": ohe_dedup,
             #  ------
             "explain_one": True,
         }

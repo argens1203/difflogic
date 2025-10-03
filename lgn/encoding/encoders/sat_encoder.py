@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class SatEncoder(Encoder):
     strategy = "full"
+    deduplicate_ohe = True
 
     def _get_inputs(self, Dataset: AutoTransformer):
         with self.use_context() as vpool:
@@ -70,7 +71,11 @@ class SatEncoder(Encoder):
     def get_encoding(self, model, Dataset: AutoTransformer):
         const_lookup, is_rev_lookup, pair_lookup = SatDeduplicator(
             self.e_ctx
-        ).deduplicate(model, Dataset, strategy=self.strategy)
+        ).deduplicate(
+            model,
+            Dataset,
+            {"strategy": self.strategy, "deduplicate_ohe": self.deduplicate_ohe},
+        )
 
         self.context = SatContext()
 
