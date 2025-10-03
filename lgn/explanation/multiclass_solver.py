@@ -44,7 +44,9 @@ class MulticlassSolver:
                 cores.append(core)
         combined_core = set()
         for core in cores:
-            combined_core = combined_core.union(set(core))
+            combined_core = combined_core.union(
+                set(core) if core is not None else set()
+            )
         return True, None, list(combined_core)
 
     def is_adj_class_satisfiable(self, true_class, adj_class, inp: list[int]):
@@ -119,13 +121,27 @@ class MulticlassSolver:
         return solver
 
     def get_lits_and_bound(self, true_class, adj_class):
+        for idx in self.encoding.special:
+            logger.debug("Special %d is %s", idx, self.encoding.special[idx])
+
+        logger.debug("adj_class %s", str(self.encoding.get_output_ids(adj_class)))
+        logger.debug("true_class %s", str(self.encoding.get_output_ids(true_class)))
+
         pos, pos_none_idxs = remove_none(self.encoding.get_output_ids(adj_class))
         neg, neg_none_idxs = remove_none(self.encoding.get_output_ids(true_class))
 
+        pos_none_idxs = list(
+            map(lambda x: x + self.encoding.get_offset(adj_class), pos_none_idxs)
+        )
+        neg_none_idxs = list(
+            map(lambda x: x + self.encoding.get_offset(true_class), neg_none_idxs)
+        )
         logger.debug("Pos: %s", str(pos))
         logger.debug("Neg: %s", str(neg))
         logger.debug("Pos none idxs: %s", str(pos_none_idxs))
         logger.debug("Neg none idxs: %s", str(neg_none_idxs))
+
+        # input("Press Enter to continue...")
 
         neg = [-a for a in neg]
         lits = pos + neg  # Sum of X_i - Sum of X_pi_i > bounding number
@@ -142,17 +158,29 @@ class MulticlassSolver:
 
         bound = self.votes_per_cls + (1 if true_class < adj_class else 0)
 
+        # print(self.encoding.special)
         for idx in pos_none_idxs:
             logger.debug(
-                "Truth value of %d is %s", idx, self.encoding.get_truth_value(idx)
+                "Truth value of %d is %s, which is %s and not %s",
+                idx,
+                self.encoding.get_truth_value(idx),
+                self.encoding.get_truth_value(idx) is True,
+                self.encoding.get_truth_value(idx) is False,
             )
+
+            assert self.encoding.get_truth_value(idx) is not None
             if self.encoding.get_truth_value(idx) is True:
+                logger.debug("Decreasing bound due to definite True")
                 bound -= 1  # One vote less for each defenite True in the output of the adj class
+
         for idx in neg_none_idxs:
             logger.debug(
                 "Truth value of %d is %s", idx, self.encoding.get_truth_value(idx)
             )
+            assert self.encoding.get_truth_value(idx) is not None
+
             if self.encoding.get_truth_value(idx) is False:
+                logger.debug("Decreasing bound due to definite False")
                 bound -= 1  # One vote more is needed for each defenite True in the output of the true class
 
         logger.debug("Bound: %d", bound)

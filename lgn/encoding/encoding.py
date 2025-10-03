@@ -65,6 +65,11 @@ class Encoding:
                 ret[idx - start] = None
         return ret
 
+    def get_offset(self, class_id):
+        step = len(self.output_ids) // self.class_dim
+        start = (class_id - 1) * step
+        return start
+
     def get_truth_value(self, idx):
         return self.special.get(idx, None)
 

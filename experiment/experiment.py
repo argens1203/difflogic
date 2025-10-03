@@ -30,6 +30,7 @@ class Experiment:
             # "verbose": "info",
             "size": "debug" if small else "small",
             "verbose": "info",
+            # "deduplicate": None,
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
             "load_model": True,
