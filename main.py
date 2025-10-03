@@ -11,16 +11,36 @@ if __name__ == "__main__":
 
     # # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
 
-    m_ctx.add(Experiment.debug(dataset="iris"))
-    m_ctx.add(Experiment.debug(dataset="monk1"))
-    m_ctx.add(Experiment.debug(dataset="monk2"))
-    m_ctx.add(Experiment.debug(dataset="monk3"))
-    m_ctx.add(Experiment.debug(dataset="breast_cancer"))
+    # m_ctx.add(Experiment.debug(dataset="iris", small=True))
+    # m_ctx.add(Experiment.debug(dataset="iris", small=True, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk1", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk1", small=True, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk2", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk2", small=True, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk3", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk3", small=True, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True, parent=True))
 
-    m_ctx.add(Experiment.debug(dataset="mnist"))
-    m_ctx.add(Experiment.debug(dataset="compas"))
-    m_ctx.add(Experiment.debug(dataset="lending"))
+    # m_ctx.add(Experiment.debug(dataset="adult", small=True))
+    # m_ctx.add(Experiment.debug(dataset="adult", parent=True, small=True))
+
+    # m_ctx.add(Experiment.debug(dataset="iris", small=False, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk1", small=False, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk2", small=False, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="monk3", small=False, parent=True))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=False, parent=True))
+
+    # m_ctx.add(Experiment.debug(dataset="monk1"))
+    # m_ctx.add(Experiment.debug(dataset="monk2"))
+    # m_ctx.add(Experiment.debug(dataset="monk3"))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer"))
+
+    # m_ctx.add(Experiment.debug(dataset="mnist"))
     m_ctx.add(Experiment.debug(dataset="adult"))
+
+    # m_ctx.add(Experiment.debug(dataset="compas"))
+    # m_ctx.add(Experiment.debug(dataset="lending"))
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))
@@ -37,7 +57,7 @@ if __name__ == "__main__":
 
     m_ctx.display()
 
-    m_ctx.to_csv(filename=f"64f29d6.csv", with_timestamp=True)
+    m_ctx.to_csv(filename=f"0f68d00.csv", with_timestamp=True)
     # # Experiment.debug(dataset="monk1")
     # # Experiment.debug(dataset="monk2")
     # # Experiment.debug(dataset="monk3")

@@ -217,9 +217,11 @@ class MultiContext:
     def __init__(self):
         self.data = []
         self.headers = None
+        self.dedup_dict = []
 
     def add(self, ctx: Context):
         self.data.append(ctx.get_data()[0])
+        self.dedup_dict.append(ctx.dedup_dict)
         self.headers = ctx.get_headers()
 
     @staticmethod
@@ -238,4 +240,7 @@ class MultiContext:
         headers = self.headers
         data = self.data
         print(tabulate(data, headers=headers, tablefmt="github"))
-        # self.print_dedup_dict()
+
+        # for dedup_dict in self.dedup_dict:
+        #     for k in dedup_dict:
+        #         print(f"Layer {k[0]} -> {k[1]}: {dedup_dict[k]}")
