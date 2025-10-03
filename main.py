@@ -11,20 +11,20 @@ if __name__ == "__main__":
 
     # # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
 
-    m_ctx.add(Experiment.debug(dataset="iris", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk1", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk2", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk3", small=True))
-    m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    # m_ctx.add(Experiment.debug(dataset="iris", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk1", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk2", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk3", small=True))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
 
-    # m_ctx.add(Experiment.debug(dataset="adult", small=True))
-    # m_ctx.add(Experiment.debug(dataset="adult", parent=True, small=True))
+    # # m_ctx.add(Experiment.debug(dataset="adult", small=True))
+    # # m_ctx.add(Experiment.debug(dataset="adult", parent=True, small=True))
 
-    m_ctx.add(Experiment.debug(dataset="adult"))
+    # m_ctx.add(Experiment.debug(dataset="adult"))
 
-    m_ctx.add(Experiment.debug(dataset="compas"))
+    # m_ctx.add(Experiment.debug(dataset="compas"))
     m_ctx.add(Experiment.debug(dataset="lending"))
-    m_ctx.add(Experiment.debug(dataset="mnist"))
+    # m_ctx.add(Experiment.debug(dataset="mnist"))
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))

@@ -27,9 +27,9 @@ class Experiment:
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
-            # "verbose": "info",
-            "size": "debug" if small else "small",
+            # "verbose": "debug",
             "verbose": "info",
+            "size": "debug" if small else "small",
             # "deduplicate": None,
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
@@ -39,7 +39,7 @@ class Experiment:
             # "strategy": ("b_full" if reverse else "full"),
             "strategy": "parent" if parent else ("b_full" if reverse else "full"),
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
-            # "xnum": 10,
+            "xnum": 1,
             "ohe_deduplication": ohe_dedup,
             #  ------
             "explain_one": True,
@@ -186,6 +186,9 @@ class Experiment:
                 args=args,
                 ctx=ctx,
             )
+            if args.verbose == "debug":
+                encoding.print()
+
             ctx.store_clause(
                 encoding.get_cnf_clauses() + encoding.get_eq_constraints_clauses()
             )

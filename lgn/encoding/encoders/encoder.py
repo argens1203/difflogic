@@ -30,6 +30,8 @@ class Encoder:
         formula, input_handles = self.get_formula(
             model, Dataset.get_input_dim(), Dataset
         )
+        logger.debug('formula: "%s"', formula)
+
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles=input_handles, formula=formula
         )
@@ -150,7 +152,7 @@ class Encoder:
 
             logger.debug("output_ids: %s", str(output_ids))
 
-        output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
+        # output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
 
         return input_ids, cnf, output_ids, special
 
