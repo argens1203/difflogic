@@ -1,4 +1,5 @@
 from difflogic import LogicLayer, GroupSum
+from experiment.helpers.util import get_enc_type
 from pysat.formula import CNF
 from pysat.card import CardEnc
 
@@ -29,13 +30,7 @@ def get_eq_constraints(Dataset: AutoTransformer, input_ids, enc_type, vpool):
     logger.debug("parts: %s", parts)
 
     for part in parts:
-        eq_constraints.extend(
-            CardEnc.equals(
-                lits=part,
-                vpool=vpool,
-                encoding=enc_type,
-            )
-        )
+        eq_constraints.extend(CardEnc.equals(lits=part, vpool=vpool, encoding=enc_type))
 
     logger.debug("eq_constraints: %s", eq_constraints.clauses)
 

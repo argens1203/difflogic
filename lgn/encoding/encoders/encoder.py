@@ -40,7 +40,7 @@ class Encoder:
         # ie.: dimension is neuron_number, not class number
 
         eq_constraints = self.initialize_ohe(
-            Dataset, input_ids, self.e_ctx.get_enc_type()
+            Dataset, input_ids, self.e_ctx.get_enc_type_eq()
         )
 
         return Encoding(
@@ -106,6 +106,8 @@ class Encoder:
 
     def populate_clauses(self, input_handles, formula):
         with self.use_context() as vpool:
+            # print("before populating", vpool.top)
+            # input("Press Enter to Continue...")
             input_ids = [vpool.id(h) for h in input_handles]
             cnf = CNF()
             output_ids = []
@@ -152,6 +154,8 @@ class Encoder:
 
             logger.debug("output_ids: %s", str(output_ids))
 
+            # print("after populating", vpool.top)
+            # input("Press Enter to Continue...")
         # output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
 
         return input_ids, cnf, output_ids, special

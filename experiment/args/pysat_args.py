@@ -5,6 +5,7 @@ from attr import dataclass
 @dataclass
 class PySatArgs:
     enc_type: str = "tot"
+    enc_type_eq: str = "lad"
     solver_type: str = "g3"
 
 
@@ -12,8 +13,19 @@ def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--enc_type",
         type=str,
-        default="tot",
-        choices=["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"],
+        default="seqc",
+        choices=[
+            "pw",
+            "seqc",
+            "cardn",
+            "sortn",
+            "tot",
+            "mtot",
+            "kmtot",
+            "bit",
+            "lad",
+            "native",
+        ],
         help="Encoding type for the model",
     )
 
@@ -23,4 +35,23 @@ def add_pysat_args(parser: argparse.ArgumentParser):
         default="g3",
         choices=["g3", "cd", "m22"],
         help="Solver type for the model",
+    )
+
+    parser.add_argument(
+        "--enc_type_eq",
+        type=str,
+        default="pw",
+        choices=[
+            "pw",
+            "seqc",
+            "cardn",
+            "sortn",
+            "tot",
+            "mtot",
+            "kmtot",
+            "bit",
+            "lad",
+            "native",
+        ],
+        help="Encoding type for equality constraints",
     )

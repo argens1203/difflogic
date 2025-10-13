@@ -19,11 +19,14 @@ def get_enc_type(enc_type):
     return {
         "pw": EncType.pairwise,
         "seqc": EncType.seqcounter,
-        "cardn": EncType.cardnetwrk,
         "sortn": EncType.sortnetwrk,
+        "cardn": EncType.cardnetwrk,
+        "bit": EncType.bitwise,
+        "lad": EncType.ladder,
         "tot": EncType.totalizer,
         "mtot": EncType.mtotalizer,
         "kmtot": EncType.kmtotalizer,
+        "native": EncType.native,
     }[enc_type]
 
 

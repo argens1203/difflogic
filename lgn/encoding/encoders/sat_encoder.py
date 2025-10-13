@@ -30,7 +30,7 @@ class SatEncoder(Encoder):
             return get_eq_constraints(
                 self.e_ctx.get_dataset(),
                 input_ids,
-                enc_type=self.e_ctx.get_enc_type(),
+                enc_type=self.e_ctx.get_enc_type_eq(),
                 vpool=vpool,
             )
 
@@ -84,9 +84,23 @@ class SatEncoder(Encoder):
             input_handles, model, const_lookup, is_rev_lookup, pair_lookup
         )
 
+        logger.debug('formula: "%s"', formula)
+
         input_ids, cnf, output_ids, special = self.populate_clauses(
             input_handles, formula
         )
+
+        clauses = cnf.clauses
+        ma = max(abs(literal) for clause in clauses for literal in clause)
+        mi = min(abs(literal) for clause in clauses for literal in clause)
+        # print(f"#clauses: {len(clauses)}, #max: {ma}, #min: {mi}")
+        # input("Press Enter to continue...")
+
+        clauses = self._get_eq_constraints(input_ids).clauses
+        ma = max(abs(literal) for clause in clauses for literal in clause)
+        mi = min(abs(literal) for clause in clauses for literal in clause)
+        # print(f"#clauses: {len(clauses)}, #max: {ma}, #min: {mi}")
+        # input("Press Enter to continue...")
 
         logger.debug("output_ids: %s", str(output_ids))
 

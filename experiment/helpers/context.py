@@ -32,6 +32,7 @@ class Context:
         )
         self.verbose = args.verbose
         self.enc_type = get_enc_type(args.enc_type)
+        self.enc_type_eq = get_enc_type(args.enc_type_eq)
         self.solver_type = args.solver_type
         self.fp_type = torch.float32
 
@@ -110,9 +111,9 @@ class Context:
     def inc_ohe_deduplication(self, ohe_from, ohe_to):
         self.ohe_deduplication.append((ohe_from, ohe_to))
 
-    def store_clause(self, clause: list[list[int]]):
-        self.num_clauses = len(clause)
-        self.num_vars = max(abs(literal) for clause in clause for literal in clause)
+    def store_clause(self, clauses: list[list[int]]):
+        self.num_clauses = len(clauses)
+        self.num_vars = max(abs(literal) for clause in clauses for literal in clause)
 
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
@@ -133,6 +134,7 @@ class Context:
             "# neu",
             "acc",
             "enc",
+            "enc_eq",
             "solver",
             "ddup",
             "ohe-ddup",
@@ -163,6 +165,7 @@ class Context:
                 self.args.num_neurons,
                 self.results.test_acc,
                 self.args.enc_type,
+                self.args.enc_type_eq,
                 self.args.solver_type,
                 self.args.deduplicate,
                 len(self.ohe_deduplication) if self.args.ohe_deduplication else "N/A",
@@ -208,6 +211,9 @@ class Context:
 
     def get_enc_type(self):
         return self.enc_type
+
+    def get_enc_type_eq(self):
+        return self.enc_type_eq
 
     def get_solver_type(self):
         return self.solver_type

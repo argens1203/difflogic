@@ -78,9 +78,12 @@ class Explainer:
         return mcs
 
     def mhs_mus_enumeration(
-        self, instance: Instance, xnum: Optional[int] = None, smallest=False
+        self, instance: Instance, xnum: Optional[int] = None, smallest=True
     ):
         session: Session
+
+        choices = ["sorted", "lbx", "sat"]
+        sat = ["mgh", "cd195"]
 
         with Session.use_context(
             instance=instance,
@@ -150,7 +153,7 @@ class Explainer:
         self,
         instance: Instance,
         xnum: Optional[int] = None,
-        smallest=False,
+        smallest=True,
     ):
         session: Session
 
@@ -249,8 +252,8 @@ class Explainer:
     def explain_both_and_assert(self, instance, xnum: Optional[int]):
         self.explain(instance)
 
-        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum)
-        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum)
+        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum, smallest=True)
+        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum, smallest=True)
 
         logger.debug("Input: %s", instance.get_input())
         logger.debug(

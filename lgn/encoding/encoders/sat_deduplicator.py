@@ -78,7 +78,7 @@ class SatDeduplicator:
             return get_eq_constraints(
                 self.e_ctx.get_dataset(),
                 input_ids,
-                enc_type=self.e_ctx.get_enc_type(),
+                enc_type=self.e_ctx.get_enc_type_eq(),
                 vpool=vpool,
             )
 
@@ -243,6 +243,8 @@ class SatDeduplicator:
 
         self.solver.append_formula(clauses)
 
+    # vars are created iteratively, which should be smallest without considering duplications
+    # gates are created iteratively, which aids in deduplication
     def _get_lookups(self, vars, gates, strategy: str, deduplicate_ohe: bool):
         const_lookup = dict()
         is_rev_lookup = dict()
@@ -268,6 +270,9 @@ class SatDeduplicator:
                     pair_lookup[(i, j)] = (i_, j_)
                 else:
                     pair_lookup[(i, j)] = (i, j)
+        # with self.use_context() as vpool:
+        # print("after deduplication", vpool.top)
+        # input("Press Enter to Continue...")
         return const_lookup, is_rev_lookup, pair_lookup
 
     def _initialize_solver(self, eq_constraints):
