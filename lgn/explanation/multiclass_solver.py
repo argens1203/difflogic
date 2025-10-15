@@ -191,3 +191,9 @@ class MulticlassSolver:
             solver.delete()
         logger.debug("Deleted all solvers")
         # pass
+
+    def get_clause_count(self):
+        return sum(map(lambda s: s.get_clause_count(), self.solvers.values()))
+
+    def get_var_count(self):
+        return sum(map(lambda s: s.get_var_count(), self.solvers.values()))

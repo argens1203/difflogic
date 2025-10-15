@@ -91,3 +91,9 @@ class Solver:
         self.solver.delete()
         # Sovler rides on Encoding vpool, so we don't need to delete it
         # Formula.cleanup(id(self))
+
+    def get_clause_count(self):
+        return self.solver.nof_clauses()
+
+    def get_var_count(self):
+        return self.solver.nof_vars()

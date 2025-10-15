@@ -1,7 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import json
 import time
 import socket
 import os
+
+if TYPE_CHECKING:
+    from lgn.encoding import Encoding
 
 
 class Results(object):
@@ -64,7 +70,7 @@ class Results(object):
 
     # ---- ADD ONs ---- #
 
-    def store_encoding(self, encoding):
+    def store_encoding(self, encoding: Encoding):
         self.cnf_size = encoding.get_stats()["clauses_size"]
         self.eq_size = encoding.get_stats()["eq_size"]
         self.formulas = [str(f.simplified()) for f in encoding.formula]

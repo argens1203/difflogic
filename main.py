@@ -24,29 +24,29 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="compas"))
 
-    # choices = [
-    #     "pw",
-    #     "seqc",
-    #     "cardn",
-    #     "sortn",
-    #     "tot",
-    #     "mtot",
-    #     "kmtot",
-    #     "bit",
-    #     "lad",
-    #     "native",
-    # ]
-    # # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
-    # for cho1 in choices:
-    #     for cho2 in ["pw"]:
-    #         try:
-    #             m_ctx.add(
-    #                 Experiment.debug(dataset="lending", enc_type=cho1, enc_type_eq=cho2)
-    #             )
-    #         except Exception as e:
-    #             print(f"Error with enc_type={cho1}, enc_type_eq={cho2}: {e}")
+    choices = [
+        "pw",
+        "seqc",
+        "cardn",
+        "sortn",
+        "tot",
+        "mtot",
+        "kmtot",
+        "bit",
+        "lad",
+        "native",
+    ]
+    # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
+    for cho1 in choices:
+        for cho2 in ["pw"]:
+            try:
+                m_ctx.add(
+                    Experiment.debug(dataset="lending", enc_type=cho1, enc_type_eq=cho2)
+                )
+            except Exception as e:
+                print(f"Error with enc_type={cho1}, enc_type_eq={cho2}: {e}")
 
-    m_ctx.add(Experiment.debug(dataset="lending"))
+    # m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="mnist"))
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     m_ctx.display()
 
-    m_ctx.to_csv(filename=f"0f68d00.csv", with_timestamp=True)
+    m_ctx.to_csv(filename=f"32d203a.csv", with_timestamp=True)
     # # Experiment.debug(dataset="monk1")
     # # Experiment.debug(dataset="monk2")
     # # Experiment.debug(dataset="monk3")

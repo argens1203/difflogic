@@ -3,6 +3,8 @@ from contextlib import contextmanager
 
 from pysat.examples.hitman import Hitman
 
+from experiment.helpers.context import Context
+
 from .multiclass_solver import MulticlassSolver
 from .instance import Instance
 from experiment.helpers import (
@@ -151,15 +153,24 @@ class Session:
         return len(self.expls)
 
     @contextmanager
+    @staticmethod
     def use_context(
-        instance: Instance, hit_type: Htype = "lbx", oracle=None
+        instance: Instance,
+        oracle: MulticlassSolver,
+        e_ctx: Context,
+        hit_type: Htype = "lbx",
+        solver="g3",
     ) -> Iterator["Session"]:
         try:
             bs = list(range(1, len(instance.grouped_inp) + 1))
             hitman = Hitman(
                 bootstrap_with=[bs],
                 htype=hit_type,
+                solver=solver,
             )
             yield Session(instance, hitman=hitman, oracle=oracle)
         finally:
             hitman.delete()  # Cleanup
+            e_ctx.record_solving_stats(
+                oracle.get_clause_count(), oracle.get_var_count()
+            )

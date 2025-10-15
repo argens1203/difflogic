@@ -3,6 +3,8 @@ import logging
 
 from tqdm import tqdm
 
+from experiment.args.args import DefaultArgs
+from experiment.args.pysat_args import PySatArgs
 from lgn.explanation import Explainer, Instance
 from experiment.args import ExplainerArgs
 from .helpers import Context
@@ -14,19 +16,28 @@ class Explain:
     # ---- ---- ---- ---- ---- EXPLAINERS  ---- ---- ---- ---- ---- #
     @staticmethod
     def explain_raw(
-        args, explainer, encoding, ctx: Context, raw=None, inp=None
+        args: DefaultArgs,
+        explainer: Explainer,
+        encoding,
+        ctx: Context,
+        raw=None,
+        inp=None,
     ) -> tuple[float, int, int]:
         start = time.time()
         ctx.logger.debug("Raw: %s\n", raw)
         ctx.logger.debug("Inp: %s\n", inp)
         instance = Instance.from_encoding(encoding=encoding, raw=raw, inp=inp)
-        exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
+        exp_count = explainer.explain_both_and_assert(
+            instance, xnum=args.xnum, args=args
+        )
 
         ctx.inc_num_explanations(exp_count)
         return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_one(args, explainer, encoding, ctx: Context) -> tuple[float, int, int]:
+    def explain_one(
+        args: DefaultArgs, explainer: Explainer, encoding, ctx: Context
+    ) -> tuple[float, int, int]:
         start = time.time()
         exp_count = -1
 
@@ -37,14 +48,18 @@ class Explain:
             ctx.logger.debug("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
-            exp_count = explainer.explain_both_and_assert(instance, xnum=args.xnum)
+            exp_count = explainer.explain_both_and_assert(
+                instance, xnum=args.xnum, args=args
+            )
             break
 
         ctx.inc_num_explanations(exp_count)
         return time.time() - start, exp_count, 1
 
     @staticmethod
-    def explain_all(args, explainer, encoding, ctx: Context) -> tuple[float, int, int]:
+    def explain_all(
+        args: DefaultArgs, explainer, encoding, ctx: Context
+    ) -> tuple[float, int, int]:
         all_times = 0
         exp_count = 0
         count = 0
@@ -60,6 +75,7 @@ class Explain:
                 explainer=explainer,
                 encoding=encoding,
                 ctx=ctx,
+                pysat_args=args,
             )
             all_times += t
             exp_count += e
@@ -74,6 +90,7 @@ class Explain:
         data_loader,
         exp_args: ExplainerArgs,
         explainer: Explainer,
+        pysat_args: PySatArgs,
         encoding,
         ctx: Context,
         is_train=False,
@@ -97,7 +114,7 @@ class Explain:
 
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
                 exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
-                    instance, xnum=exp_args.xnum
+                    instance, xnum=exp_args.xnum, args=pysat_args
                 )
                 exp_count += exp_count_axp_plus_cxp
                 count += 1

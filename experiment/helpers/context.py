@@ -115,6 +115,10 @@ class Context:
         self.num_clauses = len(clauses)
         self.num_vars = max(abs(literal) for clause in clauses for literal in clause)
 
+    def record_solving_stats(self, num_clauses, num_vars):
+        self.solving_num_clauses = num_clauses
+        self.solving_num_vars = num_vars
+
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
 
@@ -138,10 +142,14 @@ class Context:
             "solver",
             "ddup",
             "ohe-ddup",
+            "h_type",
+            "h_solver",
             "# gates",
             "# gates_f",
             "# cl",
             "# var",
+            "# cl_s",
+            "# var_s",
             "# expl",
             "run_t",
             "t_Model",
@@ -169,10 +177,14 @@ class Context:
                 self.args.solver_type,
                 self.args.deduplicate,
                 len(self.ohe_deduplication) if self.args.ohe_deduplication else "N/A",
+                self.args.h_type,
+                self.args.h_solver,
                 number_of_gates,
                 number_of_gates - self.deduplication,
                 self.num_clauses,
                 self.num_vars,
+                self.solving_num_clauses,
+                self.solving_num_vars,
                 self.num_explanations,
                 runtime,
                 self.results.get_model_ready_time(),

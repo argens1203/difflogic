@@ -7,6 +7,8 @@ class PySatArgs:
     enc_type: str = "tot"
     enc_type_eq: str = "lad"
     solver_type: str = "g3"
+    h_type: str = "sorted"  # "lbx" or "sorted" or "sat"
+    h_solver: str = "mgh"  # "mgh" or "cd195"
 
 
 def add_pysat_args(parser: argparse.ArgumentParser):
@@ -54,4 +56,20 @@ def add_pysat_args(parser: argparse.ArgumentParser):
             "native",
         ],
         help="Encoding type for equality constraints",
+    )
+
+    parser.add_argument(
+        "--h_type",
+        type=str,
+        default="lbx",
+        choices=["lbx", "sorted", "sat"],
+        help="Hitting set type",
+    )
+
+    parser.add_argument(
+        "--h_solver",
+        type=str,
+        default="g3",
+        choices=["mgh", "cd195", "g3"],
+        help="Hitting set solver",
     )

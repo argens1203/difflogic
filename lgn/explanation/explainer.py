@@ -2,6 +2,7 @@ import logging
 from typing import Optional, Set
 
 # if TYPE_CHECKING:
+from experiment.args.pysat_args import PySatArgs
 from lgn.encoding import Encoding
 from experiment.helpers import (
     Context,
@@ -22,6 +23,7 @@ class Explainer:
         self.oracle = MulticlassSolver(encoding=encoding, ctx=ctx)
         for cls in self.encoding.get_classes():
             assert self.oracle.is_solvable(pred_class=cls, inp=set())
+        self.ctx = ctx
 
     def explain(self, instance: Instance):
         pred_class = instance.get_predicted_class()
@@ -78,17 +80,16 @@ class Explainer:
         return mcs
 
     def mhs_mus_enumeration(
-        self, instance: Instance, xnum: Optional[int] = None, smallest=True
+        self, instance: Instance, args: PySatArgs, xnum: Optional[int] = None
     ):
         session: Session
 
-        choices = ["sorted", "lbx", "sat"]
-        sat = ["mgh", "cd195"]
-
         with Session.use_context(
             instance=instance,
-            hit_type="sorted" if smallest else "lbx",
+            hit_type=args.h_type,
             oracle=self.oracle,
+            solver=args.h_solver,
+            e_ctx=self.ctx,
         ) as session:
 
             # Try unit-MCSes
@@ -152,15 +153,17 @@ class Explainer:
     def mhs_mcs_enumeration(
         self,
         instance: Instance,
+        args: PySatArgs,
         xnum: Optional[int] = None,
-        smallest=True,
     ):
         session: Session
 
         with Session.use_context(
             instance=instance,
-            hit_type="sorted" if smallest else "lbx",
+            hit_type=args.h_type,
+            solver=args.h_solver,
             oracle=self.oracle,
+            e_ctx=self.ctx,
         ) as session:
 
             inp = set(session.options)
@@ -249,11 +252,11 @@ class Explainer:
 
     # NEW
 
-    def explain_both_and_assert(self, instance, xnum: Optional[int]):
+    def explain_both_and_assert(self, instance, xnum: Optional[int], args: PySatArgs):
         self.explain(instance)
 
-        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum, smallest=True)
-        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum, smallest=True)
+        axps, axp_dual = self.mhs_mus_enumeration(instance, xnum=xnum, args=args)
+        cxps, cxp_dual = self.mhs_mcs_enumeration(instance, xnum=xnum, args=args)
 
         logger.debug("Input: %s", instance.get_input())
         logger.debug(
