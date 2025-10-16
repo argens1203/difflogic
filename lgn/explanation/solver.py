@@ -26,7 +26,7 @@ class Solver:
         self.vpool_context = encoding.s_ctx.get_vpool_context()
         # NEW
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
-        self.enc_type = ctx.get_enc_type()
+        self.enc_type_at_least = ctx.get_enc_type()
 
         self.cl_counts = []
         self.var_counts = []
@@ -36,7 +36,7 @@ class Solver:
             comp = CardEnc.atleast(
                 lits=lits,
                 bound=bound,
-                encoding=self.enc_type,
+                encoding=self.enc_type_at_least,
                 vpool=vpool,
             )
             clauses = comp.clauses

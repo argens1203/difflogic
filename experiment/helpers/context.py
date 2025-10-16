@@ -11,6 +11,7 @@ from .logging import setup_logger
 from .util import seed_all, get_results, get_enc_type
 from lgn.dataset import load_dataset
 from collections import OrderedDict
+from .results import Results
 
 
 class Cached_Key:
@@ -26,12 +27,12 @@ class Context:
         self.logger = logging.getLogger(__name__)
 
         eid = args.experiment_id if args.experiment_id is not None else 0
-        self.results = get_results(eid, args)
+        self.results: Results = get_results(eid, args)
         self.train_loader, self.test_loader, self.get_raw, self.dataset = load_dataset(
             args
         )
         self.verbose = args.verbose
-        self.enc_type = get_enc_type(args.enc_type)
+        self.enc_type_at_least = get_enc_type(args.enc_type_at_least)
         self.enc_type_eq = get_enc_type(args.enc_type_eq)
         self.solver_type = args.solver_type
         self.fp_type = torch.float32
@@ -137,7 +138,7 @@ class Context:
             "# lay",
             "# neu",
             "acc",
-            "enc",
+            "enc_at_l",
             "enc_eq",
             "solver",
             "ddup",
@@ -172,7 +173,7 @@ class Context:
                 self.args.num_layers,
                 self.args.num_neurons,
                 self.results.test_acc,
-                self.args.enc_type,
+                self.args.enc_type_at_least,
                 self.args.enc_type_eq,
                 self.args.solver_type,
                 self.args.deduplicate,
@@ -222,7 +223,7 @@ class Context:
         self.logger.debug("Deduplication: %s", str(self.deduplication))
 
     def get_enc_type(self):
-        return self.enc_type
+        return self.enc_type_at_least
 
     def get_enc_type_eq(self):
         return self.enc_type_eq

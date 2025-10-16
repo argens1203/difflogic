@@ -11,11 +11,14 @@ if __name__ == "__main__":
 
     # # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
 
-    # m_ctx.add(Experiment.debug(dataset="iris", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk1", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk2", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk3", small=True))
-    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    m_ctx.add(Experiment.debug(dataset="iris", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk1", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk2", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk3", small=True))
+    m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    m_ctx.add(Experiment.debug(dataset="lending", small=True))
+    m_ctx.add(Experiment.debug(dataset="compas", small=True))
+    m_ctx.add(Experiment.debug(dataset="mnist", small=True))
 
     # # m_ctx.add(Experiment.debug(dataset="adult", small=True))
     # # m_ctx.add(Experiment.debug(dataset="adult", parent=True, small=True))
@@ -24,27 +27,29 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="compas"))
 
-    choices = [
-        "pw",
-        "seqc",
-        "cardn",
-        "sortn",
-        "tot",
-        "mtot",
-        "kmtot",
-        "bit",
-        "lad",
-        "native",
-    ]
-    # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
-    for cho1 in choices:
-        for cho2 in ["pw"]:
-            try:
-                m_ctx.add(
-                    Experiment.debug(dataset="lending", enc_type=cho1, enc_type_eq=cho2)
-                )
-            except Exception as e:
-                print(f"Error with enc_type={cho1}, enc_type_eq={cho2}: {e}")
+    # choices = [
+    #     # "pw",
+    #     # "seqc",
+    #     # "cardn",
+    #     # "sortn",
+    #     # "tot",
+    #     "mtot",
+    #     # "kmtot",
+    #     # "bit",
+    #     # "lad",
+    #     # "native",
+    # ]
+    # # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
+    # for cho1 in choices:
+    #     for cho2 in ["pw"]:
+    #         try:
+    #             m_ctx.add(
+    #                 Experiment.debug(
+    #                     dataset="lending", enc_type_at_least=cho1, enc_type_eq=cho2
+    #                 )
+    #             )
+    #         except Exception as e:
+    #             print(f"Error with enc_type_at_least={cho1}, enc_type_eq={cho2}: {e}")
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="mnist"))

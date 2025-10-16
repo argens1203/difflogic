@@ -29,7 +29,7 @@ class Experiment:
         parent=True,
         small=True,
         ohe_dedup=True,
-        enc_type="seqc",
+        enc_type_at_least="seqc",
         enc_type_eq="pw",
     ):
         dataset = dataset if dataset is not None else "iris"
@@ -47,7 +47,7 @@ class Experiment:
             # "strategy": ("b_full" if reverse else "full"),
             "strategy": "parent" if parent else ("b_full" if reverse else "full"),
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
-            "enc_type": enc_type,
+            "enc_type_at_least": enc_type_at_least,
             "enc_type_eq": enc_type_eq,
             "xnum": 1,
             "ohe_deduplication": ohe_dedup,

@@ -4,7 +4,7 @@ from attr import dataclass
 
 @dataclass
 class PySatArgs:
-    enc_type: str = "tot"
+    enc_type_at_least: str = "tot"
     enc_type_eq: str = "lad"
     solver_type: str = "g3"
     h_type: str = "sorted"  # "lbx" or "sorted" or "sat"
@@ -13,9 +13,9 @@ class PySatArgs:
 
 def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
-        "--enc_type",
+        "--enc_type_at_least",
         type=str,
-        default="seqc",
+        default="mtot",
         choices=[
             "pw",
             "seqc",

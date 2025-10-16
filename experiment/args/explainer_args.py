@@ -39,4 +39,9 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         default=False,
         help="Explain all predictions (Default: Explain only on test set)",
     )
-    parser.add_argument("--explain_one", action="store_true", default=False)
+    parser.add_argument(
+        "--explain_one",
+        action="store_true",
+        default=False,
+        help="Explain one prediction from test set. Note.: This uses fast method for getting one explanation only",
+    )

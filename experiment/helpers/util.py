@@ -40,7 +40,7 @@ def input_to_feat(inp):
     return torch.Tensor(feat).to(device)
 
 
-def get_results(experiment_id, args):
+def get_results(experiment_id, args) -> Results:
     results = Results(eid=experiment_id, path="./results/")
     results.store_args(args)
     return results

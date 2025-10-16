@@ -41,6 +41,7 @@ class Explainer:
         logger.debug("One AXP: %s", axp)
         return axp
 
+    @staticmethod
     def _enumerate_unit_mcs(session: Session):
         options = set(session.options)
         counter = 0
@@ -133,6 +134,7 @@ class Explainer:
 
             return expls, duals
 
+    @staticmethod
     def _enumerate_unit_mus(session: Session):
         options = set(session.options)
         itr = 0

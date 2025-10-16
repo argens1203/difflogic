@@ -253,7 +253,7 @@ python main.py --dataset=breast_cancer --load_model --explain=60-69,ge40,20-24,0
 
 # More Commands
 
-python main.py --dataset=iris --load_model --explain=5.1,3.3,1.7,0.5 --enc_type=tot
+python main.py --dataset=iris --load_model --explain=5.1,3.3,1.7,0.5 --enc_type_at_least=tot
 
 python main.py --dataset=mnist --load_model --explain_one --xnum=1 --verbose
 
