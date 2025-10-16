@@ -39,7 +39,7 @@ class Explain:
         args: DefaultArgs, explainer: Explainer, encoding, ctx: Context
     ) -> tuple[float, int, int]:
         start = time.time()
-        exp_count = -1
+        exp_count = 0
 
         batch, label, idx = next(iter(ctx.test_loader))
         for feat, index in zip(batch, idx):
@@ -48,9 +48,8 @@ class Explain:
             ctx.logger.debug("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
-            exp_count = explainer.explain_both_and_assert(
-                instance, xnum=args.xnum, args=args
-            )
+            explainer.explain(instance)
+            exp_count += 1
             break
 
         ctx.inc_num_explanations(exp_count)

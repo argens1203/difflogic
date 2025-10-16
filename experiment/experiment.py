@@ -232,14 +232,16 @@ class Experiment:
                     ctx=ctx,
                 )
 
-            total_time_taken, exp_count, count = f_exp()
+            total_time_taken, exp_count, instance_count = f_exp()
             # ============= ============= ============= ============= ============= ============= ============= =============
 
-            ctx.results.store_explanation_stat(exp_count / count, ctx.deduplication)
+            ctx.results.store_explanation_stat(
+                exp_count / instance_count, ctx.deduplication
+            )
             ctx.results.store_resource_usage(total_time_taken / exp_count, -1)
             profile_memory("explanation")
             ctx.results.store_explanation_ready_time()
-            ctx.results.store_counts(count, exp_count)
+            ctx.results.store_counts(instance_count, exp_count)
         # ctx.end_memory_usage()
         ctx.results.save()
         ctx.results.store_end_time()

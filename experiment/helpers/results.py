@@ -75,7 +75,7 @@ class Results(object):
         self.eq_size = encoding.get_stats()["eq_size"]
         self.formulas = [str(f.simplified()) for f in encoding.formula]
         self.encoding_time = time.time()
-        self.encoding_time_taken = self.encoding_time - self.model_complete_time
+        self.encoding_time_taken = self.encoding_time - self.model_ready_time
 
     def store_explanation_stat(self, mean_explain_count, deduplication):
         self.mean_explain_count = mean_explain_count
