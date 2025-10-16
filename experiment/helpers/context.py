@@ -47,6 +47,9 @@ class Context:
         self.num_explanations = 0
         self.ohe_deduplication = []
 
+        self.solving_num_clauses = []
+        self.solving_num_vars = []
+
     def debug(self, l: Callable):
         if self.verbose == "debug":
             l()
@@ -117,8 +120,18 @@ class Context:
         self.num_vars = max(abs(literal) for clause in clauses for literal in clause)
 
     def record_solving_stats(self, num_clauses, num_vars):
-        self.solving_num_clauses = num_clauses
-        self.solving_num_vars = num_vars
+        self.solving_num_clauses.append(num_clauses)
+        self.solving_num_vars.append(num_vars)
+
+    def get_avg_solving_clauses(self):
+        if len(self.solving_num_clauses) == 0:
+            return 0.0
+        return sum(self.solving_num_clauses) / len(self.solving_num_clauses)
+
+    def get_avg_solving_vars(self):
+        if len(self.solving_num_vars) == 0:
+            return 0.0
+        return sum(self.solving_num_vars) / len(self.solving_num_vars)
 
     def inc_num_explanations(self, num_explanations):
         self.num_explanations += num_explanations
@@ -184,8 +197,8 @@ class Context:
                 number_of_gates - self.deduplication,
                 self.num_clauses,
                 self.num_vars,
-                "{:.2f}".format(self.solving_num_clauses),
-                "{:.2f}".format(self.solving_num_vars),
+                "{:.2f}".format(self.get_avg_solving_clauses()),
+                "{:.2f}".format(self.get_avg_solving_vars()),
                 self.num_explanations,
                 runtime,
                 self.results.get_model_ready_time(),

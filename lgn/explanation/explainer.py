@@ -39,6 +39,9 @@ class Explainer:
 
         axp = self.reduce_axp(inp, pred_class)
         logger.debug("One AXP: %s", axp)
+        self.ctx.record_solving_stats(
+            self.oracle.get_clause_count(), self.oracle.get_var_count()
+        )
         return axp
 
     @staticmethod

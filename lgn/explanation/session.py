@@ -174,3 +174,6 @@ class Session:
             e_ctx.record_solving_stats(
                 oracle.get_clause_count(), oracle.get_var_count()
             )
+            e_ctx.record_solving_stats(
+                hitman.oracle.nof_clauses(), hitman.oracle.nof_vars()
+            )
