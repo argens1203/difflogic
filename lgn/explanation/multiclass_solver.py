@@ -1,3 +1,4 @@
+from typing import Tuple, Dict
 from lgn.encoding import Encoding
 
 import logging
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class MulticlassSolver:
     def __init__(self, encoding: Encoding, ctx: Context):
-        self.solvers = dict()
+        self.solvers: Dict[Tuple[int, int], Solver] = dict()
         self.encoding = encoding
         self.votes_per_cls = self.encoding.get_votes_per_cls()
         self.ctx = ctx
@@ -193,7 +194,9 @@ class MulticlassSolver:
         # pass
 
     def get_clause_count(self):
-        return sum(map(lambda s: s.get_clause_count(), self.solvers.values()))
+        clause_counts = list(map(lambda s: s.get_clause_count(), self.solvers.values()))
+        return sum(clause_counts) / len(clause_counts) if len(clause_counts) > 0 else 0
 
     def get_var_count(self):
-        return sum(map(lambda s: s.get_var_count(), self.solvers.values()))
+        var_counts = list(map(lambda s: s.get_var_count(), self.solvers.values()))
+        return sum(var_counts) / len(var_counts) if len(var_counts) > 0 else 0

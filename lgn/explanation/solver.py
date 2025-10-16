@@ -28,6 +28,9 @@ class Solver:
         # Formula.attach_vpool(self._copy_vpool(encoding), id(self))
         self.enc_type = ctx.get_enc_type()
 
+        self.cl_counts = []
+        self.var_counts = []
+
     def set_cardinality(self, lits, bound):
         with self.use_context() as vpool:
             comp = CardEnc.atleast(
@@ -42,7 +45,10 @@ class Solver:
         return self
 
     def solve(self, assumptions: list[int] = []):
-        return self.solver.solve(assumptions=assumptions)
+        ret = self.solver.solve(assumptions=assumptions)
+        self.cl_counts.append(self.solver.nof_clauses())
+        self.var_counts.append(self.solver.nof_vars())
+        return ret
 
     def get_model(self):
         model = self.solver.get_model()
@@ -93,7 +99,13 @@ class Solver:
         # Formula.cleanup(id(self))
 
     def get_clause_count(self):
-        return self.solver.nof_clauses()
+        return (
+            sum(self.cl_counts) / len(self.cl_counts) if len(self.cl_counts) > 0 else 0
+        )
 
     def get_var_count(self):
-        return self.solver.nof_vars()
+        return (
+            sum(self.var_counts) / len(self.var_counts)
+            if len(self.var_counts) > 0
+            else 0
+        )
