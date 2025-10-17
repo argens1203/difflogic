@@ -13,6 +13,10 @@ class ExplainerArgs:
     explain_inp: Optional[str] = None
     explain_algorithm: Optional[str] = "both"
 
+    explain_switch_window: int = 20
+    explain_switch_alpha: float = 2.0
+    # explain_switch_epsilon: Optional[float] = 0.05
+
 
 def add_explainer_args(parser: argparse.ArgumentParser):
     parser.add_argument("--xnum", type=int, default=None)
@@ -52,4 +56,18 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         default="both",
         choices=["mus", "mcs", "var", "both", "find_one"],
         help="Explanation algorithm to use (default: both)",
+    )
+
+    parser.add_argument(
+        "--explain_switch_window",
+        type=float,
+        default=None,
+        help="The number of previous explanations to consider when switching explanation algorithms (default: 20)",
+    )
+
+    parser.add_argument(
+        "--explain_switch_alpha",
+        type=float,
+        default=None,
+        help="The ratio of avg size of CXPs over AXPs for switching explanation algorithms (default: 2.0)",
     )

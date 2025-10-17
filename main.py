@@ -64,28 +64,35 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="monk2", explain_algorithm="both"))
 
-    for dataset in [
-        "iris",
-        "monk1",
-        "monk2",
-        "monk3",
-        "breast_cancer",
-        "compas",
-        "lending",
-    ]:
-        for exp_algorithm in ["var", "mus", "mcs", "both", "find_one"]:
-            # for exp_algorithm in ["mus", "mcs", "both", "find_one"]:
-            try:
-                m_ctx.add(
-                    Experiment.debug(dataset=dataset, explain_algorithm=exp_algorithm)
-                )
-            except Exception as e:
-                print(
-                    f"Error with dataset={dataset}, explain_algorithm={exp_algorithm}: {e}"
-                )
+    # for dataset in [
+    #     "iris",
+    #     "monk1",
+    #     "monk2",
+    #     "monk3",
+    #     "breast_cancer",
+    #     "compas",
+    #     "lending",
+    # ]:
+    #     for exp_algorithm in ["var", "mus"]:
+    #         for alpha in [1.5, 2.0, 2.5, 3.0]:
+    #             for window in [10, 20, 30]:
+    #                 # for exp_algorithm in ["mus", "mcs", "both", "find_one"]:
+    #                 try:
+    #                     m_ctx.add(
+    #                         Experiment.debug(
+    #                             dataset=dataset,
+    #                             explain_algorithm=exp_algorithm,
+    #                             alpha=alpha,
+    #                             window=window,
+    #                         )
+    #                     )
+    #                 except Exception as e:
+    #                     print(
+    #                         f"Error with dataset={dataset}, explain_algorithm={exp_algorithm}: {e}"
+    #                     )
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
-    # m_ctx.add(Experiment.debug(dataset="mnist"))
+    m_ctx.add(Experiment.debug(dataset="mnist", explain_algorithm="find_one"))
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))

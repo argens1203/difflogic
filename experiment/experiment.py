@@ -34,6 +34,8 @@ class Experiment:
         h_type="lbx",
         h_solver="g3",
         explain_algorithm="both",
+        alpha=2.0,
+        window=20,
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -59,6 +61,8 @@ class Experiment:
             "h_solver": h_solver,
             "h_type": h_type,
             "explain_algorithm": explain_algorithm,
+            "explain_switch_alpha": alpha,
+            "explain_switch_window": window,
         }
         args = {
             **vars(default_args),

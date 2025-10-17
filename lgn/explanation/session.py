@@ -153,6 +153,9 @@ class Session:
     def get_expls_count(self):
         return len(self.expls)
 
+    def get_duals_count(self):
+        return len(self.duals)
+
     @contextmanager
     @staticmethod
     def use_context(

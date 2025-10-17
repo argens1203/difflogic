@@ -290,7 +290,9 @@ class Explainer:
         elif exp_args.explain_algorithm == "both":
             return self.explain_both_and_assert(instance, xnum=xnum, args=pysat_args)
         elif exp_args.explain_algorithm == "var":
-            return self.variable_enumeration(instance, args=pysat_args)
+            return self.variable_enumeration(
+                instance, args=pysat_args, exp_args=exp_args
+            )
         elif exp_args.explain_algorithm == "find_one":
             self.explain(instance)
             return 1
@@ -362,7 +364,7 @@ class Explainer:
         # input("Press Enter to continue...")
         return len(axps) + len(axp_dual)
 
-    def variable_enumeration(self, instance, args: PySatArgs):
+    def variable_enumeration(self, instance, args: PySatArgs, exp_args: ExplainerArgs):
         # We start with MCS enumeration first
         last_time = math.inf
         session: Session
@@ -379,7 +381,6 @@ class Explainer:
 
             # Main Loop
             while True:
-                start_time = time.time()
                 # Get a guess
                 hset = session.get()
                 # print("guess", hset)
@@ -408,16 +409,30 @@ class Explainer:
 
                 session.hit(to_hit)
 
-                time_taken = time.time() - start_time
                 # if time_taken > last_time * (1 + args.switch_threshold):
-                if time_taken > last_time * (1 + 0.5):
-                    logger.debug(
-                        "Switching to MHS-MUS enumeration. Time taken: %.2f, last time: %.2f",
-                        time_taken,
-                        last_time,
-                    )
-                    break
-                last_time = time_taken
+                if (
+                    session.get_duals_count() >= exp_args.explain_switch_window
+                    and session.get_expls_count() > exp_args.explain_switch_window
+                ):
+                    recent_cxp_sizes = [
+                        len(cxp)
+                        for cxp in session.get_expls()[
+                            -exp_args.explain_switch_window :
+                        ]
+                    ]
+                    recent_axp_sizes = [
+                        len(axp)
+                        for axp in session.get_duals()[
+                            -exp_args.explain_switch_window :
+                        ]
+                    ]
+                    avg_cxp_size = sum(recent_cxp_sizes) / len(recent_cxp_sizes)
+                    avg_axp_size = sum(recent_axp_sizes) / len(recent_axp_sizes)
+
+                    # Switch when AXP >> CXP
+                    if avg_axp_size / avg_cxp_size > exp_args.explain_switch_alpha:
+                        logger.debug("Switching to MHS-MUS enumeration.")
+                        break
             # Extract outputs
             # Note: this is in OHE space, not original feature space
             # eg.: cxps = [[1], [2]] means that both feature 1 and feature 2 are CXPs
