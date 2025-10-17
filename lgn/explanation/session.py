@@ -174,6 +174,10 @@ class Session:
             e_ctx.record_solving_stats(
                 oracle.get_clause_count(), oracle.get_var_count()
             )
-            e_ctx.record_solving_stats(
-                hitman.oracle.nof_clauses(), hitman.oracle.nof_vars()
-            )
+            if (hitman.oracle is not None) and (
+                hasattr(hitman.oracle, "nof_clauses")
+                and hasattr(hitman.oracle, "nof_vars")
+            ):
+                e_ctx.record_solving_stats(
+                    hitman.oracle.nof_clauses(), hitman.oracle.nof_vars()
+                )

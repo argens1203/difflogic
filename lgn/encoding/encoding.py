@@ -1,5 +1,7 @@
+from pysat.formula import Atom
 from .pseudo_model import PseudoModel
 from lgn.encoding.util import get_parts
+from typing import Dict
 
 
 class Encoding:
@@ -24,7 +26,7 @@ class Encoding:
         self.input_ids = input_ids
         self.output_ids = output_ids
         self.formula = formula
-        self.special = special
+        self.special: Dict[int, Atom] = special
 
         self.s_ctx = s_ctx
         self.e_ctx = e_ctx
@@ -71,7 +73,10 @@ class Encoding:
         return start
 
     def get_truth_value(self, idx):
-        return self.special.get(idx, None)
+        value = self.special.get(idx, None)
+        if value is None:
+            return None
+        return value == Atom(True)
 
     def get_votes_per_cls(self):
         return len(self.output_ids) // self.class_dim
@@ -114,6 +119,9 @@ class Encoding:
                 print("==== IDPool ====")
                 for f, e in vpool.obj2id.items():
                     print(e, f)
+
+            print("==== Truth Values ==== ")
+            print("; ".join([f"{k}:{v}" for k, v in self.special.items()]))
 
     def get_vpool_size(self):
         with self.use_context() as vpool:

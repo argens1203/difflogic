@@ -25,7 +25,12 @@ class PseudoModel:
 
         if o_id is None:
             if idx in self.special:
-                return self.special[idx] == Atom(True)
+                if self.special[idx] == Atom(True):
+                    return True
+                elif self.special[idx] == Atom(False):
+                    return False
+                else:
+                    print("special", self.special[idx])
             assert False, "Output id is None"
 
         # print("assumptions", assumptions)

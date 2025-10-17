@@ -27,6 +27,8 @@ class Encode:
         elif args.deduplicate == "bdd":
             logger.info("Using BDD Encoder...")
             _Encoder = BddEncoder(e_ctx=ctx)
+        else:
+            logger.info("Using standard Encoder...")
 
         encoding = _Encoder.get_encoding(
             model,

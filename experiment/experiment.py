@@ -52,7 +52,7 @@ class Experiment:
             "xnum": 1,
             "ohe_deduplication": ohe_dedup,
             #  ------
-            "explain_one": True,
+            # "explain_one": True,
         }
         args = {
             **vars(default_args),
@@ -60,8 +60,8 @@ class Experiment:
             **{"dataset": dataset},
         }
 
-        # Experiment.compare_encoders(args)
         args = Experiment.setup_preset_args(args)
+        # Experiment.compare_encoders(args)
         ctx = Experiment.run(args)
 
         # args["deduplicate"] = "bdd"
@@ -227,6 +227,7 @@ class Experiment:
                     ctx.test_loader,
                     args,
                     explainer=explainer,
+                    pysat_args=args,
                     encoding=encoding,
                     is_train=False,
                     ctx=ctx,
@@ -265,6 +266,7 @@ class Experiment:
             ctx=ctx,
         )
         ctx.debug(encoding1.print)
+        # input("Press Enter to continue...")
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -272,7 +274,9 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        ctx.debug(lambda: '"BDD Encoding:"')
         ctx.debug(encoding2.print)
+        # input("Press Enter to continue...")
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -280,13 +284,16 @@ class Experiment:
             args=args,
             ctx=ctx,
         )
+        ctx.debug(lambda: '"SAT Encoding:"')
         ctx.debug(encoding3.print)
+        # input("Press Enter to continue...")
 
-        assert str(encoding2.formula) == str(encoding3.formula), (
-            "Formulas should be equal",
-            encoding2.formula,
-            encoding3.formula,
-        )
+        # Not guaranteed when order of deduplication is different
+        # assert str(encoding2.formula) == str(encoding3.formula), (
+        #     "Formulas should be equal",
+        #     encoding2.formula,
+        #     encoding3.formula,
+        # )
         validator = Validator(ctx)
 
         validator.validate_encodings_with_data(
@@ -299,15 +306,16 @@ class Experiment:
             encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
 
-        validator.validate_encodings_with_truth_table(
-            encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
-        )
-        validator.validate_encodings_with_truth_table(
-            encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
-        )
-        validator.validate_encodings_with_truth_table(
-            encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
-        )
+        # Not realistic with anything other than smallest datasets
+        # validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
+        # )
+        # validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
+        # )
+        # validator.validate_encodings_with_truth_table(
+        #     encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
+        # )
 
         explainer = Explainer(encoding1, ctx=ctx)
         f_exp = lambda: Explain.explain_all(args, explainer, encoding1, ctx)

@@ -126,7 +126,7 @@ class Encoder:
                 l = list(f)
                 if len(l) == 0:
                     # print("Empty formula:", f)
-                    special[idx] = f.simplified() == Atom(True)
+                    special[idx] = f.simplified()
                     # print("Special:", idx, special[idx])
                     output_ids.extend([None])
                     # input("Press Enter to Continue...")
