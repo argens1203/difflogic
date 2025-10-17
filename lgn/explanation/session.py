@@ -120,12 +120,13 @@ class Session:
 
     def hit(self, hypo: Partial_Inp_Set):
         self.hitman.hit(list(hypo))
+        assert hypo not in self.duals
         self.duals.append(hypo)
 
     def block(self, hypo: Partial_Inp_Set):
         self.hitman.block(list(hypo))
+        assert hypo not in self.expls
         self.expls.append(hypo)
-        pass
 
     def get(self):
         self.itr += 1

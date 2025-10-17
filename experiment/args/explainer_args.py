@@ -11,6 +11,7 @@ class ExplainerArgs:
     explain_all: bool = False
     explain_one: bool = False
     explain_inp: Optional[str] = None
+    explain_algorithm: Optional[str] = "both"
 
 
 def add_explainer_args(parser: argparse.ArgumentParser):
@@ -44,4 +45,11 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         action="store_true",
         default=False,
         help="Explain one prediction from test set. Note.: This uses fast method for getting one explanation only",
+    )
+    parser.add_argument(
+        "--explain_algorithm",
+        type=str,
+        default="both",
+        choices=["mus", "mcs", "var", "both", "find_one"],
+        help="Explanation algorithm to use (default: both)",
     )

@@ -172,7 +172,8 @@ class Context:
             "t/Exp",
             "m_enc",
             "m_expl",
-            "strategy",
+            "dedup_strat",
+            "exp_strat",
         ]
         return headers
 
@@ -208,6 +209,7 @@ class Context:
                 humanfriendly.format_size(self.results.get_value("memory/encoding")),
                 humanfriendly.format_size(self.results.get_value("memory/explanation")),
                 self.args.strategy,
+                self.args.explain_algorithm,
             ]
         ]
         return data

@@ -42,25 +42,47 @@ if __name__ == "__main__":
     # ]
     # # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
 
-    hitman_choices = ["sorted", "lbx", "sat"]
-    h_solver_choices = ["mgh", "cd195", "g3"]
+    # hitman_choices = ["sorted", "lbx", "sat"]
+    # h_solver_choices = ["mgh", "cd195", "g3"]
 
-    for h_type in hitman_choices:
-        if h_type == "sat":
-            for h_solver in h_solver_choices:
-                try:
-                    m_ctx.add(
-                        Experiment.debug(
-                            dataset="lending", h_type=h_type, h_solver=h_solver
-                        )
-                    )
-                except Exception as e:
-                    print(f"Error with hitman={h_type}, h_solver={h_solver}: {e}")
-        else:
+    # for h_type in hitman_choices:
+    #     if h_type == "sat":
+    #         for h_solver in h_solver_choices:
+    #             try:
+    #                 m_ctx.add(
+    #                     Experiment.debug(
+    #                         dataset="lending", h_type=h_type, h_solver=h_solver
+    #                     )
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Error with hitman={h_type}, h_solver={h_solver}: {e}")
+    #     else:
+    #         try:
+    #             m_ctx.add(Experiment.debug(dataset="lending", h_type=h_type))
+    #         except Exception as e:
+    #             print(f"Error with hitman={h_type}: {e}")
+
+    # m_ctx.add(Experiment.debug(dataset="monk2", explain_algorithm="both"))
+
+    for dataset in [
+        "iris",
+        "monk1",
+        "monk2",
+        "monk3",
+        "breast_cancer",
+        "compas",
+        "lending",
+    ]:
+        for exp_algorithm in ["var", "mus", "mcs", "both", "find_one"]:
+            # for exp_algorithm in ["mus", "mcs", "both", "find_one"]:
             try:
-                m_ctx.add(Experiment.debug(dataset="lending", h_type=h_type))
+                m_ctx.add(
+                    Experiment.debug(dataset=dataset, explain_algorithm=exp_algorithm)
+                )
             except Exception as e:
-                print(f"Error with hitman={h_type}: {e}")
+                print(
+                    f"Error with dataset={dataset}, explain_algorithm={exp_algorithm}: {e}"
+                )
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="mnist"))

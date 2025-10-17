@@ -1,8 +1,12 @@
 import logging
+import math
+import time
+
 from typing import Optional, Set
 
 # if TYPE_CHECKING:
 from experiment.args.pysat_args import PySatArgs
+from experiment.args.explainer_args import ExplainerArgs
 from lgn.encoding import Encoding
 from experiment.helpers import (
     Context,
@@ -122,18 +126,22 @@ class Explainer:
                 mcs = Explainer._extract_mcs(session, guess=guess, model=res["model"])
                 session.hit(mcs)
 
-            # Extact outputs
-            expls = session.get_expls_opt()
-            duals = session.get_duals_opt()
             itr = session.get_itr()
-
             # Check itration count
             if xnum is None:
                 assert itr == (
                     len(session.expls) + len(session.duals) + 1
                 ), "Assertion Error: " + ",".join(
-                    map(str, [itr, len(expls), len(duals)])
+                    map(str, [itr, len(session.expls), len(session.duals)])
                 )
+
+                # Also if dual is None, it means the entire input is unSAT
+                if len(session.duals) == 0:
+                    session.hit(set(session.options))
+
+            # Extact outputs
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
 
             return expls, duals
 
@@ -205,16 +213,21 @@ class Explainer:
 
             # Extract outputs
             itr = session.get_itr()
-            expls = session.get_expls_opt()
-            duals = session.get_duals_opt()
 
             if xnum is None:
                 # Check iteration count
                 assert itr == (
-                    len(expls) + len(duals) + 1
+                    len(session.expls) + len(session.duals) + 1
                 ), "Assertion Error: " + ",".join(
-                    map(str, [itr, len(expls), len(duals)])
+                    map(str, [itr, len(session.expls), len(session.duals)])
                 )
+
+                # Also if dual is None, it means the entire input is unSAT
+                if len(session.duals) == 0:
+                    session.hit(set(session.options))
+
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
             return expls, duals
 
     # PRIVATE
@@ -257,6 +270,35 @@ class Explainer:
 
     # NEW
 
+    def combined_explain(
+        self,
+        instance,
+        xnum: Optional[int],
+        exp_args: ExplainerArgs,
+        pysat_args: PySatArgs,
+    ) -> int:
+        if exp_args.explain_algorithm == "mus":
+            axps, axp_dual = self.mhs_mus_enumeration(
+                instance, xnum=xnum, args=pysat_args
+            )
+            return len(axps) + len(axp_dual)
+        elif exp_args.explain_algorithm == "mcs":
+            cxps, cxp_dual = self.mhs_mcs_enumeration(
+                instance, xnum=xnum, args=pysat_args
+            )
+            return len(cxps) + len(cxp_dual)
+        elif exp_args.explain_algorithm == "both":
+            return self.explain_both_and_assert(instance, xnum=xnum, args=pysat_args)
+        elif exp_args.explain_algorithm == "var":
+            return self.variable_enumeration(instance, args=pysat_args)
+        elif exp_args.explain_algorithm == "find_one":
+            self.explain(instance)
+            return 1
+        else:
+            raise ValueError(
+                f"Unknown explanation algorithm: {exp_args.explain_algorithm}"
+            )
+
     def explain_both_and_assert(self, instance, xnum: Optional[int], args: PySatArgs):
         self.explain(instance)
 
@@ -297,6 +339,11 @@ class Explainer:
         for cxp_d in cxp_dual:
             cxp_dual_set.add(frozenset(cxp_d))
 
+        # print("cxp_dual_set:", cxp_dual_set)
+        # print("cxp_set:", cxp_set)
+        # print("axp_dual_set:", axp_dual_set)
+        # print("axp_set:", axp_set)
+
         if xnum is None:
             assert axp_set.difference(cxp_dual_set) == set()
             assert cxp_dual_set.difference(axp_set) == set()
@@ -312,4 +359,115 @@ class Explainer:
             logger.debug("CXP #%d: %s", i, cxp)
         logger.debug("\n")
 
+        # input("Press Enter to continue...")
         return len(axps) + len(axp_dual)
+
+    def variable_enumeration(self, instance, args: PySatArgs):
+        # We start with MCS enumeration first
+        last_time = math.inf
+        session: Session
+        with Session.use_context(
+            instance=instance,
+            hit_type=args.h_type,
+            solver=args.h_solver,
+            oracle=self.oracle,
+            e_ctx=self.ctx,
+        ) as session:
+            inp = set(session.options)
+            counter = Explainer._enumerate_unit_mus(session=session)
+            session.add_to_itr(counter)
+
+            # Main Loop
+            while True:
+                start_time = time.time()
+                # Get a guess
+                hset = session.get()
+                # print("guess", hset)
+                if hset == None:
+                    break
+
+                # Try the guess
+                res = session.solve_opt(inp=inp - hset)
+
+                # If guess is MCS, block it
+                if res["solvable"]:
+                    session.block(hset)
+                    continue
+
+                # if res["core"] is None:
+                #     print("No core found, breaking loop.")
+                #     print("res:", res)
+                #     print("inp:", inp)
+                #     input("Press Enter to continue...")
+                # Else extract MUS from the guess
+                to_hit = self.reduce_axp_opt(
+                    inp=res["core"],
+                    session=session,
+                )
+                to_hit = set(to_hit)
+
+                session.hit(to_hit)
+
+                time_taken = time.time() - start_time
+                # if time_taken > last_time * (1 + args.switch_threshold):
+                if time_taken > last_time * (1 + 0.5):
+                    logger.debug(
+                        "Switching to MHS-MUS enumeration. Time taken: %.2f, last time: %.2f",
+                        time_taken,
+                        last_time,
+                    )
+                    break
+                last_time = time_taken
+            # Extract outputs
+            # Note: this is in OHE space, not original feature space
+            # eg.: cxps = [[1], [2]] means that both feature 1 and feature 2 are CXPs
+            # It would translate to [1, -2] or [3, -4] or [-1, 2] depending on instance
+            cxps = session.get_expls()
+            axps = session.get_duals()
+
+        with Session.use_context(
+            instance=instance,
+            hit_type=args.h_type,
+            oracle=self.oracle,
+            solver=args.h_solver,
+            e_ctx=self.ctx,
+        ) as session:
+
+            # Commented out since it is already done in previous session
+            # preempt_hit = Explainer._enumerate_unit_mcs(session)
+            for c in cxps:
+                session.hit(set(c))
+                assert session.is_solvable_with_opt(set(session.options) - set(c))
+            for a in axps:
+                session.block(set(a))
+                assert not session.is_solvable_with_opt(set(a))
+            session.add_to_itr(len(cxps) + len(axps))
+            # session.add_to_itr(preempt_hit)
+
+            # Main Loop
+            while True:
+                # Get a guess
+                guess = session.get()
+                if guess == None:
+                    break
+
+                # Try the guess
+                res = session.solve_opt(inp=guess)
+
+                # If guess is MUS, block it
+                if not res["solvable"]:
+                    session.block(guess)
+                    continue
+
+                # Else extract MCS from the guess
+                mcs = Explainer._extract_mcs(session, guess=guess, model=res["model"])
+                session.hit(mcs)
+
+            # Extact outputs
+            expls = session.get_expls_opt()
+            duals = session.get_duals_opt()
+
+            itr = session.get_itr()
+            # input("Press Enter to continue...")
+
+            return len(expls) + len(duals)

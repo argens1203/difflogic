@@ -27,9 +27,14 @@ class Explain:
         ctx.logger.debug("Raw: %s\n", raw)
         ctx.logger.debug("Inp: %s\n", inp)
         instance = Instance.from_encoding(encoding=encoding, raw=raw, inp=inp)
-        exp_count = explainer.explain_both_and_assert(
-            instance, xnum=args.xnum, args=args
+
+        exp_count = explainer.combined_explain(
+            instance, xnum=args.xnum, exp_args=args, pysat_args=args
         )
+
+        # exp_count = explainer.explain_both_and_assert(
+        #     instance, xnum=args.xnum, args=args
+        # )
 
         ctx.inc_num_explanations(exp_count)
         return time.time() - start, exp_count, 1
@@ -48,8 +53,9 @@ class Explain:
             ctx.logger.debug("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
-            explainer.explain(instance)
-            exp_count += 1
+            exp_count = explainer.combined_explain(
+                instance, xnum=args.xnum, exp_args=args, pysat_args=args
+            )
             break
 
         ctx.inc_num_explanations(exp_count)
@@ -112,10 +118,17 @@ class Explain:
                 ctx.logger.debug("Raw: %s\n", raw)
 
                 instance = Instance.from_encoding(encoding=encoding, feat=feat)
-                exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
-                    instance, xnum=exp_args.xnum, args=pysat_args
+                delta_exp_count = explainer.combined_explain(
+                    instance,
+                    xnum=exp_args.xnum,
+                    exp_args=exp_args,
+                    pysat_args=pysat_args,
                 )
-                exp_count += exp_count_axp_plus_cxp
+
+                # exp_count_axp_plus_cxp = explainer.explain_both_and_assert(
+                #     instance, xnum=exp_args.xnum, args=pysat_args
+                # )
+                exp_count += delta_exp_count
                 count += 1
                 if (
                     max_explain_time is not None

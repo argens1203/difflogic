@@ -33,6 +33,7 @@ class Experiment:
         enc_type_eq="pw",
         h_type="lbx",
         h_solver="g3",
+        explain_algorithm="both",
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -51,12 +52,13 @@ class Experiment:
             # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
             "enc_type_at_least": enc_type_at_least,
             "enc_type_eq": enc_type_eq,
-            "xnum": 1,
+            # "xnum": 10,
             "ohe_deduplication": ohe_dedup,
             #  ------
             # "explain_one": True,
             "h_solver": h_solver,
             "h_type": h_type,
+            "explain_algorithm": explain_algorithm,
         }
         args = {
             **vars(default_args),
