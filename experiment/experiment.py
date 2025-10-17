@@ -28,21 +28,20 @@ class Experiment:
         reverse=False,
         parent=True,
         small=True,
+        custom=False,
         ohe_dedup=True,
         enc_type_at_least="seqc",
         enc_type_eq="pw",
         h_type="lbx",
         h_solver="g3",
         explain_algorithm="both",
-        alpha=2.0,
-        window=20,
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
             # "verbose": "debug",
             "verbose": "info",
-            "size": "debug" if small else "small",
+            "size": "custom" if custom else ("debug" if small else "small"),
             # "deduplicate": None,
             "deduplicate": "sat",  # 'bdd', 'sat', None
             "experiment_id": 10000,
@@ -57,12 +56,10 @@ class Experiment:
             # "xnum": 10,
             "ohe_deduplication": ohe_dedup,
             #  ------
-            # "explain_one": True,
+            "explain_one": True,
             "h_solver": h_solver,
             "h_type": h_type,
             "explain_algorithm": explain_algorithm,
-            "explain_switch_alpha": alpha,
-            "explain_switch_window": window,
         }
         args = {
             **vars(default_args),
@@ -81,6 +78,8 @@ class Experiment:
 
     @staticmethod
     def setup_preset_args(args):
+        # print(args)
+        # input("Press Enter to continue...")
         if args.get("size") != "custom":
             model_args = Settings.get_model_args(
                 dataset_name=args.get("dataset"),
@@ -96,6 +95,19 @@ class Experiment:
                 **vars(model_args),
                 **{"model_path": model_path},
                 **{"save_model": save_model},
+            }
+        else:
+            model_args = Settings.get_model_args(
+                dataset_name=args.get("dataset"), custom=True
+            )
+            model_path = Settings.get_model_path(
+                dataset=args.get("dataset"),
+                custom=True,
+            )
+            args = {
+                **args,
+                **vars(model_args),
+                **{"model_path": model_path},
             }
         return args
 

@@ -1,5 +1,6 @@
 import torch
 import torchvision.datasets
+from typing import Optional
 
 from torchvision import transforms
 
@@ -11,9 +12,19 @@ class Flatten:
         return x.reshape(-1)
 
 
+def MNISTDatasetFactory(args):
+    cls = MNISTDataset
+    if args.size == "custom":
+        cls.bin_size = 8
+    else:
+        cls.bin_size = 2
+    return cls()
+
+
 class MNISTDataset(AutoTransformer):
     converter = None
     label_encoder = None
+    bin_size: int = 1
 
     @classmethod
     def attributes(cls):
@@ -29,7 +40,7 @@ class MNISTDataset(AutoTransformer):
 
     @classmethod
     def bin_sizes(cls):
-        return {k: 2 for k in cls.attributes()}
+        return {k: cls.bin_size for k in cls.attributes()}
 
     def __init__(self):
         self.dataset = torchvision.datasets.MNIST(
@@ -54,6 +65,10 @@ class MNISTDataset(AutoTransformer):
         self.raw_features = features.copy()
         self.features = MNISTDataset.transform_feature(features)
         self.labels = MNISTDataset.transform_label(labels)
+        # print(self.features.shape)
+        # print(MNISTDataset.converter.get_attr_domains())
+        # print(MNISTDataset.get_input_dim())
+        # input("Press Enter to continue...")
 
     def __len__(self):
         return len(self.dataset)

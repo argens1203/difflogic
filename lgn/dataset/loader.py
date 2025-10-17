@@ -1,7 +1,7 @@
 import torch
 
 from .dataset import Caltech101Dataset
-from .mnist import MNISTDataset
+from .mnist import MNISTDataset, MNISTDatasetFactory
 from .adult import AdultDataset
 from .monk import Monk1Dataset, Monk2Dataset, Monk3Dataset
 from .iris import IrisDataset
@@ -73,7 +73,7 @@ def load_dataset(args):
     elif args.dataset == "caltech101":
         dataset = Caltech101Dataset()
     elif args.dataset == "mnist":
-        dataset = MNISTDataset()
+        dataset = MNISTDatasetFactory(args)
     elif args.dataset == "compas":
         dataset = CompasDataset()
 

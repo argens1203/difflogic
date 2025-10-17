@@ -135,7 +135,7 @@ def train_eval(
                 packbits_eval=args.packbits_eval,
             )
             print(results.test_acc)
-            if results.test_acc - previous_acc < 0.01:
+            if results.test_acc - previous_acc < 0.0:
                 print("Early stopping")
                 return
             previous_acc = results.test_acc

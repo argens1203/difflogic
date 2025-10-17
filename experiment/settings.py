@@ -118,10 +118,35 @@ class Settings:
     ]
     debug_network_param = dict(dataset_params)
 
+    custom_dataset_neurons = [
+        (
+            "mnist",
+            1530,
+        )
+    ]
+    custom_network_param = dict(
+        [
+            (
+                ds,
+                {
+                    **{"num_neurons": neurons},
+                    **{
+                        "num_layers": 2,
+                        "num_iterations": 2000,
+                        "batch_size": 100,
+                    },
+                },
+            )
+            for ds, neurons in custom_dataset_neurons
+        ]
+    )
+
     @staticmethod
     def get_settings(
-        dataset_name: str = "", paper=False, minimal=True
+        dataset_name: str = "", paper=False, minimal=True, custom=False
     ) -> dict[str, int]:
+        if custom:
+            return Settings.custom_network_param.get(dataset_name, {})
         if not paper:
             return Settings.debug_network_param.get(dataset_name, {})
         if dataset_name == "iris":
@@ -137,15 +162,17 @@ class Settings:
         return {}
 
     @staticmethod
-    def get_model_args(dataset_name: str = "", paper=False) -> ModelArgs:
-        params = Settings.get_settings(dataset_name, paper)
+    def get_model_args(dataset_name: str = "", paper=False, custom=False) -> ModelArgs:
+        params = Settings.get_settings(dataset_name, paper, custom=custom)
         return ModelArgs(
             num_neurons=params.get("num_neurons"),
             num_layers=params.get("num_layers"),
         )
 
     @staticmethod
-    def get_model_path(dataset: str, size: str) -> str:
+    def get_model_path(dataset: str, size: str = "small", custom: bool = False) -> str:
+        if custom:
+            return "model-paths/custom_" + dataset + "_" + "model.pth"
         if size == "small":
             return "model-paths/$" + dataset + "_" + "model.pth"
         if size == "debug":

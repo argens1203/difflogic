@@ -92,7 +92,9 @@ if __name__ == "__main__":
     #                     )
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
-    m_ctx.add(Experiment.debug(dataset="mnist", explain_algorithm="find_one"))
+    m_ctx.add(
+        Experiment.debug(dataset="mnist", explain_algorithm="find_one", custom=True)
+    )
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))
