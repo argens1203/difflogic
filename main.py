@@ -11,13 +11,13 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
 
-    m_ctx.add(Experiment.debug(dataset="iris", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk1", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk2", small=True))
-    m_ctx.add(Experiment.debug(dataset="monk3", small=True))
-    m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
-    m_ctx.add(Experiment.debug(dataset="compas", small=True))
-    m_ctx.add(Experiment.debug(dataset="lending", small=True))
+    # m_ctx.add(Experiment.debug(dataset="iris", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk1", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk2", small=True))
+    # m_ctx.add(Experiment.debug(dataset="monk3", small=True))
+    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    # m_ctx.add(Experiment.debug(dataset="compas", small=True))
+    # m_ctx.add(Experiment.debug(dataset="lending", small=True))
 
     # m_ctx.add(Experiment.debug(dataset="mnist", small=True))
 
@@ -41,16 +41,26 @@ if __name__ == "__main__":
     #     # "native",
     # ]
     # # choices = ["pw", "seqc", "cardn", "sortn", "tot", "mtot", "kmtot"]
-    # for cho1 in choices:
-    #     for cho2 in ["pw"]:
-    #         try:
-    #             m_ctx.add(
-    #                 Experiment.debug(
-    #                     dataset="lending", enc_type_at_least=cho1, enc_type_eq=cho2
-    #                 )
-    #             )
-    #         except Exception as e:
-    #             print(f"Error with enc_type_at_least={cho1}, enc_type_eq={cho2}: {e}")
+
+    hitman_choices = ["sorted", "lbx", "sat"]
+    h_solver_choices = ["mgh", "cd195", "g3"]
+
+    for h_type in hitman_choices:
+        if h_type == "sat":
+            for h_solver in h_solver_choices:
+                try:
+                    m_ctx.add(
+                        Experiment.debug(
+                            dataset="lending", h_type=h_type, h_solver=h_solver
+                        )
+                    )
+                except Exception as e:
+                    print(f"Error with hitman={h_type}, h_solver={h_solver}: {e}")
+        else:
+            try:
+                m_ctx.add(Experiment.debug(dataset="lending", h_type=h_type))
+            except Exception as e:
+                print(f"Error with hitman={h_type}: {e}")
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
     # m_ctx.add(Experiment.debug(dataset="mnist"))
@@ -70,7 +80,7 @@ if __name__ == "__main__":
 
     m_ctx.display()
 
-    m_ctx.to_csv(filename=f"32d203a.csv", with_timestamp=True)
+    m_ctx.to_csv(filename=f"717bc2b.csv", with_timestamp=True)
     # # Experiment.debug(dataset="monk1")
     # # Experiment.debug(dataset="monk2")
     # # Experiment.debug(dataset="monk3")

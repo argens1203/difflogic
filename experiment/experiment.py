@@ -31,6 +31,8 @@ class Experiment:
         ohe_dedup=True,
         enc_type_at_least="seqc",
         enc_type_eq="pw",
+        h_type="lbx",
+        h_solver="g3",
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -53,6 +55,8 @@ class Experiment:
             "ohe_deduplication": ohe_dedup,
             #  ------
             # "explain_one": True,
+            "h_solver": h_solver,
+            "h_type": h_type,
         }
         args = {
             **vars(default_args),

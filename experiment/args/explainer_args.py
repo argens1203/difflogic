@@ -37,7 +37,7 @@ def add_explainer_args(parser: argparse.ArgumentParser):
         "--explain_all",
         action="store_true",
         default=False,
-        help="Explain all predictions (Default: Explain only on test set)",
+        help="Explain all predictions (Test + Train set). Warning: This can take a long time",
     )
     parser.add_argument(
         "--explain_one",
