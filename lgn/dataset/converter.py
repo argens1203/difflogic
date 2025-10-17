@@ -101,6 +101,9 @@ class Converter:
         if self.ohe is None:
             self.ohe = OneHotEncoder(
                 sparse_output=False,
+                categories=[
+                    range(self.attr_domains[i]) for i in range(len(self.attributes))
+                ],
             )
             data = self.ohe.fit_transform(data)
         else:
