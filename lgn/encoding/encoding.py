@@ -132,3 +132,9 @@ class Encoding:
 
     def use_context(self):
         return self.s_ctx.use_vpool()
+
+    def get_all_input_ids(self):
+        return self.input_ids
+
+    def get_all_output_ids(self):
+        return self.output_ids

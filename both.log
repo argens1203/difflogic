@@ -1,0 +1,91 @@
+args: DefaultArgs(experiment_id=10000, dataset='iris', verbose='info', save_model=True, load_model=True, model_path='iris_model.pth', size='debug', output='csv', output_path='results.csv', seed=0, packbits_eval=False, compile_model=False, implementation='cuda', enc_type_at_least='seqc', enc_type_eq='pw', solver_type='g3', h_type='lbx', h_solver='g3', connections='unique', num_neurons=12, num_layers=2, tau=10, learning_rate=0.01, grad_factor=1.0, batch_size=128, training_bit_count=32, eval_freq=1000, num_iterations=100000, valid_set_size=0.0, extensive_eval=False, deduplicate='sat', strategy='parent', ohe_deduplication=True, xnum=None, max_explain_time=30, explain=None, explain_all=False, explain_one=False, explain_inp=None, explain_algorithm='both')
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2], [3, 6, 7, -8, -5, -4]]
+[[3, -4], [-5, 6], [-8, 1, -2, 7]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2]]
+[[1, -2], [3, -4], [-5, 6]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2]]
+[[1, -2], [3, -4], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1], [-5, 4, -3, 6]]
+[[-5, 6], [8, -7, 4, -3], [2, 4, -3, -1]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2], [3, 6, 7, -8, -5, -4]]
+[[3, -4], [-5, 6], [-8, 1, -2, 7]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1], [-5, 4, -3, 6]]
+[[-5, 6], [8, -7, 4, -3], [2, 4, -3, -1]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2]]
+[[1, -2], [3, -4], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[1, 3, 6, -5, -4, -2], [3, 6, 7, -8, -5, -4]]
+[[3, -4], [-5, 6], [-8, 1, -2, 7]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[-6, 5]]
+[[-6, 5]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]
+Final Expls and duals:
+[[2, 6, 8, -7, -5, -1]]
+[[8, -7], [2, -1], [-5, 6]]

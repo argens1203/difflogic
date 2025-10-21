@@ -174,6 +174,7 @@ class Context:
             "m_expl",
             "dedup_strat",
             "exp_strat",
+            "proc_rounds",
         ]
         return headers
 
@@ -210,6 +211,7 @@ class Context:
                 humanfriendly.format_size(self.results.get_value("memory/explanation")),
                 self.args.strategy,
                 self.args.explain_algorithm,
+                self.get_process_rounds(),
             ]
         ]
         return data
@@ -251,6 +253,9 @@ class Context:
 
     def get_dataset(self):
         return self.dataset
+
+    def get_process_rounds(self):
+        return self.args.process_rounds
 
 
 class MultiContext:

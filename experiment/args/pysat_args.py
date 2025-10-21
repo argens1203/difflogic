@@ -9,6 +9,7 @@ class PySatArgs:
     solver_type: str = "g3"
     h_type: str = "sorted"  # "lbx" or "sorted" or "sat"
     h_solver: str = "mgh"  # "mgh" or "cd195"
+    process_rounds: int = 0
 
 
 def add_pysat_args(parser: argparse.ArgumentParser):
@@ -72,4 +73,11 @@ def add_pysat_args(parser: argparse.ArgumentParser):
         default="g3",
         choices=["mgh", "cd195", "g3"],
         help="Hitting set solver",
+    )
+
+    parser.add_argument(
+        "--process_rounds",
+        type=int,
+        default=0,
+        help="Number of process rounds for cnf simplification",
     )

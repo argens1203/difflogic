@@ -35,6 +35,7 @@ class Experiment:
         h_type="lbx",
         h_solver="g3",
         explain_algorithm="both",
+        proc_rounds=0,
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -60,6 +61,7 @@ class Experiment:
             "h_solver": h_solver,
             "h_type": h_type,
             "explain_algorithm": explain_algorithm,
+            "process_rounds": proc_rounds,
         }
         args = {
             **vars(default_args),

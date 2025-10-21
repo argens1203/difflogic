@@ -92,8 +92,15 @@ if __name__ == "__main__":
     #                     )
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
+    # for round in [0, 1, 2, 3]:
     m_ctx.add(
-        Experiment.debug(dataset="mnist", explain_algorithm="find_one", custom=True)
+        Experiment.debug(
+            dataset="mnist",
+            explain_algorithm="explain_one",
+            custom=False,
+            small=False,
+            proc_rounds=1,
+        )
     )
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))

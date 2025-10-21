@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from pysat.solvers import Solver as BaseSolver
 from pysat.card import CardEnc, EncType
 from pysat.formula import Formula
+from pysat.process import Processor
 from experiment.helpers import Context
 
 logger = logging.getLogger(__name__)
@@ -17,10 +18,24 @@ class Solver:
             name=ctx.get_solver_type()
         )  # g42, cd19 > m22 # TODO: try other solvers
         self.encoding = encoding
-        self._append_formula(encoding.get_cnf_clauses())
+
+        clauses = encoding.get_cnf_clauses() + encoding.get_eq_constraints_clauses()
+        if ctx.get_process_rounds() > 0:
+            to_freeze = self.encoding.get_all_input_ids() + list(
+                filter(lambda x: x is not None, self.encoding.get_all_output_ids())
+            )
+            processor = Processor(bootstrap_with=clauses)
+            processed = processor.process(
+                rounds=ctx.get_process_rounds(), freeze=to_freeze
+            )
+            assert processed is not None, "Processing failed"
+            # print(len(processed.clauses), len(clauses))
+            self._append_formula(processed.clauses)
+        else:
+            self._append_formula(clauses)
         # print("cnf", encoding.get_cnf_clauses())
         # NEW
-        self._append_formula(encoding.get_eq_constraints_clauses())
+        # self._append_formula(encoding.get_eq_constraints_clauses())
         # print("eq_constraints", encoding.get_eq_constraints_clauses())
 
         self.vpool_context = encoding.s_ctx.get_vpool_context()
