@@ -36,6 +36,7 @@ class Experiment:
         h_solver="g3",
         explain_algorithm="both",
         proc_rounds=0,
+        solver_type="mgh",
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -56,6 +57,7 @@ class Experiment:
             "enc_type_eq": enc_type_eq,
             # "xnum": 10,
             "ohe_deduplication": ohe_dedup,
+            "solver_type": solver_type,
             #  ------
             "explain_one": True,
             "h_solver": h_solver,

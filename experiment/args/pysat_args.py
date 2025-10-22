@@ -8,7 +8,7 @@ class PySatArgs:
     enc_type_eq: str = "lad"
     solver_type: str = "g3"
     h_type: str = "sorted"  # "lbx" or "sorted" or "sat"
-    h_solver: str = "mgh"  # "mgh" or "cd195"
+    h_solver: str = "mgh"  # "mgh" or "cd195" or "g3"
     process_rounds: int = 0
 
 
@@ -70,7 +70,7 @@ def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--h_solver",
         type=str,
-        default="g3",
+        default="mgh",
         choices=["mgh", "cd195", "g3"],
         help="Hitting set solver",
     )

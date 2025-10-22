@@ -93,15 +93,72 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="lending"))
     # for round in [0, 1, 2, 3]:
-    m_ctx.add(
-        Experiment.debug(
-            dataset="mnist",
-            explain_algorithm="explain_one",
-            custom=False,
-            small=False,
-            proc_rounds=1,
-        )
-    )
+    # m_ctx.add(
+    #     Experiment.debug(
+    #         dataset="mnist",
+    #         explain_algorithm="explain_one",
+    #         custom=False,
+    #         small=False,
+    #         proc_rounds=1,
+    #     )
+    # )
+
+    # m_ctx.add(
+    #     Experiment.debug(
+    #         dataset="lending",
+    #         explain_algorithm="mus",
+    #         solver_type="g3",
+    #         h_solver="mgh",
+    #         h_type="sat",
+    #         custom=False,
+    #         small=False,
+    #     )
+    # )
+
+    for dataset in [
+        "breast_cancer",
+        "adult",
+        "monk1",
+        "monk2",
+        "monk3",
+        "iris",
+        "compas",
+        "lending",
+    ]:
+        for solver in [
+            "cd",
+            "cd15",
+            "cd19",
+            "cms",
+            "gc3",
+            "gc4",
+            "g3",
+            "g4",
+            "g42",
+            "lgl",
+            "mcb",
+            "mcm",
+            "mpl",
+            "mg3",
+            "mc",
+            "m22",
+            "mgh",
+        ]:
+            try:
+                for i in range(10):
+                    m_ctx.add(
+                        Experiment.debug(
+                            dataset=dataset,
+                            explain_algorithm="mus",
+                            solver_type=solver,
+                            h_solver="mgh",
+                            h_type="sat",
+                            custom=False,
+                            small=True,
+                        )
+                    )
+            except Exception as e:
+                print(f"Error with solver={solver}: {e}")
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))
