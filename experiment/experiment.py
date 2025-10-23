@@ -25,18 +25,19 @@ class Experiment:
     @staticmethod
     def debug(
         dataset=None,
-        reverse=False,
-        parent=True,
         small=True,
         custom=False,
         ohe_dedup=True,
-        enc_type_at_least="seqc",
-        enc_type_eq="pw",
+        enc_type_at_least="tot",
+        enc_type_eq="bit",
         h_type="lbx",
         h_solver="g3",
         explain_algorithm="both",
         proc_rounds=0,
-        solver_type="mgh",
+        solver_type="gc3",
+        deduplicate="sat",
+        parent=True,
+        reverse=False,
     ):
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
@@ -45,7 +46,7 @@ class Experiment:
             "verbose": "info",
             "size": "custom" if custom else ("debug" if small else "small"),
             # "deduplicate": None,
-            "deduplicate": "sat",  # 'bdd', 'sat', None
+            "deduplicate": deduplicate,  # 'bdd', 'sat', None
             "experiment_id": 10000,
             "load_model": True,
             "output": "csv",

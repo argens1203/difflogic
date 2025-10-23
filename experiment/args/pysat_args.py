@@ -5,8 +5,8 @@ from attr import dataclass
 @dataclass
 class PySatArgs:
     enc_type_at_least: str = "tot"
-    enc_type_eq: str = "lad"
-    solver_type: str = "g3"
+    enc_type_eq: str = "bit"
+    solver_type: str = "gc3"
     h_type: str = "sorted"  # "lbx" or "sorted" or "sat"
     h_solver: str = "mgh"  # "mgh" or "cd195" or "g3"
     process_rounds: int = 0
@@ -16,7 +16,7 @@ def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--enc_type_at_least",
         type=str,
-        default="mtot",
+        default="tot",
         choices=[
             "pw",
             "seqc",
@@ -35,7 +35,7 @@ def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--solver_type",
         type=str,
-        default="g3",
+        default="gc3",
         choices=["g3", "cd", "m22"],
         help="Solver type for the model",
     )
@@ -43,7 +43,7 @@ def add_pysat_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--enc_type_eq",
         type=str,
-        default="pw",
+        default="bit",
         choices=[
             "pw",
             "seqc",
