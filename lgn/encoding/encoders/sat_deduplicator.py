@@ -119,7 +119,7 @@ class SatDeduplicator:
             for m, prev in enumerate(layer):
                 if k == i and m == j:
                     return None, None, None
-                if gates[i][j].ohe & gates[k][m].ohe == set():
+                if deduplicate_ohe and gates[i][j].ohe & gates[k][m].ohe == set():
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
@@ -142,7 +142,7 @@ class SatDeduplicator:
             for m, prev in enumerate(layer):
                 if k == i and m == j:
                     break  # For reverse order, skip checking self and everything after in the same layer
-                if gates[i][j].ohe & gates[k][m].ohe == set():
+                if deduplicate_ohe and gates[i][j].ohe & gates[k][m].ohe == set():
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
@@ -165,7 +165,7 @@ class SatDeduplicator:
             for m, prev in enumerate(layer):
                 if k == i and m == j:
                     break  # For reverse order, skip checking self and everything after in the same layer
-                if gates[i][j].ohe & gates[k][m].ohe == set():
+                if deduplicate_ohe and gates[i][j].ohe & gates[k][m].ohe == set():
                     continue
                 is_reverse = self.dedup_pair_c(curr, prev)
                 if is_reverse is not None:
