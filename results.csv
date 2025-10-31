@@ -1,2 +1,2 @@
 ds,input_dim,# lay,# neu,acc,enc_at_l,enc_eq,solver,ddup,ohe-ddup,h_type,h_solver,# gates,# gates_f,# cl,# var,# avg_cl_s,# avg_var_s,# expl,run_t,t_Model,t_Encoding,t_Explain,t/Exp,m_enc,m_expl,dedup_strat,exp_strat,proc_rounds
-adult,115,5,256,0.8472085605233403,tot,bit,gc3,sat,12,lbx,mgh,1280,535,5377,736,37345.52,3673.00,153,5241.648553848267,2.394068956375122,5237.954313993454,1.2972609996795654,0.008478830063265134,3.02 MB,8.14 MB,parent,mus,0
+lending,182,2,100,0.842571839094162,tot,bit,gc3,sat,2,lbx,g3,200,92,1248,433,5360.40,1297.00,1,22.646702766418457,8.008526802062988,2.738218069076538,11.89792799949646,11.89792799949646,1.1 MB,17.67 MB,parent,both,0

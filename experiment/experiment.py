@@ -42,7 +42,7 @@ class Experiment:
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
-            # "verbose": "debug",
+            "verbose": "debug",
             "verbose": "info",
             "size": "custom" if custom else ("debug" if small else "small"),
             # "deduplicate": None,
@@ -59,8 +59,9 @@ class Experiment:
             # "xnum": 10,
             "ohe_deduplication": ohe_dedup,
             "solver_type": solver_type,
-            #  ------
             "explain_one": True,
+            #  ------
+            # "explain_one": True,
             "h_solver": h_solver,
             "h_type": h_type,
             "explain_algorithm": explain_algorithm,

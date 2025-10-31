@@ -37,7 +37,7 @@ class Model:
     @staticmethod
     def get_model(args, ctx):
         model, loss_fn, optim = get_model(args, ctx.results)
-        if args.save_model and args.load_model:
+        if args.load_model:
             try:
                 model.load_state_dict(
                     torch.load(args.model_path, map_location=torch.device(device))
@@ -48,22 +48,25 @@ class Model:
                 logger.info(f"Error loading model: {e}; using saved model")
                 Model.train_model(args, model, loss_fn, optim, ctx)
                 Model.eval_model(args, model, ctx)
-                torch.save(model.state_dict(), args.model_path)
-
-        elif args.save_model:
-            Model.train_model(args, model, loss_fn, optim, ctx)
-            Model.eval_model(args, model, ctx)
-            torch.save(model.state_dict(), args.model_path)
-
-        elif args.load_model:
-            model.load_state_dict(
-                torch.load(args.model_path, map_location=torch.device(device))
-            )
-            Model.eval_model(args, model, ctx)
-
+                # torch.save(model.state_dict(), args.model_path)
         else:
             Model.train_model(args, model, loss_fn, optim, ctx)
             Model.eval_model(args, model, ctx)
+
+        if args.save_model:
+            # Model.train_model(args, model, loss_fn, optim, ctx)
+            # Model.eval_model(args, model, ctx)
+            torch.save(model.state_dict(), args.model_path)
+
+        # elif args.load_model:
+        #     model.load_state_dict(
+        #         torch.load(args.model_path, map_location=torch.device(device))
+        #     )
+        #     Model.eval_model(args, model, ctx)
+
+        # else:
+        #     Model.train_model(args, model, loss_fn, optim, ctx)
+        #     Model.eval_model(args, model, ctx)
 
         ####################################################################################################################
         if args.compile_model:

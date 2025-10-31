@@ -42,7 +42,7 @@ pyrsistent==0.19.3
 PySocks==1.7.1
 pytest==8.4.1
 python-dateutil==2.9.0.post0
-python-sat==1.8.dev19
+python-sat==1.8.dev24
 requests==2.32.3
 scikit-learn==1.6.1
 scipy==1.15.1

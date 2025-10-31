@@ -2,6 +2,13 @@ from sqlite3 import Date
 from experiment.experiment import Experiment
 from experiment.helpers.context import MultiContext
 
+# import gc
+
+# gc.set_threshold(1400, 10, 10)
+
+# print(gc.get_threshold())
+# input("Press Enter to continue...")
+
 if __name__ == "__main__":
     # experiment.run_with_cmd()
     # experiment.get_and_retest_model()
@@ -11,13 +18,13 @@ if __name__ == "__main__":
 
     # m_ctx.add(Experiment.debug(dataset="iris", ohe=True))
 
-    # m_ctx.add(Experiment.debug(dataset="iris", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk1", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk2", small=True))
-    # m_ctx.add(Experiment.debug(dataset="monk3", small=True))
-    # m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
-    # m_ctx.add(Experiment.debug(dataset="compas", small=True))
-    # m_ctx.add(Experiment.debug(dataset="lending", small=True))
+    m_ctx.add(Experiment.debug(dataset="iris", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk1", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk2", small=True))
+    m_ctx.add(Experiment.debug(dataset="monk3", small=True))
+    m_ctx.add(Experiment.debug(dataset="breast_cancer", small=True))
+    m_ctx.add(Experiment.debug(dataset="compas", small=True))
+    m_ctx.add(Experiment.debug(dataset="lending", small=True))
 
     # m_ctx.add(Experiment.debug(dataset="mnist", small=True))
 
@@ -115,50 +122,149 @@ if __name__ == "__main__":
     #     )
     # )
 
-    for dataset in [
-        "breast_cancer",
-        "adult",
-        "monk1",
-        "monk2",
-        "monk3",
-        "iris",
-        "compas",
-        "lending",
-    ]:
-        for solver in [
-            "cd",
-            "cd15",
-            "cd19",
-            "cms",
-            "gc3",
-            "gc4",
-            "g3",
-            "g4",
-            "g42",
-            "lgl",
-            "mcb",
-            "mcm",
-            "mpl",
-            "mg3",
-            "mc",
-            "m22",
-            "mgh",
-        ]:
-            try:
-                for i in range(10):
-                    m_ctx.add(
-                        Experiment.debug(
-                            dataset=dataset,
-                            explain_algorithm="mus",
-                            solver_type=solver,
-                            h_solver="mgh",
-                            h_type="sat",
-                            custom=False,
-                            small=True,
-                        )
-                    )
-            except Exception as e:
-                print(f"Error with solver={solver}: {e}")
+    # for dataset in [
+    #     # "breast_cancer",
+    #     # "adult",
+    #     # "monk1",
+    #     # "monk2",
+    #     # "monk3",
+    #     # "iris",
+    #     "compas",
+    #     "lending",
+    # ]:
+    #     for dedup in ["bdd", "sat", None]:
+    #         try:
+    #             for i in range(5):
+    #                 m_ctx.add(
+    #                     Experiment.debug(
+    #                         dataset=dataset,
+    #                         explain_algorithm="mus",
+    #                         h_solver="mgh",
+    #                         h_type="sat",
+    #                         custom=False,
+    #                         small=True,
+    #                         parent=False,
+    #                         reverse=False,
+    #                         deduplicate=dedup,
+    #                         # ohe_dedup=dedup,
+    #                     )
+    #                 )
+    #         except Exception as e:
+    #             print(f"Error with deduplication={dedup}: {e}")
+
+    # for dataset in [
+    #     "breast_cancer",
+    #     # "adult",
+    #     "monk1",
+    #     "monk2",
+    #     "monk3",
+    #     "iris",
+    #     "compas",
+    #     # "lending",
+    # ]:
+    #     for dedup in [False, True]:
+    #         for order in ["full", "b_full", "parent"]:
+    #             try:
+    #                 m_ctx.add(
+    #                     Experiment.debug(
+    #                         dataset=dataset,
+    #                         explain_algorithm="mus",
+    #                         h_solver="mgh",
+    #                         h_type="sat",
+    #                         custom=False,
+    #                         small=False,
+    #                         parent=order == "parent",
+    #                         reverse=order == "b_full",
+    #                         deduplicate="sat",
+    #                         ohe_dedup=dedup,
+    #                     )
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Error with deduplication={dedup}: {e}")
+
+    # m_ctx.add(
+    #     Experiment.debug(
+    #         dataset="mnist",
+    #         explain_algorithm="find_one",
+    #         h_solver="mgh",
+    #         h_type="sat",
+    #         custom=False,
+    #         small=True,
+    #         parent=True,
+    #         deduplicate="sat",
+    #         ohe_dedup=True,
+    #     )
+    # )
+    # m_ctx.add(
+    #     Experiment.debug(
+    #         dataset="mnist",
+    #         explain_algorithm="mus",
+    #         h_solver="mgh",
+    #         h_type="sat",
+    #         custom=False,
+    #         small=True,
+    #         parent=True,
+    #         deduplicate="sat",
+    #         ohe_dedup=True,
+    #     )
+    # )
+
+    # for dataset in [
+    #     "breast_cancer",
+    #     "adult",
+    #     "monk1",
+    #     "monk2",
+    #     "monk3",
+    #     "iris",
+    #     "compas",
+    #     "lending",
+    # ]:
+    #     for ohe_dedup in [False, True]:
+    #         for order in ["full", "b_full", "parent"]:
+    #             try:
+    #                 m_ctx.add(
+    #                     Experiment.debug(
+    #                         dataset=dataset,
+    #                         explain_algorithm="mus",
+    #                         h_solver="mgh",
+    #                         h_type="sat",
+    #                         custom=False,
+    #                         small=False,
+    #                         parent=order == "parent",
+    #                         reverse=order == "b_full",
+    #                         deduplicate="sat",
+    #                         ohe_dedup=ohe_dedup,
+    #                     )
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Error with deduplication={order}: {e}")
+
+    # for dataset in [
+    #     # "breast_cancer",
+    #     # "adult",
+    #     # "monk1",
+    #     # "monk2",
+    #     # "monk3",
+    #     # "iris",
+    #     "compas",
+    #     "lending",
+    # ]:
+    #     for h_type in ["sat", "lbx", "sorted"]:
+    #         try:
+    #             m_ctx.add(
+    #                 Experiment.debug(
+    #                     dataset=dataset,
+    #                     explain_algorithm="mus",
+    #                     h_solver="mgh",
+    #                     h_type=h_type,
+    #                     custom=False,
+    #                     small=True,
+    #                     parent=True,
+    #                     deduplicate="sat",
+    #                 )
+    #             )
+    #         except Exception as e:
+    #             print(f"Error with deduplication={h_type}: {e}")
 
     # # m_ctx.add(Experiment.debug(dataset="adult"))
     # # m_ctx.add(Experiment.debug(dataset="breast_cancer", ohe=True))

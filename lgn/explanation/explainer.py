@@ -30,6 +30,8 @@ class Explainer:
         self.ctx = ctx
 
     def explain(self, instance: Instance):
+        # print(instance.feat)
+        # print(instance.get_input())
         pred_class = instance.get_predicted_class()
         inp = instance.get_input()
 
@@ -294,7 +296,7 @@ class Explainer:
                 instance, args=pysat_args, exp_args=exp_args
             )
         elif exp_args.explain_algorithm == "find_one":
-            self.explain(instance)
+            return self.explain(instance)
             return 1
         else:
             raise ValueError(

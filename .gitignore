@@ -16,3 +16,4 @@ main.log.i
 *.pth
 allres.txt
 *.csv
+*.xlsx

@@ -53,13 +53,14 @@ class Explain:
             ctx.logger.debug("Raw: %s\n", raw)
 
             instance = Instance.from_encoding(encoding=encoding, feat=feat)
-            exp_count = explainer.combined_explain(
+            exp = explainer.combined_explain(
                 instance, xnum=args.xnum, exp_args=args, pysat_args=args
             )
+            # print(instance.verbose(exp))
             break
 
-        ctx.inc_num_explanations(exp_count)
-        return time.time() - start, exp_count, 1
+        ctx.inc_num_explanations(1)
+        return time.time() - start, 1, 1
 
     @staticmethod
     def explain_all(
