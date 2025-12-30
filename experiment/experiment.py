@@ -1,9 +1,7 @@
 import argparse
-from typing import Dict
-import torch
 import json
 
-from experiment.args.model_args import ModelArgs
+import torch
 
 from .args import get_args, DefaultArgs
 from .helpers import Context
@@ -18,7 +16,10 @@ from .model import Model
 
 default_args = DefaultArgs()
 
-torch.set_num_threads(1)  # ???
+# Limit PyTorch to single thread to avoid contention with SAT solvers
+# and ensure deterministic behavior during explanation generation
+TORCH_NUM_THREADS = 1
+torch.set_num_threads(TORCH_NUM_THREADS)
 
 
 class Experiment:

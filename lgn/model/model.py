@@ -1,14 +1,16 @@
-import torch
 import logging
-from attr import dataclass
+import os
 
-from difflogic import LogicLayer, GroupSum
+import torch
 
+from difflogic import CompiledLogicNet, LogicLayer, GroupSum
 from lgn.dataset import get_dataset
 from constant import device
 
-
 logger = logging.getLogger(__name__)
+
+# Number of possible binary logic operations (2^4 = 16 combinations of 2 inputs)
+NUM_BINARY_OPS = 16
 
 
 def get_model(args, results=None):
@@ -31,7 +33,7 @@ def get_model(args, results=None):
     model = torch.nn.Sequential(*logic_layers, GroupSum(class_count, args.tau))
 
     total_num_neurons = sum(map(lambda x: x.num_neurons, logic_layers))
-    total_num_weights = sum(map(lambda x: x.num_weights, logic_layers)) * 16
+    total_num_weights = sum(map(lambda x: x.num_weights, logic_layers)) * NUM_BINARY_OPS
     if results is not None:
         results.store_results(
             {
@@ -50,10 +52,6 @@ def get_model(args, results=None):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     return model, loss_fn, optimizer
-
-
-import os
-from difflogic import CompiledLogicNet
 
 
 def compile_model(args, model, test_loader):

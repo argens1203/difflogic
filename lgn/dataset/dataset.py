@@ -1,4 +1,3 @@
-import logging
 import torch
 
 from .adult import AdultDataset

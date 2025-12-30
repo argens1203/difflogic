@@ -1,7 +1,5 @@
 import logging
 import math
-import time
-
 from typing import Optional, Set
 
 # if TYPE_CHECKING:
