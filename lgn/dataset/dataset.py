@@ -95,32 +95,6 @@ from torchvision import transforms
 
 
 class Caltech101Dataset:
-    # dataset = torchvision.datasets.Caltech101(
-    #     "data-uci",
-    #     download=False,
-    #     transform=transforms.Compose(
-    #         [
-    #             transforms.ToTensor(),
-    #             transforms.Resize((64, 64)),
-    #             transforms.Grayscale(),
-    #             Flatten(),
-    #         ]
-    #     ),
-    # )
-    # dataset = torchvision.datasets.Caltech101(
-    #     "data-uci",
-    #     download=False,
-    #     transform=transforms.Compose(
-    #         [
-    #             transforms.ToTensor(),
-    #             transforms.Resize((64, 64)),
-    #             transforms.Grayscale(),
-    #             Flatten(),
-    #             Binarizer(dataset, 2),
-    #         ]
-    #     ),
-    # )
-
     def __call__(self):
         return self.dataset
 

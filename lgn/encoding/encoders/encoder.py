@@ -106,57 +106,26 @@ class Encoder:
 
     def populate_clauses(self, input_handles, formula):
         with self.use_context() as vpool:
-            # print("before populating", vpool.top)
-            # input("Press Enter to Continue...")
             input_ids = [vpool.id(h) for h in input_handles]
             cnf = CNF()
             output_ids = []
             special = dict()
-            # adding the clauses to a global CNF
             idx = 0
 
             for f, g in zip(
                 [And(Atom(True), f.simplified()) for f in formula], formula
             ):
-                # print("f", f)
-                # print("g", g)
-                # print("list(g)", list(g))
-                # print("f", f.simplified())
-                # print("list(f)", list(f))
                 l = list(f)
                 if len(l) == 0:
-                    # print("Empty formula:", f)
                     special[idx] = f.simplified()
-                    # print("Special:", idx, special[idx])
                     output_ids.extend([None])
-                    # input("Press Enter to Continue...")
                 else:
-                    # f.clausify()
-                    # print("list(f)[:-1]", list(f)[:-1])
-                    # print("'f.clauses[-1][1]", f.clauses[-1][1])
-                    # print("list(f)[-1]", list(f)[-1])
                     cnf.extend(list(f)[:-1])
-                    # logger.debug("Formula: %s", f)
-                    # logger.debug("CNF Clauses: %s", f.clauses)
-                    # logger.debug("Simplified: %s", f.simplified())
-                    # logger.debug("CNF Clauses: %s", cnf.clauses)
-                    # print("(Populate Clauses) vpool", vpool.id2obj.items())
-                    # input()
-
-                    # if f.clauses[-1][1] is None:
-                    # special[idx] = f.simplified()
                     output_ids.extend(list(f)[-1])
-                # input("Press Enter to Continue...")
                 idx += 1
 
-                # logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
-
             logger.debug("output_ids: %s", str(output_ids))
-
-            # print("after populating", vpool.top)
-            # input("Press Enter to Continue...")
-        # output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
 
         return input_ids, cnf, output_ids, special
 

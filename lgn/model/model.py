@@ -18,14 +18,11 @@ def get_model(args, results=None):
     class_count = dataset.get_num_of_classes()
 
     logger.debug(f"in_dim={in_dim}, class_count={class_count}")
-    # input("Press Enter to continue...")
 
     logic_layers = []
 
     k = args.num_neurons
     l = args.num_layers
-
-    ####################################################################################################################
 
     logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
     for _ in range(l - 1):
@@ -33,18 +30,8 @@ def get_model(args, results=None):
 
     model = torch.nn.Sequential(*logic_layers, GroupSum(class_count, args.tau))
 
-    ####################################################################################################################
-
-    total_num_neurons = sum(
-        map(lambda x: x.num_neurons, logic_layers[:])
-    )  # TODO: Why 1:-1?
-    # if args.verbose in ["debug", "info"]:
-    # print(f"total_num_neurons={total_num_neurons}")
-    total_num_weights = (
-        sum(map(lambda x: x.num_weights, logic_layers[:])) * 16
-    )  # TODO: Why 1:-1?
-    # if args.verbose in ["debug", "info"]:
-    # print(f"total_num_weights={total_num_weights}")
+    total_num_neurons = sum(map(lambda x: x.num_neurons, logic_layers))
+    total_num_weights = sum(map(lambda x: x.num_weights, logic_layers)) * 16
     if results is not None:
         results.store_results(
             {
@@ -55,8 +42,6 @@ def get_model(args, results=None):
 
     model = model.to(device)
 
-    # print(model)
-    # input("Press Enter to continue...")
     if results is not None:
         results.store_results({"model_str": str(model)})
 

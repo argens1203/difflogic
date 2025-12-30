@@ -84,8 +84,6 @@ class Experiment:
 
     @staticmethod
     def setup_preset_args(args):
-        # print(args)
-        # input("Press Enter to continue...")
         if args.get("size") != "custom":
             model_args = Settings.get_model_args(
                 dataset_name=args.get("dataset"),
@@ -210,15 +208,12 @@ class Experiment:
         # args = argparse.Namespace(**args)
         if args.verbose != "warn":
             print("args:", args)
-            # input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = Model.get_model(args, ctx=ctx)
 
         with ctx.use_memory_profile() as profile_memory:
-            # ctx.start_memory_usage()
-
             encoding = Encode.get_encoding(
                 model=model,
                 args=args,
@@ -262,7 +257,6 @@ class Experiment:
                 )
 
             total_time_taken, exp_count, instance_count = f_exp()
-            # ============= ============= ============= ============= ============= ============= ============= =============
 
             ctx.results.store_explanation_stat(
                 exp_count / instance_count, ctx.deduplication
@@ -271,11 +265,9 @@ class Experiment:
             profile_memory("explanation")
             ctx.results.store_explanation_ready_time()
             ctx.results.store_counts(instance_count, exp_count)
-        # ctx.end_memory_usage()
         ctx.results.save()
         ctx.results.store_end_time()
         ctx.output()
-        # input("Press Enter to continue...")
 
         return ctx
 
@@ -294,7 +286,6 @@ class Experiment:
             ctx=ctx,
         )
         ctx.debug(encoding1.print)
-        # input("Press Enter to continue...")
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -304,7 +295,6 @@ class Experiment:
         )
         ctx.debug(lambda: '"BDD Encoding:"')
         ctx.debug(encoding2.print)
-        # input("Press Enter to continue...")
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -314,14 +304,7 @@ class Experiment:
         )
         ctx.debug(lambda: '"SAT Encoding:"')
         ctx.debug(encoding3.print)
-        # input("Press Enter to continue...")
 
-        # Not guaranteed when order of deduplication is different
-        # assert str(encoding2.formula) == str(encoding3.formula), (
-        #     "Formulas should be equal",
-        #     encoding2.formula,
-        #     encoding3.formula,
-        # )
         validator = Validator(ctx)
 
         validator.validate_encodings_with_data(
@@ -333,17 +316,6 @@ class Experiment:
         validator.validate_encodings_with_data(
             encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
-
-        # Not realistic with anything other than smallest datasets
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
-        # )
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
-        # )
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
-        # )
 
         explainer = Explainer(encoding1, ctx=ctx)
         f_exp = lambda: Explain.explain_all(args, explainer, encoding1, ctx)

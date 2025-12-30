@@ -296,7 +296,7 @@ class Explainer:
                 instance, args=pysat_args, exp_args=exp_args
             )
         elif exp_args.explain_algorithm == "find_one":
-            return self.explain(instance)
+            self.explain(instance)
             return 1
         else:
             raise ValueError(
