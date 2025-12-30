@@ -1,4 +1,5 @@
 from .args import *
+from .debug_config import DebugConfig
 
 from .encoding_args import *
 from .experiment_args import *

@@ -1,10 +1,11 @@
 import argparse
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import torch
 
 from .args import get_args, DefaultArgs
+from .args.debug_config import DebugConfig
 from .helpers import Context
 
 from lgn.encoding import Validator, encoding
@@ -26,6 +27,8 @@ torch.set_num_threads(TORCH_NUM_THREADS)
 class Experiment:
     @staticmethod
     def debug(
+        config: Optional[Union[DebugConfig, str]] = None,
+        # Legacy parameters for backward compatibility
         dataset: Optional[str] = None,
         small: bool = True,
         custom: bool = False,
@@ -41,46 +44,70 @@ class Experiment:
         parent: bool = True,
         reverse: bool = False,
     ) -> Context:
-        dataset = dataset if dataset is not None else "iris"
-        exp_args = {
-            "eval_freq": 1000,
-            "verbose": "debug",
-            "verbose": "info",
-            "size": "custom" if custom else ("debug" if small else "small"),
-            # "deduplicate": None,
-            "deduplicate": deduplicate,  # 'bdd', 'sat', None
-            "experiment_id": 10000,
-            "load_model": True,
-            "output": "csv",
-            "max_explain_time": 30,
-            # "strategy": ("b_full" if reverse else "full"),
-            "strategy": "parent" if parent else ("b_full" if reverse else "full"),
-            # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
-            "enc_type_at_least": enc_type_at_least,
-            "enc_type_eq": enc_type_eq,
-            # "xnum": 10,
-            "ohe_deduplication": ohe_dedup,
-            "solver_type": solver_type,
-            "explain_one": True,
-            #  ------
-            # "explain_one": True,
-            "h_solver": h_solver,
-            "h_type": h_type,
-            "explain_algorithm": explain_algorithm,
-            "process_rounds": proc_rounds,
-        }
+        """
+        Run a debug experiment.
+
+        Can be called with a DebugConfig object or with individual parameters.
+
+        Examples:
+            # Using config object (recommended)
+            config = DebugConfig(dataset="iris", deduplicate="bdd")
+            ctx = Experiment.debug(config)
+
+            # Using config factory methods
+            ctx = Experiment.debug(DebugConfig.small("mnist"))
+
+            # Using legacy parameters (backward compatible)
+            ctx = Experiment.debug(dataset="iris", small=True)
+        """
+        # Handle config object or string dataset
+        if isinstance(config, DebugConfig):
+            exp_args = config.to_exp_args()
+            dataset = config.dataset
+        elif isinstance(config, str):
+            # config is actually a dataset name
+            dataset = config
+            exp_args = DebugConfig(
+                dataset=dataset,
+                size="custom" if custom else ("debug" if small else "small"),
+                deduplicate=deduplicate,
+                enc_type_at_least=enc_type_at_least,
+                enc_type_eq=enc_type_eq,
+                ohe_dedup=ohe_dedup,
+                solver_type=solver_type,
+                h_type=h_type,
+                h_solver=h_solver,
+                explain_algorithm=explain_algorithm,
+                proc_rounds=proc_rounds,
+                use_parent_strategy=parent,
+                reverse=reverse,
+            ).to_exp_args()
+        else:
+            # Legacy mode: use individual parameters
+            dataset = dataset if dataset is not None else "iris"
+            exp_args = DebugConfig(
+                dataset=dataset,
+                size="custom" if custom else ("debug" if small else "small"),
+                deduplicate=deduplicate,
+                enc_type_at_least=enc_type_at_least,
+                enc_type_eq=enc_type_eq,
+                ohe_dedup=ohe_dedup,
+                solver_type=solver_type,
+                h_type=h_type,
+                h_solver=h_solver,
+                explain_algorithm=explain_algorithm,
+                proc_rounds=proc_rounds,
+                use_parent_strategy=parent,
+                reverse=reverse,
+            ).to_exp_args()
+
         args = {
             **vars(default_args),
             **exp_args,
-            **{"dataset": dataset},
         }
 
         args = Experiment.setup_preset_args(args)
-        # Experiment.compare_encoders(args)
         ctx = Experiment.run(args)
-
-        # args["deduplicate"] = "bdd"
-        # results = Experiment.run(args)
 
         return ctx
 
