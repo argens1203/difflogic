@@ -2,6 +2,11 @@
 
 ![difflogic_logo](difflogic_logo.png)
 
+> **Note:** This repository is a modified version of the [original difflogic repository](https://github.com/Felix-Petersen/difflogic), extended as part of the Master's thesis *"Efficient Formal Explainability of Logic Gate Networks"* at Monash University.
+>
+> **Author:** Argens Ng (ng.argens@gmail.com)
+> **Supervisor:** Alexey Ignatiev
+
 This repository includes the official implementation of our NeurIPS 2022 Paper "Deep Differentiable Logic Gate Networks"
 (Paper @ [ArXiv](https://arxiv.org/abs/2210.08277)).
 
