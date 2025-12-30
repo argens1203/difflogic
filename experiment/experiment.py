@@ -1,5 +1,6 @@
 import argparse
 import json
+from typing import Any, Optional
 
 import torch
 
@@ -25,21 +26,21 @@ torch.set_num_threads(TORCH_NUM_THREADS)
 class Experiment:
     @staticmethod
     def debug(
-        dataset=None,
-        small=True,
-        custom=False,
-        ohe_dedup=True,
-        enc_type_at_least="tot",
-        enc_type_eq="bit",
-        h_type="lbx",
-        h_solver="g3",
-        explain_algorithm="both",
-        proc_rounds=0,
-        solver_type="gc3",
-        deduplicate="sat",
-        parent=True,
-        reverse=False,
-    ):
+        dataset: Optional[str] = None,
+        small: bool = True,
+        custom: bool = False,
+        ohe_dedup: bool = True,
+        enc_type_at_least: str = "tot",
+        enc_type_eq: str = "bit",
+        h_type: str = "lbx",
+        h_solver: str = "g3",
+        explain_algorithm: str = "both",
+        proc_rounds: int = 0,
+        solver_type: str = "gc3",
+        deduplicate: Optional[str] = "sat",
+        parent: bool = True,
+        reverse: bool = False,
+    ) -> Context:
         dataset = dataset if dataset is not None else "iris"
         exp_args = {
             "eval_freq": 1000,
@@ -84,7 +85,7 @@ class Experiment:
         return ctx
 
     @staticmethod
-    def setup_preset_args(args):
+    def setup_preset_args(args: dict[str, Any]) -> dict[str, Any]:
         if args.get("size") != "custom":
             model_args = Settings.get_model_args(
                 dataset_name=args.get("dataset"),
@@ -117,7 +118,7 @@ class Experiment:
         return args
 
     @staticmethod
-    def run_with_cmd():
+    def run_with_cmd() -> None:
         args = get_args()
         dataset_args = Settings.debug_network_param.get(args.dataset) or {}
         exp_args = {
@@ -127,10 +128,8 @@ class Experiment:
 
         Experiment.run(args)
 
-    ####################################################################################################################
-
     @staticmethod
-    def find_model():
+    def find_model() -> None:
         experiment_id = 1000
         best_ids = []
         for dataset in [
@@ -187,7 +186,7 @@ class Experiment:
         print(best_ids)
 
     @staticmethod
-    def rerun_experiments(experiment_ids=[], output_eid=500):
+    def rerun_experiments(experiment_ids: list[int] = [], output_eid: int = 500) -> None:
         # experiement_ids = [1000, 1015, 1031, 1048, 1060]
         for eid in experiment_ids:
             for deduplication in [False, True]:
@@ -203,8 +202,7 @@ class Experiment:
                     output_eid += 1
 
     @staticmethod
-    def run(args):
-
+    def run(args: dict[str, Any]) -> Context:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         if args.verbose != "warn":
@@ -273,7 +271,7 @@ class Experiment:
         return ctx
 
     @staticmethod
-    def compare_encoders(args):
+    def compare_encoders(args: dict[str, Any]) -> None:
         args = DefaultArgs(**args)
 
         ctx = Context(args)

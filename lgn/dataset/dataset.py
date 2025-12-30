@@ -1,6 +1,9 @@
+from typing import Any, Generator, Iterator, Type, TypedDict
+
 import torch
 
 from .adult import AdultDataset
+from .auto_transformer import AutoTransformer
 from .monk import MonkDataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
@@ -9,9 +12,15 @@ from .lending import LendingDataset
 from .compas import CompasDataset
 
 
+class LegacyDatasetInfo(TypedDict):
+    """Type for legacy dataset configuration."""
+    input_dim: int
+    num_classes: int
+
+
 # Dataset registry mapping names to dataset classes
 # Each dataset class must implement get_input_dim() and get_num_of_classes()
-DATASET_REGISTRY = {
+DATASET_REGISTRY: dict[str, Type[AutoTransformer]] = {
     "iris": IrisDataset,
     "adult": AdultDataset,
     "monk1": MonkDataset,
@@ -25,7 +34,7 @@ DATASET_REGISTRY = {
 
 # Legacy datasets that don't have proper dataset classes yet
 # These are image datasets with hardcoded dimensions
-LEGACY_DATASETS = {
+LEGACY_DATASETS: dict[str, LegacyDatasetInfo] = {
     "mnist20x20": {"input_dim": 400, "num_classes": 10},
     "cifar-10-3-thresholds": {"input_dim": 3 * 32 * 32 * 3, "num_classes": 10},
     "cifar-10-31-thresholds": {"input_dim": 3 * 32 * 32 * 31, "num_classes": 10},
@@ -33,7 +42,7 @@ LEGACY_DATASETS = {
 }
 
 
-def get_dataset(dataset_name: str):
+def get_dataset(dataset_name: str) -> Type[AutoTransformer]:
     """
     Get the dataset class for the given dataset name.
 
@@ -93,7 +102,7 @@ def num_classes_of_dataset(dataset_name: str) -> int:
     raise KeyError(f"Dataset '{dataset_name}' not found")
 
 
-def load_n(loader, n):
+def load_n(loader: Iterator[Any], n: int) -> Generator[Any, None, None]:
     """Load n samples from a data loader."""
     i = 0
     while i < n:
@@ -112,11 +121,13 @@ class Flatten:
 
 class Caltech101Dataset:
     """Placeholder for Caltech101 dataset (not fully implemented)."""
-    def __call__(self):
+    dataset: Any  # Set by subclass or initialization
+
+    def __call__(self) -> Any:
         return self.dataset
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dataset)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Any:
         return self.dataset[index]

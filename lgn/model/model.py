@@ -1,7 +1,9 @@
 import logging
 import os
+from typing import Any, Optional
 
 import torch
+from torch.utils.data import DataLoader
 
 from difflogic import CompiledLogicNet, LogicLayer, GroupSum
 from lgn.dataset import get_dataset
@@ -13,7 +15,9 @@ logger = logging.getLogger(__name__)
 NUM_BINARY_OPS = 16
 
 
-def get_model(args, results=None):
+def get_model(
+    args: Any, results: Optional[Any] = None
+) -> tuple[torch.nn.Sequential, torch.nn.CrossEntropyLoss, torch.optim.Adam]:
     llkw = dict(grad_factor=args.grad_factor, connections=args.connections)
     dataset = get_dataset(args.dataset)
     in_dim = dataset.get_input_dim()
@@ -54,7 +58,7 @@ def get_model(args, results=None):
     return model, loss_fn, optimizer
 
 
-def compile_model(args, model, test_loader):
+def compile_model(args: Any, model: torch.nn.Sequential, test_loader: DataLoader) -> None:
     print("\n" + "=" * 80)
     print(" Converting the model to C code and compiling it...")
     print("=" * 80)
