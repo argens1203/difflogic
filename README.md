@@ -28,6 +28,25 @@ pip install difflogic
 
 For additional installation support, see [INSTALLATION_SUPPORT.md](INSTALLATION_SUPPORT.md).
 
+### Quick Start (Development Setup)
+
+To set up the development environment and run experiments:
+
+```shell
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run a simple experiment
+python main.py --dataset iris -bs 100 -ni 2000 -ef 1000 -k 6 -l 2 --save_model
+
+# Or run predefined debug experiments on multiple datasets
+python main.py --debug
+```
+
 ## Table of Contents
 
 - [Intro and Training](#-intro-and-training)
@@ -157,34 +176,31 @@ implementations over publishing a plethora of different competing implementation
 
 ## Experiments
 
-In the following, we present a few example experiments which are contained in the `experiments` directory.
-`main.py` executes the experiments for difflogic and `main_baseline.py` contains regular neural network baselines.
+In the following, we present a few example experiments.
+`main.py` executes the experiments for difflogic.
 
 ### Adult / Breast Cancer
 
 ```shell
-python experiments/main.py  -eid 526010           -bs 100 -t 20 --dataset adult         -ni 100_000 -ef 1_000 -k 256 -l 5 --compile_model
-python experiments/main.py  -eid 526020 -lr 0.001 -bs 100 -t 20 --dataset breast_cancer -ni 100_000 -ef 1_000 -k 128 -l 5 --compile_model
+python main.py  -eid 526010           -bs 100 -t 20 --dataset adult         -ni 100_000 -ef 1_000 -k 256 -l 5 --compile_model
+python main.py  -eid 526020 -lr 0.001 -bs 100 -t 20 --dataset breast_cancer -ni 100_000 -ef 1_000 -k 128 -l 5 --compile_model
 ```
 
 ### MNIST
 
 ```shell
-python experiments/main.py  -bs 100 -t  10 --dataset mnist20x20 -ni 200_000 -ef 1_000 -k  8_000 -l 6 --compile_model
-python experiments/main.py  -bs 100 -t  30 --dataset mnist      -ni 200_000 -ef 1_000 -k 64_000 -l 6 --compile_model
-# Baselines:
-python experiments/main_baseline.py  -bs 100 --dataset mnist    -ni 200_000 -ef 1_000 -k  128 -l 3
-python experiments/main_baseline.py  -bs 100 --dataset mnist    -ni 200_000 -ef 1_000 -k 2048 -l 7
+python main.py  -bs 100 -t  10 --dataset mnist20x20 -ni 200_000 -ef 1_000 -k  8_000 -l 6 --compile_model
+python main.py  -bs 100 -t  30 --dataset mnist      -ni 200_000 -ef 1_000 -k 64_000 -l 6 --compile_model
 ```
 
 ### CIFAR-10
 
 ```shell
-python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k    12_000 -l 4 --compile_model
-python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k   128_000 -l 4 --compile_model
-python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k   256_000 -l 5
-python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k   512_000 -l 5
-python experiments/main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k 1_024_000 -l 5
+python main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k    12_000 -l 4 --compile_model
+python main.py  -bs 100 -t 100 --dataset cifar-10-3-thresholds  -ni 200_000 -ef 1_000 -k   128_000 -l 4 --compile_model
+python main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k   256_000 -l 5
+python main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k   512_000 -l 5
+python main.py  -bs 100 -t 100 --dataset cifar-10-31-thresholds -ni 200_000 -ef 1_000 -k 1_024_000 -l 5
 ```
 
 ## LGN Explanation Framework
@@ -260,10 +276,10 @@ This repository also includes the Logic Gate Network (LGN) explanation framework
 python main.py --dataset iris -bs 100 -ni 2000 -ef 1000 -k 6 -l 2 --save_model
 ```
 
-#### Load Model and Extract Logic Gates
+#### Load Model and Explain an Instance
 
 ```shell
-python main.py --dataset iris --load_model --get_formula
+python main.py --dataset iris --load_model --explain=5.1,3.3,1.7,0.5
 ```
 
 #### Explain a Single Instance
@@ -310,7 +326,7 @@ python main.py --dataset iris --explain_one --load_model --deduplicate=bdd
 ### Running Tests
 
 ```shell
-cd experiments && python -m unittest
+python -m pytest
 ```
 
 ## Installation Notes
@@ -359,6 +375,29 @@ For CPU-only usage without CUDA:
    ```shell
    pip install -r requirements.txt
    ```
+
+### SSL Certificate Fix (macOS)
+
+If you encounter SSL certificate errors when downloading datasets:
+
+```
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
+```
+
+Run the following command (adjust for your Python version):
+
+```shell
+/Applications/Python\ 3.11/Install\ Certificates.command
+```
+
+Or install certificates via pip:
+
+```shell
+pip install certifi
+python -c "import certifi; print(certifi.where())"
+```
+
+Then set the `SSL_CERT_FILE` environment variable to the path printed above.
 
 ## Citing
 

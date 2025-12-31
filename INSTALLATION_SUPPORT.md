@@ -41,5 +41,9 @@ versions, so in case it should match but doesn't, a quick fix can be to try some
 
 ---
 
-For the experiments, please make sure all dependencies in `experiments/requirements.txt` are installed in the Python environment.
+For the experiments, please make sure all dependencies in `requirements.txt` are installed in the Python environment:
+
+```shell
+pip install -r requirements.txt
+```
 
