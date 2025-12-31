@@ -1,11 +1,11 @@
 import argparse
-from typing import Dict
-import torch
 import json
+from typing import Any, Optional, Union
 
-from experiment.args.model_args import ModelArgs
+import torch
 
 from .args import get_args, DefaultArgs
+from .args.debug_config import DebugConfig
 from .helpers import Context
 
 from lgn.encoding import Validator, encoding
@@ -18,74 +18,101 @@ from .model import Model
 
 default_args = DefaultArgs()
 
-torch.set_num_threads(1)  # ???
+# Limit PyTorch to single thread to avoid contention with SAT solvers
+# and ensure deterministic behavior during explanation generation
+TORCH_NUM_THREADS = 1
+torch.set_num_threads(TORCH_NUM_THREADS)
 
 
 class Experiment:
     @staticmethod
     def debug(
-        dataset=None,
-        small=True,
-        custom=False,
-        ohe_dedup=True,
-        enc_type_at_least="tot",
-        enc_type_eq="bit",
-        h_type="lbx",
-        h_solver="g3",
-        explain_algorithm="both",
-        proc_rounds=0,
-        solver_type="gc3",
-        deduplicate="sat",
-        parent=True,
-        reverse=False,
-    ):
-        dataset = dataset if dataset is not None else "iris"
-        exp_args = {
-            "eval_freq": 1000,
-            "verbose": "debug",
-            "verbose": "info",
-            "size": "custom" if custom else ("debug" if small else "small"),
-            # "deduplicate": None,
-            "deduplicate": deduplicate,  # 'bdd', 'sat', None
-            "experiment_id": 10000,
-            "load_model": True,
-            "output": "csv",
-            "max_explain_time": 30,
-            # "strategy": ("b_full" if reverse else "full"),
-            "strategy": "parent" if parent else ("b_full" if reverse else "full"),
-            # "strategy": "b_full",  # "full", "b_full", "parent", "ohe"
-            "enc_type_at_least": enc_type_at_least,
-            "enc_type_eq": enc_type_eq,
-            # "xnum": 10,
-            "ohe_deduplication": ohe_dedup,
-            "solver_type": solver_type,
-            "explain_one": True,
-            #  ------
-            # "explain_one": True,
-            "h_solver": h_solver,
-            "h_type": h_type,
-            "explain_algorithm": explain_algorithm,
-            "process_rounds": proc_rounds,
-        }
+        config: Optional[Union[DebugConfig, str]] = None,
+        # Legacy parameters for backward compatibility
+        dataset: Optional[str] = None,
+        small: bool = True,
+        custom: bool = False,
+        ohe_dedup: bool = True,
+        enc_type_at_least: str = "tot",
+        enc_type_eq: str = "bit",
+        h_type: str = "lbx",
+        h_solver: str = "g3",
+        explain_algorithm: str = "both",
+        proc_rounds: int = 0,
+        solver_type: str = "gc3",
+        deduplicate: Optional[str] = "sat",
+        parent: bool = True,
+        reverse: bool = False,
+    ) -> Context:
+        """
+        Run a debug experiment.
+
+        Can be called with a DebugConfig object or with individual parameters.
+
+        Examples:
+            # Using config object (recommended)
+            config = DebugConfig(dataset="iris", deduplicate="bdd")
+            ctx = Experiment.debug(config)
+
+            # Using config factory methods
+            ctx = Experiment.debug(DebugConfig.small("mnist"))
+
+            # Using legacy parameters (backward compatible)
+            ctx = Experiment.debug(dataset="iris", small=True)
+        """
+        # Handle config object or string dataset
+        if isinstance(config, DebugConfig):
+            exp_args = config.to_exp_args()
+            dataset = config.dataset
+        elif isinstance(config, str):
+            # config is actually a dataset name
+            dataset = config
+            exp_args = DebugConfig(
+                dataset=dataset,
+                size="custom" if custom else ("debug" if small else "small"),
+                deduplicate=deduplicate,
+                enc_type_at_least=enc_type_at_least,
+                enc_type_eq=enc_type_eq,
+                ohe_dedup=ohe_dedup,
+                solver_type=solver_type,
+                h_type=h_type,
+                h_solver=h_solver,
+                explain_algorithm=explain_algorithm,
+                proc_rounds=proc_rounds,
+                use_parent_strategy=parent,
+                reverse=reverse,
+            ).to_exp_args()
+        else:
+            # Legacy mode: use individual parameters
+            dataset = dataset if dataset is not None else "iris"
+            exp_args = DebugConfig(
+                dataset=dataset,
+                size="custom" if custom else ("debug" if small else "small"),
+                deduplicate=deduplicate,
+                enc_type_at_least=enc_type_at_least,
+                enc_type_eq=enc_type_eq,
+                ohe_dedup=ohe_dedup,
+                solver_type=solver_type,
+                h_type=h_type,
+                h_solver=h_solver,
+                explain_algorithm=explain_algorithm,
+                proc_rounds=proc_rounds,
+                use_parent_strategy=parent,
+                reverse=reverse,
+            ).to_exp_args()
+
         args = {
             **vars(default_args),
             **exp_args,
-            **{"dataset": dataset},
         }
 
         args = Experiment.setup_preset_args(args)
-        # Experiment.compare_encoders(args)
         ctx = Experiment.run(args)
-
-        # args["deduplicate"] = "bdd"
-        # results = Experiment.run(args)
 
         return ctx
 
     @staticmethod
-    def setup_preset_args(args):
-        # print(args)
-        # input("Press Enter to continue...")
+    def setup_preset_args(args: dict[str, Any]) -> dict[str, Any]:
         if args.get("size") != "custom":
             model_args = Settings.get_model_args(
                 dataset_name=args.get("dataset"),
@@ -118,7 +145,7 @@ class Experiment:
         return args
 
     @staticmethod
-    def run_with_cmd():
+    def run_with_cmd() -> None:
         args = get_args()
         dataset_args = Settings.debug_network_param.get(args.dataset) or {}
         exp_args = {
@@ -128,10 +155,8 @@ class Experiment:
 
         Experiment.run(args)
 
-    ####################################################################################################################
-
     @staticmethod
-    def find_model():
+    def find_model() -> None:
         experiment_id = 1000
         best_ids = []
         for dataset in [
@@ -188,7 +213,7 @@ class Experiment:
         print(best_ids)
 
     @staticmethod
-    def rerun_experiments(experiment_ids=[], output_eid=500):
+    def rerun_experiments(experiment_ids: list[int] = [], output_eid: int = 500) -> None:
         # experiement_ids = [1000, 1015, 1031, 1048, 1060]
         for eid in experiment_ids:
             for deduplication in [False, True]:
@@ -204,21 +229,17 @@ class Experiment:
                     output_eid += 1
 
     @staticmethod
-    def run(args):
-
+    def run(args: dict[str, Any]) -> Context:
         args = DefaultArgs(**args)
         # args = argparse.Namespace(**args)
         if args.verbose != "warn":
             print("args:", args)
-            # input("Press Enter to continue...")
 
         ctx = Context(args)
         # Asserts that results is not None, and enforces that entire test_set is explained
         model = Model.get_model(args, ctx=ctx)
 
         with ctx.use_memory_profile() as profile_memory:
-            # ctx.start_memory_usage()
-
             encoding = Encode.get_encoding(
                 model=model,
                 args=args,
@@ -262,7 +283,6 @@ class Experiment:
                 )
 
             total_time_taken, exp_count, instance_count = f_exp()
-            # ============= ============= ============= ============= ============= ============= ============= =============
 
             ctx.results.store_explanation_stat(
                 exp_count / instance_count, ctx.deduplication
@@ -271,16 +291,14 @@ class Experiment:
             profile_memory("explanation")
             ctx.results.store_explanation_ready_time()
             ctx.results.store_counts(instance_count, exp_count)
-        # ctx.end_memory_usage()
         ctx.results.save()
         ctx.results.store_end_time()
         ctx.output()
-        # input("Press Enter to continue...")
 
         return ctx
 
     @staticmethod
-    def compare_encoders(args):
+    def compare_encoders(args: dict[str, Any]) -> None:
         args = DefaultArgs(**args)
 
         ctx = Context(args)
@@ -294,7 +312,6 @@ class Experiment:
             ctx=ctx,
         )
         ctx.debug(encoding1.print)
-        # input("Press Enter to continue...")
 
         args.deduplicate = "bdd"
         encoding2 = Encode.get_encoding(
@@ -304,7 +321,6 @@ class Experiment:
         )
         ctx.debug(lambda: '"BDD Encoding:"')
         ctx.debug(encoding2.print)
-        # input("Press Enter to continue...")
 
         args.deduplicate = "sat"
         encoding3 = Encode.get_encoding(
@@ -314,14 +330,7 @@ class Experiment:
         )
         ctx.debug(lambda: '"SAT Encoding:"')
         ctx.debug(encoding3.print)
-        # input("Press Enter to continue...")
 
-        # Not guaranteed when order of deduplication is different
-        # assert str(encoding2.formula) == str(encoding3.formula), (
-        #     "Formulas should be equal",
-        #     encoding2.formula,
-        #     encoding3.formula,
-        # )
         validator = Validator(ctx)
 
         validator.validate_encodings_with_data(
@@ -333,17 +342,6 @@ class Experiment:
         validator.validate_encodings_with_data(
             encoding1=encoding2, encoding2=encoding3, dataloader=ctx.test_loader
         )
-
-        # Not realistic with anything other than smallest datasets
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding1, encoding2=encoding2, dataset=ctx.dataset
-        # )
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding1, encoding2=encoding3, dataset=ctx.dataset
-        # )
-        # validator.validate_encodings_with_truth_table(
-        #     encoding1=encoding2, encoding2=encoding3, dataset=ctx.dataset
-        # )
 
         explainer = Explainer(encoding1, ctx=ctx)
         f_exp = lambda: Explain.explain_all(args, explainer, encoding1, ctx)

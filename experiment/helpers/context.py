@@ -1,25 +1,51 @@
+"""Experiment context for managing state during runs."""
+
 from datetime import datetime
 import csv
 import logging
-import tracemalloc
-from contextlib import contextmanager
-from typing import Callable
+from typing import Any, Callable
+
 from tabulate import tabulate
-import humanfriendly
 import torch
+
 from .logging import setup_logger
 from .util import seed_all, get_results, get_enc_type
-from lgn.dataset import load_dataset
-from collections import OrderedDict
 from .results import Results
+from .memory_profiler import MemoryProfiler
+from .deduplication_tracker import DeduplicationTracker
+from .solving_stats import SolvingStats
+from .output_formatter import OutputFormatter
+from lgn.dataset import load_dataset
 
 
-class Cached_Key:
+class CacheKey:
+    """Cache key constants."""
+
     SOLVER = "solver"
 
 
+# Backward compatibility alias
+Cached_Key = CacheKey
+
+
 class Context:
-    def __init__(self, args):
+    """Experiment context managing state, logging, and metrics.
+
+    This class coordinates various trackers and provides a unified interface
+    for experiment execution.
+
+    Attributes:
+        args: Experiment configuration
+        results: Results storage
+        dataset: Loaded dataset
+        train_loader: Training data loader
+        test_loader: Test data loader
+        dedup_tracker: Deduplication statistics tracker
+        solving_stats: SAT solving statistics tracker
+        memory_profiler: Memory profiling utility
+    """
+
+    def __init__(self, args: Any) -> None:
         self.args = args
         setup_logger(args)
         seed_all(args.seed)
@@ -37,106 +63,144 @@ class Context:
         self.solver_type = args.solver_type
         self.fp_type = torch.float32
 
-        self.cache_hit = {Cached_Key.SOLVER: 0}
-        self.cache_miss = {Cached_Key.SOLVER: 0}
-        self.deduplication = 0
-        self.layer_seen = set()
-        self.dedup_dict = dict()
+        # Cache tracking
+        self.cache_hit = {CacheKey.SOLVER: 0}
+        self.cache_miss = {CacheKey.SOLVER: 0}
+
+        # Initialize focused trackers
+        self.dedup_tracker = DeduplicationTracker()
+        self.solving_stats = SolvingStats()
+        self.memory_profiler = MemoryProfiler(self.results)
+        self._output_formatter = OutputFormatter(self)
 
         self.results.store_start_time()
         self.num_explanations = 0
-        self.ohe_deduplication = []
 
-        self.solving_num_clauses = []
-        self.solving_num_vars = []
+    # === Logging ===
 
-    def debug(self, l: Callable):
+    def debug(self, fn: Callable[[], Any]) -> None:
+        """Execute function only in debug mode."""
         if self.verbose == "debug":
-            l()
+            fn()
 
-    @contextmanager
+    # === Memory Profiling (delegated) ===
+
     def use_memory_profile(self):
-        try:
-            tracemalloc.start()
-            yield lambda label: self.store_memory_peak(label)
-        finally:
-            tracemalloc.stop()
+        """Context manager for memory profiling."""
+        return self.memory_profiler.profile()
 
-    def store_memory_peak(self, label=None):
-        current, peak = tracemalloc.get_traced_memory()  # in Bytes
-        # print("current", current)
-        # print("peak", peak)
-        self.results.store_custom(f"memory/{label}", peak)
-        tracemalloc.reset_peak()
+    def store_memory_peak(self, label: str = None) -> None:
+        """Store current memory peak."""
+        self.memory_profiler._store_peak(label)
 
-    def start_memory_usage(self):
-        tracemalloc.start()
+    def start_memory_usage(self) -> None:
+        """Start memory tracking."""
+        self.memory_profiler.start()
 
-    def end_memory_usage(self):
-        tracemalloc.stop()
+    def end_memory_usage(self) -> None:
+        """Stop memory tracking."""
+        self.memory_profiler.stop()
 
-    def get_memory_usage(self, label=None):
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-        return peak
+    def get_memory_usage(self, label: str = None) -> int:
+        """Get peak memory usage."""
+        return self.memory_profiler.get_peak()
 
-    def inc_cache_hit(self, flag: str):
+    # === Cache Tracking ===
+
+    def inc_cache_hit(self, flag: str) -> None:
+        """Increment cache hit counter."""
         self.cache_hit[flag] += 1
 
-    def inc_cache_miss(self, flag: str):
+    def inc_cache_miss(self, flag: str) -> None:
+        """Increment cache miss counter."""
         self.cache_miss[flag] += 1
 
-    def reset_deduplication(self):
-        self.deduplication = 0
-        self.dedup_dict = OrderedDict()
+    # === Deduplication (delegated, with backward compatibility) ===
 
-    def inc_deduplication(self, curr_layer, target_layer):
-        CONSTANT = "Constant"
-        INPUT = "Input"
+    @property
+    def deduplication(self) -> int:
+        """Total deduplication count."""
+        return self.dedup_tracker.count
 
-        if curr_layer not in self.layer_seen:
-            self.layer_seen.add(curr_layer)
-            self.dedup_dict[(curr_layer, CONSTANT)] = 0
-            self.dedup_dict[(curr_layer, INPUT)] = 0
-            for k in range(1, curr_layer + 1):
-                self.dedup_dict[(curr_layer, k)] = 0
-        # curr_layer = 1-based
-        # target_layer = 1-based, 0 = input, -1 = constants
+    @property
+    def ohe_deduplication(self) -> list[tuple[int, int]]:
+        """OHE deduplication pairs."""
+        return self.dedup_tracker.ohe_deduplication
 
-        if target_layer == -1:
-            target_layer = CONSTANT
-        if target_layer == 0:
-            target_layer = INPUT
-        self.deduplication += 1
-        self.dedup_dict[(curr_layer, target_layer)] = (
-            self.dedup_dict.get((curr_layer, target_layer), 0) + 1
-        )
+    @property
+    def dedup_dict(self):
+        """Deduplication dictionary."""
+        return self.dedup_tracker.dedup_dict
 
-    def inc_ohe_deduplication(self, ohe_from, ohe_to):
-        self.ohe_deduplication.append((ohe_from, ohe_to))
+    @property
+    def layer_seen(self) -> set[int]:
+        """Layers that have been seen."""
+        return self.dedup_tracker._layer_seen
 
-    def store_clause(self, clauses: list[list[int]]):
-        self.num_clauses = len(clauses)
-        self.num_vars = max(abs(literal) for clause in clauses for literal in clause)
+    def reset_deduplication(self) -> None:
+        """Reset deduplication tracking."""
+        self.dedup_tracker.reset()
 
-    def record_solving_stats(self, num_clauses, num_vars):
-        self.solving_num_clauses.append(num_clauses)
-        self.solving_num_vars.append(num_vars)
+    def inc_deduplication(self, curr_layer: int, target_layer: int) -> None:
+        """Increment deduplication counter."""
+        self.dedup_tracker.increment(curr_layer, target_layer)
 
-    def get_avg_solving_clauses(self):
-        if len(self.solving_num_clauses) == 0:
-            return 0.0
-        return sum(self.solving_num_clauses) / len(self.solving_num_clauses)
+    def inc_ohe_deduplication(self, ohe_from: int, ohe_to: int) -> None:
+        """Increment OHE deduplication counter."""
+        self.dedup_tracker.increment_ohe(ohe_from, ohe_to)
 
-    def get_avg_solving_vars(self):
-        if len(self.solving_num_vars) == 0:
-            return 0.0
-        return sum(self.solving_num_vars) / len(self.solving_num_vars)
+    def print_dedup_dict(self) -> None:
+        """Print deduplication summary."""
+        self.dedup_tracker.print_summary()
 
-    def inc_num_explanations(self, num_explanations):
-        self.num_explanations += num_explanations
+    # === Solving Stats (delegated, with backward compatibility) ===
 
-    def output(self):
+    @property
+    def num_clauses(self) -> int:
+        """Number of clauses."""
+        return self.solving_stats.num_clauses
+
+    @property
+    def num_vars(self) -> int:
+        """Number of variables."""
+        return self.solving_stats.num_vars
+
+    @property
+    def solving_num_clauses(self) -> list[int]:
+        """Per-instance clause counts."""
+        return self.solving_stats._solving_num_clauses
+
+    @property
+    def solving_num_vars(self) -> list[int]:
+        """Per-instance variable counts."""
+        return self.solving_stats._solving_num_vars
+
+    def store_clause(self, clauses: list[list[int]]) -> None:
+        """Store clause statistics."""
+        self.solving_stats.store_encoding_stats(clauses)
+
+    def record_solving_stats(self, num_clauses: int, num_vars: int) -> None:
+        """Record solving instance statistics."""
+        self.solving_stats.record_solving_instance(num_clauses, num_vars)
+
+    def get_avg_solving_clauses(self) -> float:
+        """Get average clauses per solve."""
+        return self.solving_stats.get_avg_clauses()
+
+    def get_avg_solving_vars(self) -> float:
+        """Get average variables per solve."""
+        return self.solving_stats.get_avg_vars()
+
+    # === Explanation Counting ===
+
+    def inc_num_explanations(self, num: int) -> None:
+        """Increment explanation count."""
+        self.num_explanations += num
+
+    # === Output (delegated) ===
+
+    def output(self) -> None:
+        """Output results based on args.output format."""
         if self.args.output == "display":
             self.display()
         elif self.args.output == "csv":
@@ -144,148 +208,89 @@ class Context:
         else:
             raise ValueError(f"Unknown output format: {self.args.output}")
 
-    def get_headers(self):
-        headers = [
-            "ds",
-            "input_dim",
-            "# lay",
-            "# neu",
-            "acc",
-            "enc_at_l",
-            "enc_eq",
-            "solver",
-            "ddup",
-            "ohe-ddup",
-            "h_type",
-            "h_solver",
-            "# gates",
-            "# gates_f",
-            "# cl",
-            "# var",
-            "# avg_cl_s",
-            "# avg_var_s",
-            "# expl",
-            "run_t",
-            "t_Model",
-            "t_Encoding",
-            "t_Explain",
-            "t/Exp",
-            "m_enc",
-            "m_expl",
-            "dedup_strat",
-            "exp_strat",
-            "proc_rounds",
-        ]
-        return headers
+    def get_headers(self) -> list[str]:
+        """Get output headers."""
+        return self._output_formatter.get_headers()
 
-    def get_data(self):
-        number_of_gates = self.args.num_layers * self.args.num_neurons
-        runtime = self.results.get_total_runtime()
-        data = [
-            [
-                self.args.dataset,
-                self.dataset.get_input_dim(),
-                self.args.num_layers,
-                self.args.num_neurons,
-                self.results.test_acc,
-                self.args.enc_type_at_least,
-                self.args.enc_type_eq,
-                self.args.solver_type,
-                self.args.deduplicate,
-                len(self.ohe_deduplication) if self.args.ohe_deduplication else "N/A",
-                self.args.h_type,
-                self.args.h_solver,
-                number_of_gates,
-                number_of_gates - self.deduplication,
-                self.num_clauses,
-                self.num_vars,
-                "{:.2f}".format(self.get_avg_solving_clauses()),
-                "{:.2f}".format(self.get_avg_solving_vars()),
-                self.num_explanations,
-                runtime,
-                self.results.get_model_ready_time(),
-                self.results.get_encoding_time(),
-                self.results.get_explanation_time(),
-                self.results.get_explanation_time() / self.num_explanations,
-                humanfriendly.format_size(self.results.get_value("memory/encoding")),
-                humanfriendly.format_size(self.results.get_value("memory/explanation")),
-                self.args.strategy,
-                self.args.explain_algorithm,
-                self.get_process_rounds(),
-            ]
-        ]
-        return data
+    def get_data(self) -> list[list[Any]]:
+        """Get formatted output data."""
+        return self._output_formatter.get_data()
 
-    def to_csv(self):
-        data = self.get_data()
-        headers = self.get_headers()
-        with open("results.csv", "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(headers)
-            writer.writerows(data)
+    def to_csv(self) -> None:
+        """Write results to CSV."""
+        self._output_formatter.to_csv()
 
-    def display(self):
-        headers = self.get_headers()
-        data = self.get_data()
-        print(tabulate(data, headers=headers, tablefmt="github"))
-        self.print_dedup_dict()
+    def display(self) -> None:
+        """Display results as table."""
+        self._output_formatter.display()
 
-    def print_dedup_dict(self):
-        for k in self.dedup_dict:
-            print(f"Layer {k[0]} -> {k[1]}: {self.dedup_dict[k]}")
+    # === Config Accessors ===
 
-    def __del__(self):
+    def get_enc_type(self):
+        """Get encoding type for at-least constraints."""
+        return self.enc_type_at_least
+
+    def get_enc_type_eq(self):
+        """Get encoding type for equality constraints."""
+        return self.enc_type_eq
+
+    def get_solver_type(self) -> str:
+        """Get solver type."""
+        return self.solver_type
+
+    def get_fp_type(self):
+        """Get floating point type."""
+        return self.fp_type
+
+    def get_dataset(self):
+        """Get the loaded dataset."""
+        return self.dataset
+
+    def get_process_rounds(self) -> int:
+        """Get number of process rounds."""
+        return self.args.process_rounds
+
+    def __del__(self) -> None:
+        """Log cache statistics on destruction."""
         self.logger.debug("Cache Hit: %s", str(self.cache_hit))
         self.logger.debug("Cache Miss: %s", str(self.cache_miss))
         self.logger.debug("Deduplication: %s", str(self.deduplication))
 
-    def get_enc_type(self):
-        return self.enc_type_at_least
-
-    def get_enc_type_eq(self):
-        return self.enc_type_eq
-
-    def get_solver_type(self):
-        return self.solver_type
-
-    def get_fp_type(self):
-        return self.fp_type
-
-    def get_dataset(self):
-        return self.dataset
-
-    def get_process_rounds(self):
-        return self.args.process_rounds
-
 
 class MultiContext:
-    def __init__(self):
-        self.data = []
-        self.headers = None
-        self.dedup_dict = []
+    """Aggregates results from multiple experiment runs."""
 
-    def add(self, ctx: Context):
+    def __init__(self) -> None:
+        self.data: list[list[Any]] = []
+        self.headers: list[str] = None
+        self.dedup_dicts: list = []
+
+    def add(self, ctx: Context) -> None:
+        """Add a context's results to the aggregation."""
         self.data.append(ctx.get_data()[0])
-        self.dedup_dict.append(ctx.dedup_dict)
+        self.dedup_dicts.append(ctx.dedup_dict)
         self.headers = ctx.get_headers()
 
     @staticmethod
-    def __unique_str_from_timestamp():
-        return datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]  # Up to milliseconds
+    def _unique_timestamp() -> str:
+        """Generate unique timestamp string."""
+        return datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
 
-    def to_csv(self, filename, with_timestamp=True):
+    def to_csv(self, filename: str, with_timestamp: bool = True) -> None:
+        """Write aggregated results to CSV."""
         if with_timestamp:
-            filename = f"{MultiContext.__unique_str_from_timestamp()}_{filename}"
+            filename = f"{self._unique_timestamp()}_{filename}"
         with open(filename, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(self.headers)
             writer.writerows(self.data)
 
-    def display(self):
-        headers = self.headers
-        data = self.data
-        print(tabulate(data, headers=headers, tablefmt="github"))
+    def display(self) -> None:
+        """Display aggregated results as table."""
+        print(tabulate(self.data, headers=self.headers, tablefmt="github"))
 
-        # for dedup_dict in self.dedup_dict:
-        #     for k in dedup_dict:
-        #         print(f"Layer {k[0]} -> {k[1]}: {dedup_dict[k]}")
+    # Backward compatibility
+    @property
+    def dedup_dict(self):
+        """Alias for dedup_dicts."""
+        return self.dedup_dicts

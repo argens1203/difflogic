@@ -1,31 +1,34 @@
-import torch
 import logging
-from attr import dataclass
+import os
+from typing import Any, Optional
 
-from difflogic import LogicLayer, GroupSum
+import torch
+from torch.utils.data import DataLoader
 
+from difflogic import CompiledLogicNet, LogicLayer, GroupSum
 from lgn.dataset import get_dataset
 from constant import device
 
-
 logger = logging.getLogger(__name__)
 
+# Number of possible binary logic operations (2^4 = 16 combinations of 2 inputs)
+NUM_BINARY_OPS = 16
 
-def get_model(args, results=None):
+
+def get_model(
+    args: Any, results: Optional[Any] = None
+) -> tuple[torch.nn.Sequential, torch.nn.CrossEntropyLoss, torch.optim.Adam]:
     llkw = dict(grad_factor=args.grad_factor, connections=args.connections)
     dataset = get_dataset(args.dataset)
     in_dim = dataset.get_input_dim()
     class_count = dataset.get_num_of_classes()
 
     logger.debug(f"in_dim={in_dim}, class_count={class_count}")
-    # input("Press Enter to continue...")
 
     logic_layers = []
 
     k = args.num_neurons
     l = args.num_layers
-
-    ####################################################################################################################
 
     logic_layers.append(LogicLayer(in_dim=in_dim, out_dim=k, **llkw))
     for _ in range(l - 1):
@@ -33,18 +36,8 @@ def get_model(args, results=None):
 
     model = torch.nn.Sequential(*logic_layers, GroupSum(class_count, args.tau))
 
-    ####################################################################################################################
-
-    total_num_neurons = sum(
-        map(lambda x: x.num_neurons, logic_layers[:])
-    )  # TODO: Why 1:-1?
-    # if args.verbose in ["debug", "info"]:
-    # print(f"total_num_neurons={total_num_neurons}")
-    total_num_weights = (
-        sum(map(lambda x: x.num_weights, logic_layers[:])) * 16
-    )  # TODO: Why 1:-1?
-    # if args.verbose in ["debug", "info"]:
-    # print(f"total_num_weights={total_num_weights}")
+    total_num_neurons = sum(map(lambda x: x.num_neurons, logic_layers))
+    total_num_weights = sum(map(lambda x: x.num_weights, logic_layers)) * NUM_BINARY_OPS
     if results is not None:
         results.store_results(
             {
@@ -55,8 +48,6 @@ def get_model(args, results=None):
 
     model = model.to(device)
 
-    # print(model)
-    # input("Press Enter to continue...")
     if results is not None:
         results.store_results({"model_str": str(model)})
 
@@ -67,11 +58,7 @@ def get_model(args, results=None):
     return model, loss_fn, optimizer
 
 
-import os
-from difflogic import CompiledLogicNet
-
-
-def compile_model(args, model, test_loader):
+def compile_model(args: Any, model: torch.nn.Sequential, test_loader: DataLoader) -> None:
     print("\n" + "=" * 80)
     print(" Converting the model to C code and compiling it...")
     print("=" * 80)

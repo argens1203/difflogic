@@ -1,9 +1,9 @@
-import logging
+from typing import Any, Generator, Iterator, Type, TypedDict
+
 import torch
 
-from lgn.dataset.lending import LendingDataset
-
 from .adult import AdultDataset
+from .auto_transformer import AutoTransformer
 from .monk import MonkDataset
 from .iris import IrisDataset
 from .breast_cancer import BreastCancerDataset
@@ -12,7 +12,98 @@ from .lending import LendingDataset
 from .compas import CompasDataset
 
 
-def load_n(loader, n):
+class LegacyDatasetInfo(TypedDict):
+    """Type for legacy dataset configuration."""
+    input_dim: int
+    num_classes: int
+
+
+# Dataset registry mapping names to dataset classes
+# Each dataset class must implement get_input_dim() and get_num_of_classes()
+DATASET_REGISTRY: dict[str, Type[AutoTransformer]] = {
+    "iris": IrisDataset,
+    "adult": AdultDataset,
+    "monk1": MonkDataset,
+    "monk2": MonkDataset,
+    "monk3": MonkDataset,
+    "breast_cancer": BreastCancerDataset,
+    "mnist": MNISTDataset,
+    "lending": LendingDataset,
+    "compas": CompasDataset,
+}
+
+# Legacy datasets that don't have proper dataset classes yet
+# These are image datasets with hardcoded dimensions
+LEGACY_DATASETS: dict[str, LegacyDatasetInfo] = {
+    "mnist20x20": {"input_dim": 400, "num_classes": 10},
+    "cifar-10-3-thresholds": {"input_dim": 3 * 32 * 32 * 3, "num_classes": 10},
+    "cifar-10-31-thresholds": {"input_dim": 3 * 32 * 32 * 31, "num_classes": 10},
+    "caltech101": {"input_dim": 64 * 64 * 2, "num_classes": 101},
+}
+
+
+def get_dataset(dataset_name: str) -> Type[AutoTransformer]:
+    """
+    Get the dataset class for the given dataset name.
+
+    Args:
+        dataset_name: Name of the dataset (e.g., 'iris', 'mnist', 'monk1')
+
+    Returns:
+        The dataset class (not an instance)
+
+    Raises:
+        KeyError: If the dataset is not found in the registry
+    """
+    if dataset_name in DATASET_REGISTRY:
+        return DATASET_REGISTRY[dataset_name]
+    raise KeyError(f"Dataset '{dataset_name}' not found. Available datasets: {list(DATASET_REGISTRY.keys())}")
+
+
+def input_dim_of_dataset(dataset_name: str) -> int:
+    """
+    Get the input dimension for the given dataset.
+
+    Note: For registry datasets, this requires the dataset class to have been
+    instantiated at least once (to set up the converter). For legacy datasets,
+    returns hardcoded values.
+
+    Args:
+        dataset_name: Name of the dataset
+
+    Returns:
+        The input dimension (number of features after binarization)
+    """
+    if dataset_name in LEGACY_DATASETS:
+        return LEGACY_DATASETS[dataset_name]["input_dim"]
+    if dataset_name in DATASET_REGISTRY:
+        return DATASET_REGISTRY[dataset_name].get_input_dim()
+    raise KeyError(f"Dataset '{dataset_name}' not found")
+
+
+def num_classes_of_dataset(dataset_name: str) -> int:
+    """
+    Get the number of classes for the given dataset.
+
+    Note: For registry datasets, this requires the dataset class to have been
+    instantiated at least once (to set up the label encoder). For legacy datasets,
+    returns hardcoded values.
+
+    Args:
+        dataset_name: Name of the dataset
+
+    Returns:
+        The number of output classes
+    """
+    if dataset_name in LEGACY_DATASETS:
+        return LEGACY_DATASETS[dataset_name]["num_classes"]
+    if dataset_name in DATASET_REGISTRY:
+        return DATASET_REGISTRY[dataset_name].get_num_of_classes()
+    raise KeyError(f"Dataset '{dataset_name}' not found")
+
+
+def load_n(loader: Iterator[Any], n: int) -> Generator[Any, None, None]:
+    """Load n samples from a data loader."""
     i = 0
     while i < n:
         for x in loader:
@@ -22,110 +113,21 @@ def load_n(loader, n):
                 break
 
 
-def input_dim_of_dataset(dataset):  # TODO: get it from Dataset class
-    if dataset == "adult":
-        return AdultDataset.get_input_dim()
-    if dataset in ["monk1", "monk2", "monk3"]:
-        return MonkDataset.get_input_dim()
-    if dataset == "iris":
-        return IrisDataset.get_input_dim()
-    if dataset == "breast_cancer":
-        return BreastCancerDataset.get_input_dim()
-    if dataset == "mnist":
-        return MNISTDataset.get_input_dim()
-    if dataset == "lending":
-        return LendingDataset.get_input_dim()
-    if dataset == "compas":
-        return CompasDataset.get_input_dim()
-    return {
-        "mnist20x20": 400,
-        "cifar-10-3-thresholds": 3 * 32 * 32 * 3,
-        "cifar-10-31-thresholds": 3 * 32 * 32 * 31,
-        "caltech101": 64 * 64 * 2,
-    }[dataset]
-
-
-def num_classes_of_dataset(dataset):  # TODO: get it from Dataset class
-    if dataset == "adult":
-        return AdultDataset.get_num_of_classes()
-    if dataset in ["monk1", "monk2", "monk3"]:
-        return MonkDataset.get_num_of_classes()
-    if dataset == "iris":
-        return IrisDataset.get_num_of_classes()
-    if dataset == "breast_cancer":
-        return BreastCancerDataset.get_num_of_classes()
-    if dataset == "mnist":
-        return MNISTDataset.get_num_of_classes()
-    if dataset == "lending":
-        return LendingDataset.get_num_of_classes()
-    if dataset == "compas":
-        return CompasDataset.get_num_of_classes()
-    return {
-        "mnist20x20": 10,
-        "cifar-10-3-thresholds": 10,
-        "cifar-10-31-thresholds": 10,
-        "caltech101": 101,
-    }[dataset]
-
-
-def get_dataset(dataset):
-    if dataset == "adult":
-        return AdultDataset
-    if dataset in ["monk1", "monk2", "monk3"]:
-        return MonkDataset
-    if dataset == "iris":
-        return IrisDataset
-    if dataset == "breast_cancer":
-        return BreastCancerDataset
-    if dataset == "mnist":
-        return MNISTDataset
-    if dataset == "lending":
-        return LendingDataset
-    if dataset == "compas":
-        return CompasDataset
-
-
 class Flatten:
+    """Transform to flatten a tensor to 1D."""
     def __call__(self, x: torch.Tensor) -> torch.Tensor:
         return x.view(-1)
 
 
-import torchvision.datasets
-from torchvision import transforms
-
-
 class Caltech101Dataset:
-    # dataset = torchvision.datasets.Caltech101(
-    #     "data-uci",
-    #     download=False,
-    #     transform=transforms.Compose(
-    #         [
-    #             transforms.ToTensor(),
-    #             transforms.Resize((64, 64)),
-    #             transforms.Grayscale(),
-    #             Flatten(),
-    #         ]
-    #     ),
-    # )
-    # dataset = torchvision.datasets.Caltech101(
-    #     "data-uci",
-    #     download=False,
-    #     transform=transforms.Compose(
-    #         [
-    #             transforms.ToTensor(),
-    #             transforms.Resize((64, 64)),
-    #             transforms.Grayscale(),
-    #             Flatten(),
-    #             Binarizer(dataset, 2),
-    #         ]
-    #     ),
-    # )
+    """Placeholder for Caltech101 dataset (not fully implemented)."""
+    dataset: Any  # Set by subclass or initialization
 
-    def __call__(self):
+    def __call__(self) -> Any:
         return self.dataset
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dataset)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Any:
         return self.dataset[index]

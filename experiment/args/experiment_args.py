@@ -24,7 +24,9 @@ def add_experiment_args(parser: argparse.ArgumentParser):
         choices=[
             "adult",
             "breast_cancer",
+            "compas",
             "iris",
+            "lending",
             "monk1",
             "monk2",
             "monk3",
@@ -33,7 +35,6 @@ def add_experiment_args(parser: argparse.ArgumentParser):
             "cifar-10-3-thresholds",
             "cifar-10-31-thresholds",
             "caltech101",
-            "lending",
         ],
         required=True,
         help="the dataset to use",

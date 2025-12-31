@@ -1,90 +1,153 @@
+"""Utility functions for experiment setup and data processing."""
+
 import logging
-import torch
-import numpy as np
 import random
+from typing import Any, Generator, Iterator, Optional
+
+import numpy as np
+import torch
+from torch import Tensor
 from pysat.card import EncType
 
 from .results import Results
-
 from constant import device
 
 
-def seed_all(seed=0):
+# Mapping from string encoding type names to PySAT EncType values
+ENC_TYPE_MAP: dict[str, int] = {
+    "pw": EncType.pairwise,
+    "seqc": EncType.seqcounter,
+    "sortn": EncType.sortnetwrk,
+    "cardn": EncType.cardnetwrk,
+    "bit": EncType.bitwise,
+    "lad": EncType.ladder,
+    "tot": EncType.totalizer,
+    "mtot": EncType.mtotalizer,
+    "kmtot": EncType.kmtotalizer,
+    "native": EncType.native,
+}
+
+
+def seed_all(seed: int = 0) -> None:
+    """Set random seeds for reproducibility.
+
+    Args:
+        seed: Random seed value
+    """
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
 
 
-def get_enc_type(enc_type):
-    return {
-        "pw": EncType.pairwise,
-        "seqc": EncType.seqcounter,
-        "sortn": EncType.sortnetwrk,
-        "cardn": EncType.cardnetwrk,
-        "bit": EncType.bitwise,
-        "lad": EncType.ladder,
-        "tot": EncType.totalizer,
-        "mtot": EncType.mtotalizer,
-        "kmtot": EncType.kmtotalizer,
-        "native": EncType.native,
-    }[enc_type]
+def get_enc_type(enc_type: str) -> int:
+    """Convert string encoding type to PySAT EncType.
+
+    Args:
+        enc_type: String name of encoding type
+
+    Returns:
+        PySAT EncType constant
+    """
+    return ENC_TYPE_MAP[enc_type]
 
 
-def feat_to_input(feat):
-    inp = [idx + 1 if f == 1 else -(idx + 1) for idx, f in enumerate(feat)]
-    return inp
+def feat_to_input(feat: list[int]) -> list[int]:
+    """Convert binary features to signed literal input.
+
+    Args:
+        feat: List of binary features (0 or 1)
+
+    Returns:
+        List of signed literals (positive for 1, negative for 0)
+    """
+    return [idx + 1 if f == 1 else -(idx + 1) for idx, f in enumerate(feat)]
 
 
-def input_to_feat(inp):
+def input_to_feat(inp: list[int]) -> Tensor:
+    """Convert signed literal input to binary features tensor.
+
+    Args:
+        inp: List of signed literals
+
+    Returns:
+        Tensor of binary features on the configured device
+    """
     feat = [1 if i > 0 else 0 for i in inp]
     return torch.Tensor(feat).to(device)
 
 
-def get_results(experiment_id, args) -> Results:
+def get_results(experiment_id: int, args: Any) -> Results:
+    """Create and initialize a Results object.
+
+    Args:
+        experiment_id: Unique experiment identifier
+        args: Experiment arguments to store
+
+    Returns:
+        Initialized Results object
+    """
     results = Results(eid=experiment_id, path="./results/")
     results.store_args(args)
     return results
 
 
-def get_truth_table_loader(input_dim, batch_size=10):
-    """
-    This generator yields all possible binary inputs for a given input dimension. The labels are set to None to adhere to the format of DataLodaers.
+def get_truth_table_loader(
+    input_dim: int, batch_size: int = 10
+) -> Generator[tuple[Tensor, None], None, None]:
+    """Generate all possible binary inputs for a given input dimension.
 
-    returns: (x, None)
+    Yields batches of binary vectors covering all 2^input_dim combinations.
+    Labels are set to None to match DataLoader format.
+
+    Args:
+        input_dim: Number of binary input features
+        batch_size: Number of samples per batch
+
+    Yields:
+        Tuple of (input tensor, None)
 
     Example:
-
-    .. code-block:: python
-        >>> instances = next(get_truth_table_loader(input_dim=2, batch_size=2))
-        >>> print(instances)
-        (tensor([[0, 0],
-                [0, 1]]), None)
+        >>> loader = get_truth_table_loader(input_dim=2, batch_size=2)
+        >>> x, _ = next(loader)
+        >>> print(x)
+        tensor([[0, 0],
+                [0, 1]])
     """
     count = 0
 
-    def get_one(x):
+    def get_one(x: int) -> list[int]:
         return list(map(int, format(x, f"0{input_dim}b")))
 
     while count < 2**input_dim:
-        l = [get_one(i) for i in range(count, min(count + batch_size, 2**input_dim))]
+        batch = [get_one(i) for i in range(count, min(count + batch_size, 2**input_dim))]
         count += batch_size
-        yield torch.tensor(l), None
+        yield torch.tensor(batch), None
 
 
-def remove_none(lst):
-    ret = []
-    indices = []
-    for idx, l in enumerate(lst):
-        if l is not None:
-            ret.append(l)
+def remove_none(lst: list[Optional[Any]]) -> tuple[list[Any], list[int]]:
+    """Remove None values from a list and track their indices.
+
+    Args:
+        lst: List potentially containing None values
+
+    Returns:
+        Tuple of (filtered list without Nones, indices of removed Nones)
+    """
+    ret: list[Any] = []
+    indices: list[int] = []
+    for idx, item in enumerate(lst):
+        if item is not None:
+            ret.append(item)
         else:
             indices.append(idx)
     return ret, indices
 
 
-def get_onehot_loader(input_dim, attribute_ranges, batch_size=10):
-    """
-    This generator yields all possible one-hot encoded inputs for given attribute ranges.
+def get_onehot_loader(
+    input_dim: int, attribute_ranges: list[int], batch_size: int = 10
+) -> Generator[tuple[Tensor, None], None, None]:
+    """Generate all possible one-hot encoded inputs for given attribute ranges.
+
     Each attribute range gets exactly one 1, representing a one-hot encoding.
 
     Args:
@@ -92,17 +155,16 @@ def get_onehot_loader(input_dim, attribute_ranges, batch_size=10):
         attribute_ranges: List of ints representing size of each attribute group
         batch_size: Number of samples per batch
 
-    Returns: (x, None)
+    Yields:
+        Tuple of (input tensor, None)
 
     Example:
-
-    .. code-block:: python
         >>> # For 2 attributes of size 2 and 3 respectively
         >>> loader = get_onehot_loader(input_dim=5, attribute_ranges=[2, 3], batch_size=2)
-        >>> instances = next(loader)
-        >>> print(instances)
-        (tensor([[1, 0, 1, 0, 0],
-                [1, 0, 0, 1, 0]]), None)
+        >>> x, _ = next(loader)
+        >>> print(x)
+        tensor([[1, 0, 1, 0, 0],
+                [1, 0, 0, 1, 0]])
     """
     assert (
         sum(attribute_ranges) == input_dim
@@ -115,13 +177,12 @@ def get_onehot_loader(input_dim, attribute_ranges, batch_size=10):
 
     count = 0
 
-    def get_onehot_combination(combo_idx):
-        """Convert combination index to one-hot encoded vector"""
+    def get_onehot_combination(combo_idx: int) -> list[int]:
+        """Convert combination index to one-hot encoded vector."""
         result = [0] * input_dim
         offset = 0
 
         for range_size in attribute_ranges:
-            # Get which position in this attribute range should be 1
             position_in_range = combo_idx % range_size
             result[offset + position_in_range] = 1
             offset += range_size

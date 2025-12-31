@@ -1,11 +1,13 @@
-import logging
-import torch
+"""Base encoder for converting neural network models to SAT formulas."""
 
-from pysat.formula import Formula, Atom, CNF, Or, And
+import logging
+from typing import Any, Optional
+
+import torch
+from pysat.formula import Formula, Atom, CNF, Or, And, IDPool
 from pysat.card import CardEnc, EncType
 
 from difflogic import LogicLayer, GroupSum
-
 from experiment.helpers import Context, SatContext
 from lgn.dataset import AutoTransformer
 from lgn.encoding import Encoding
@@ -17,14 +19,39 @@ logger = logging.getLogger(__name__)
 
 
 class Encoder:
-    def __init__(self, e_ctx: Context):
+    """Encodes a logic gate neural network as a SAT formula.
+
+    Converts LogicLayer and GroupSum layers into CNF clauses that can be
+    used for formal verification and explanation generation.
+
+    Attributes:
+        e_ctx: Experiment context for configuration and tracking
+        context: SAT context for variable pool management
+    """
+
+    def __init__(self, e_ctx: Context) -> None:
+        """Initialize the encoder.
+
+        Args:
+            e_ctx: Experiment context with configuration
+        """
         self.e_ctx = e_ctx
+        self.context: Optional[SatContext] = None
 
     def get_encoding(
         self,
-        model,
+        model: Any,
         Dataset: AutoTransformer,
-    ):
+    ) -> Encoding:
+        """Generate a complete encoding of the model.
+
+        Args:
+            model: Neural network model with LogicLayer/GroupSum layers
+            Dataset: Dataset transformer with input/output specifications
+
+        Returns:
+            Encoding object containing CNF clauses and metadata
+        """
         self.context = SatContext()
 
         formula, input_handles = self.get_formula(
@@ -56,37 +83,58 @@ class Encoder:
 
     def get_formula(
         self,
-        model,
-        input_dim,
+        model: Any,
+        input_dim: int,
         Dataset: AutoTransformer,
-        # TODO: second return is actually list[Atom] but cannot be defined as such
-    ) -> tuple[list[Formula], list[Formula]]:
+    ) -> tuple[list[Formula], list[Atom]]:
+        """Convert model layers to Boolean formulas.
+
+        Args:
+            model: Neural network model
+            input_dim: Number of input dimensions
+            Dataset: Dataset transformer
+
+        Returns:
+            Tuple of (output formulas, input atoms)
+        """
         with self.use_context() as vpool:
-            x = [Atom(i + 1) for i in range(input_dim)]
+            x: list[Atom] = [Atom(i + 1) for i in range(input_dim)]
             inputs = x
 
             logger.debug("Not deduplicating...")
 
             for layer in model:
                 assert isinstance(layer, LogicLayer) or isinstance(layer, GroupSum)
-                if isinstance(layer, GroupSum):  # TODO: make get_formula for GroupSum
+                if isinstance(layer, GroupSum):
                     continue
                 x = layer.get_formula(x)
 
         return x, inputs
 
-    def __handle_output_duplicates(self, output_ids, cnf):
+    def __handle_output_duplicates(
+        self,
+        output_ids: list[Optional[int]],
+        cnf: CNF,
+    ) -> tuple[list[Optional[int]], CNF]:
+        """Handle duplicate output variables across classes.
+
+        Args:
+            output_ids: List of output variable IDs
+            cnf: CNF formula to extend
+
+        Returns:
+            Tuple of (updated output_ids, updated CNF)
+        """
         total_output_len = len(output_ids)
         cls_no = self.e_ctx.dataset.get_num_of_classes()
         assert total_output_len % cls_no == 0
         group_size = total_output_len // cls_no
 
-        duplicates = dict()  # key: output var, value: list of indices in output_ids
+        duplicates: dict[int, list[int]] = {}
 
         for idx in range(0, total_output_len, group_size):
             subgroup = output_ids[idx : idx + group_size]
             rest = output_ids[:idx]
-            # rest = output_ids[:idx] + output_ids[idx + group_size :] Only compare with previous, previous takes precendence
             for o in subgroup:
                 if o is not None and -o in rest:
                     duplicates.setdefault(o, []).append(idx)
@@ -104,65 +152,67 @@ class Encoder:
 
         return output_ids, cnf
 
-    def populate_clauses(self, input_handles, formula):
+    def populate_clauses(
+        self,
+        input_handles: list[Atom],
+        formula: list[Formula],
+    ) -> tuple[list[int], CNF, list[Optional[int]], dict[int, Atom]]:
+        """Convert formulas to CNF clauses.
+
+        Args:
+            input_handles: Input atom handles
+            formula: List of output formulas
+
+        Returns:
+            Tuple of (input_ids, CNF, output_ids, special constants)
+        """
         with self.use_context() as vpool:
-            # print("before populating", vpool.top)
-            # input("Press Enter to Continue...")
-            input_ids = [vpool.id(h) for h in input_handles]
+            input_ids: list[int] = [vpool.id(h) for h in input_handles]
             cnf = CNF()
-            output_ids = []
-            special = dict()
-            # adding the clauses to a global CNF
+            output_ids: list[Optional[int]] = []
+            special: dict[int, Atom] = {}
             idx = 0
 
             for f, g in zip(
                 [And(Atom(True), f.simplified()) for f in formula], formula
             ):
-                # print("f", f)
-                # print("g", g)
-                # print("list(g)", list(g))
-                # print("f", f.simplified())
-                # print("list(f)", list(f))
-                l = list(f)
-                if len(l) == 0:
-                    # print("Empty formula:", f)
+                clause_list = list(f)
+                if len(clause_list) == 0:
                     special[idx] = f.simplified()
-                    # print("Special:", idx, special[idx])
                     output_ids.extend([None])
-                    # input("Press Enter to Continue...")
                 else:
-                    # f.clausify()
-                    # print("list(f)[:-1]", list(f)[:-1])
-                    # print("'f.clauses[-1][1]", f.clauses[-1][1])
-                    # print("list(f)[-1]", list(f)[-1])
                     cnf.extend(list(f)[:-1])
-                    # logger.debug("Formula: %s", f)
-                    # logger.debug("CNF Clauses: %s", f.clauses)
-                    # logger.debug("Simplified: %s", f.simplified())
-                    # logger.debug("CNF Clauses: %s", cnf.clauses)
-                    # print("(Populate Clauses) vpool", vpool.id2obj.items())
-                    # input()
-
-                    # if f.clauses[-1][1] is None:
-                    # special[idx] = f.simplified()
                     output_ids.extend(list(f)[-1])
-                # input("Press Enter to Continue...")
                 idx += 1
 
-                # logger.debug("=== === === ===")
             logger.debug("CNF Clauses: %s", cnf.clauses)
-
             logger.debug("output_ids: %s", str(output_ids))
-
-            # print("after populating", vpool.top)
-            # input("Press Enter to Continue...")
-        # output_ids, cnf = self.__handle_output_duplicates(output_ids, cnf)
 
         return input_ids, cnf, output_ids, special
 
-    def initialize_ohe(self, Dataset: AutoTransformer, input_ids, enc_type):
+    def initialize_ohe(
+        self,
+        Dataset: AutoTransformer,
+        input_ids: list[int],
+        enc_type: int,
+    ) -> CNF:
+        """Initialize one-hot encoding constraints.
+
+        Args:
+            Dataset: Dataset transformer with attribute ranges
+            input_ids: Input variable IDs
+            enc_type: Encoding type for cardinality constraints
+
+        Returns:
+            CNF with equality constraints
+        """
         with self.use_context() as vpool:
             return get_eq_constraints(Dataset, input_ids, enc_type, vpool)
 
-    def use_context(self):
+    def use_context(self) -> Any:
+        """Get the variable pool context manager.
+
+        Returns:
+            Context manager for the SAT variable pool
+        """
         return self.context.use_vpool()

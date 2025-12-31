@@ -1,8 +1,9 @@
+from typing import Optional, Union
+
+import numpy as np
 import torch
 from pysat.formula import Formula
 
-# import difflogic_cuda
-import numpy as np
 from .functional import (
     bin_op_s,
     get_unique_connections,
@@ -12,7 +13,6 @@ from .functional import (
     idx_to_clauses,
     bit_add,
 )
-
 from .packbitstensor import PackBitsTensor
 
 
@@ -34,7 +34,7 @@ class LogicLayer(torch.nn.Module):
             else "mps" if torch.mps.is_available() else "cpu"
         ),
         grad_factor: float = 1.0,
-        implementation: str = None,
+        implementation: Optional[str] = None,
         connections: str = "random",
     ):
         """
@@ -94,7 +94,7 @@ class LogicLayer(torch.nn.Module):
         self.num_neurons = out_dim
         self.num_weights = out_dim
 
-    def forward(self, x):
+    def forward(self, x: Union[torch.Tensor, PackBitsTensor]) -> Union[torch.Tensor, PackBitsTensor]:
         if isinstance(x, PackBitsTensor):
             assert (
                 not self.training
@@ -118,7 +118,7 @@ class LogicLayer(torch.nn.Module):
         else:
             raise ValueError(self.implementation)
 
-    def forward_python(self, x):
+    def forward_python(self, x: torch.Tensor) -> torch.Tensor:
         # x.shape: batch_size, input_dim
         # self.indices: Tuple (neuron_size, neuron_size)
         # self.weights: (neuron_size, bin_op_number)
@@ -142,7 +142,7 @@ class LogicLayer(torch.nn.Module):
             x = bin_op_s(a, b, weights)
         return x
 
-    def forward_cuda(self, x):
+    def forward_cuda(self, x: torch.Tensor) -> torch.Tensor:
         if self.training:
             assert x.device.type == "cuda", x.device
         assert x.ndim == 2, x.ndim
@@ -171,12 +171,12 @@ class LogicLayer(torch.nn.Module):
                     self.given_x_indices_of_y,
                 ).transpose(0, 1)
 
-    def forward_cuda_eval(self, x):
+    def forward_cuda_eval(self, x: PackBitsTensor) -> PackBitsTensor:
         """
         WARNING: this is an in-place operation.
 
-        :param x:
-        :return:
+        :param x: PackBitsTensor input
+        :return: PackBitsTensor output
         """
         assert not self.training
         assert isinstance(x, PackBitsTensor)
@@ -188,14 +188,14 @@ class LogicLayer(torch.nn.Module):
 
         return x
 
-    def extra_repr(self):
+    def extra_repr(self) -> str:
         return "{}, {}, {}".format(
             self.in_dim, self.out_dim, "train" if self.training else "eval"
         )
 
     def get_connections(
-        self, connections, device="cuda"
-    ):  # Default connnections (is unique, from command line args)
+        self, connections: str, device: str = "cuda"
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         assert self.out_dim * 2 >= self.in_dim, (
             "The number of neurons ({}) must not be smaller than half of the "
             "number of inputs ({}) because otherwise not all inputs could be "
@@ -248,7 +248,7 @@ class LogicLayer(torch.nn.Module):
             )
         )
 
-    def print(self):
+    def print(self) -> None:
         ops = [idx_to_op(i) for i in self.weights.argmax(-1)]
         print("Operations:")
         idx = 0
@@ -265,7 +265,7 @@ class GroupSum(torch.nn.Module):
     The GroupSum module.
     """
 
-    def __init__(self, k: int, tau: float = 1.0, device="cuda"):
+    def __init__(self, k: int, tau: float = 1.0, device: str = "cuda") -> None:
         # tau default is 10 from args
         """
 
@@ -278,7 +278,7 @@ class GroupSum(torch.nn.Module):
         self.tau = tau
         self.device = device
 
-    def forward(self, x):
+    def forward(self, x: Union[torch.Tensor, PackBitsTensor]) -> torch.Tensor:
         if isinstance(x, PackBitsTensor):
             return x.group_sum(self.k)
 
@@ -292,15 +292,15 @@ class GroupSum(torch.nn.Module):
             else x.reshape(*x.shape[:-1], self.k, x.shape[-1] // self.k).sum(-1)
         )
 
-    def extra_repr(self):
+    def extra_repr(self) -> str:
         return "k={}, tau={}".format(self.k, self.tau)
 
-    def get_formula(self, x):
+    def get_formula(self, x: list[Formula]) -> list[Formula]:
         step_size = len(x) // self.k
         formulas = [bit_add(*[x[i * step_size + j] for j in step_size]) for i in self.k]
         return formulas
 
-    def print(self):
+    def print(self) -> None:
         print(f"GroupSum: k={self.k}, tau={self.tau}")
 
 
