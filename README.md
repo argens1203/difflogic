@@ -2,12 +2,12 @@
 
 ![difflogic_logo](difflogic_logo.png)
 
-> **Note:** This repository is a modified version of the [original difflogic repository](https://github.com/Felix-Petersen/difflogic), extended as part of the Master's thesis *"Efficient Formal Explainability of Logic Gate Networks"* at Monash University.
+> **Note:** This repository is a modified version of the [original difflogic repository](https://github.com/Felix-Petersen/difflogic), extended as part of the Master's thesis *"Efficient Formal Explainability of Logic Gate Networks"* at Monash University. The main pupose of our code is to experiment on the effects of different hyperparameters on the efficiency of formal explaining.
 >
 > **Author:** Argens Ng (ng.argens@gmail.com)
 > **Supervisor:** Alexey Ignatiev
 
-This repository includes the official implementation of our NeurIPS 2022 Paper "Deep Differentiable Logic Gate Networks"
+This repository includes the official implementation of NeurIPS 2022 Paper "Deep Differentiable Logic Gate Networks"
 (Paper @ [ArXiv](https://arxiv.org/abs/2210.08277)).
 
 The goal behind differentiable logic gate networks is to solve machine learning tasks by learning combinations of logic
